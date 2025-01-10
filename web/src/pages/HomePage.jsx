@@ -13,7 +13,7 @@ import {
   Container,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { getStyles, getTitleDecorations } from "./styles/modeStyles";
+import { getStyles, getTitleDecorations } from "../assets/styles/modeStyles";
 import AddIcon from "@mui/icons-material/Add";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
