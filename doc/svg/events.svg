@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- イベントリストセクション -->
+    <g transform="translate(20, 20)">
+        <rect width="380" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">イベント一覧</text>
+        
+        <!-- イベントリスト -->
+        <g transform="translate(20, 60)">
+            <!-- イベント1 -->
+            <rect width="340" height="100" rx="5" fill="#007bff" fill-opacity="0.1"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#007bff">マイホーム購入</text>
+            <text x="20" y="50" font-family="Arial" font-size="12" fill="#6c757d">2025/10/01 - 2025/12/31</text>
+            <text x="20" y="70" font-family="Arial" font-size="12" fill="#495057">予算: ¥50,000,000</text>
+            
+            <!-- イベント2 -->
+            <g transform="translate(0, 120)">
+                <rect width="340" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">結婚式</text>
+                <text x="20" y="50" font-family="Arial" font-size="12" fill="#6c757d">2026/03/15</text>
+                <text x="20" y="70" font-family="Arial" font-size="12" fill="#495057">予算: ¥3,000,000</text>
+            </g>
+            
+            <!-- イベント3 -->
+            <g transform="translate(0, 240)">
+                <rect width="340" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">海外旅行</text>
+                <text x="20" y="50" font-family="Arial" font-size="12" fill="#6c757d">2025/08/10 - 2025/08/20</text>
+                <text x="20" y="70" font-family="Arial" font-size="12" fill="#495057">予算: ¥500,000</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- イベントカレンダーセクション -->
+    <g transform="translate(420, 20)">
+        <rect width="760" height="380" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">イベントカレンダー</text>
+        
+        <!-- カレンダーヘッダー -->
+        <g transform="translate(20, 60)">
+            <text x="0" y="20" font-family="Arial" font-size="12" fill="#495057">日</text>
+            <text x="100" y="20" font-family="Arial" font-size="12" fill="#495057">月</text>
+            <text x="200" y="20" font-family="Arial" font-size="12" fill="#495057">火</text>
+            <text x="300" y="20" font-family="Arial" font-size="12" fill="#495057">水</text>
+            <text x="400" y="20" font-family="Arial" font-size="12" fill="#495057">木</text>
+            <text x="500" y="20" font-family="Arial" font-size="12" fill="#495057">金</text>
+            <text x="600" y="20" font-family="Arial" font-size="12" fill="#495057">土</text>
+        </g>
+        
+        <!-- カレンダーグリッド -->
+        <g transform="translate(20, 90)">
+            <!-- Week 1 -->
+            <rect width="80" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="10" y="20" font-family="Arial" font-size="12" fill="#495057">1</text>
+            
+            <rect x="100" width="80" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="110" y="20" font-family="Arial" font-size="12" fill="#495057">2</text>
+            
+            <rect x="200" width="80" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="210" y="20" font-family="Arial" font-size="12" fill="#495057">3</text>
+            
+            <rect x="300" width="80" height="60" fill="#007bff" fill-opacity="0.1"/>
+            <text x="310" y="20" font-family="Arial" font-size="12" fill="#495057">4</text>
+            <text x="310" y="40" font-family="Arial" font-size="10" fill="#007bff">マイホーム</text>
+            
+            <rect x="400" width="80" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="410" y="20" font-family="Arial" font-size="12" fill="#495057">5</text>
+        </g>
+    </g>
+    
+    <!-- イベント詳細セクション -->
+    <g transform="translate(420, 420)">
+        <rect width="760" height="360" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">イベント詳細</text>
+        
+        <!-- イベント情報 -->
+        <g transform="translate(20, 60)">
+            <text x="0" y="20" font-family="Arial" font-size="20" fill="#007bff">マイホーム購入</text>
+            <text x="0" y="50" font-family="Arial" font-size="14" fill="#6c757d">2025/10/01 - 2025/12/31</text>
+            
+            <!-- 予算プログレス -->
+            <text x="0" y="80" font-family="Arial" font-size="14" fill="#495057">予算進捗</text>
+            <rect x="0" y="90" width="500" height="20" rx="10" fill="#e9ecef"/>
+            <rect x="0" y="90" width="150" height="20" rx="10" fill="#28a745"/>
+            <text x="520" y="105" font-family="Arial" font-size="14" fill="#495057">30%</text>
+            
+            <!-- 関連取引 -->
+            <text x="0" y="140" font-family="Arial" font-size="14" fill="#495057">関連取引</text>
+            <rect x="0" y="150" width="700" height="50" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="10" y="180" font-family="Arial" font-size="12" fill="#495057">頭金支払い</text>
+            <text x="600" y="180" font-family="Arial" font-size="12" fill="#dc3545">-¥5,000,000</text>
+        </g>
+    </g>
+    
+    <!-- 新規イベント追加ボタン -->
+    <circle cx="340" cy="740" r="30" fill="#007bff"/>
+    <text x="330" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+</svg>

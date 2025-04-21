@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- サイドナビゲーション -->
+    <g transform="translate(20, 20)">
+        <rect width="280" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- プロファイルセクション -->
+        <g transform="translate(20, 20)">
+            <circle cx="40" cy="40" r="40" fill="#007bff"/>
+            <text x="30" y="55" font-family="Arial" font-size="36" fill="#ffffff">U</text>
+            <text x="100" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">山田太郎</text>
+            <text x="100" y="55" font-family="Arial" font-size="14" fill="#6c757d">yamada@example.com</text>
+        </g>
+        
+        <!-- メニュー項目 -->
+        <g transform="translate(20, 120)">
+            <!-- プロファイル -->
+            <rect width="240" height="50" rx="5" fill="#007bff"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">プロファイル</text>
+            
+            <!-- バックアップ -->
+            <g transform="translate(0, 60)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">バックアップ</text>
+            </g>
+            
+            <!-- 通知 -->
+            <g transform="translate(0, 120)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">通知</text>
+            </g>
+            
+            <!-- 表示設定 -->
+            <g transform="translate(0, 180)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">表示設定</text>
+            </g>
+            
+            <!-- データ管理 -->
+            <g transform="translate(0, 240)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">データ管理</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(320, 20)">
+        <rect width="860" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- プロファイル設定 -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">プロファイル設定</text>
+        
+        <!-- フォーム -->
+        <g transform="translate(40, 80)">
+            <!-- 名前 -->
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">名前</text>
+            <rect x="0" y="30" width="400" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">山田太郎</text>
+            
+            <!-- メールアドレス -->
+            <text x="0" y="100" font-family="Arial" font-size="14" fill="#495057">メールアドレス</text>
+            <rect x="0" y="110" width="400" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="135" font-family="Arial" font-size="14" fill="#495057">yamada@example.com</text>
+            
+            <!-- 通貨 -->
+            <text x="0" y="180" font-family="Arial" font-size="14" fill="#495057">通貨</text>
+            <rect x="0" y="190" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="215" font-family="Arial" font-size="14" fill="#495057">日本円 (JPY)▼</text>
+            
+            <!-- テーマ -->
+            <text x="0" y="260" font-family="Arial" font-size="14" fill="#495057">テーマ</text>
+            <rect x="0" y="270" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="295" font-family="Arial" font-size="14" fill="#495057">ライト▼</text>
+            
+            <!-- 通知設定 -->
+            <text x="0" y="340" font-family="Arial" font-size="14" font-weight="bold" fill="#212529">通知設定</text>
+            
+            <!-- 予算超過通知 -->
+            <g transform="translate(0, 360)">
+                <rect width="400" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">予算超過通知</text>
+                <text x="20" y="45" font-family="Arial" font-size="12" fill="#6c757d">予算の80%を超過した際に通知</text>
+                <rect x="340" y="15" width="40" height="24" rx="12" fill="#28a745"/>
+                <circle cx="360" cy="27" r="10" fill="#ffffff"/>
+            </g>
+            
+            <!-- 支払い期限通知 -->
+            <g transform="translate(0, 430)">
+                <rect width="400" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">支払い期限通知</text>
+                <text x="20" y="45" font-family="Arial" font-size="12" fill="#6c757d">期限の3日前に通知</text>
+                <rect x="340" y="15" width="40" height="24" rx="12" fill="#6c757d"/>
+                <circle cx="350" cy="27" r="10" fill="#ffffff"/>
+            </g>
+        </g>
+        
+        <!-- 保存ボタン -->
+        <g transform="translate(40, 680)">
+            <rect width="200" height="40" rx="5" fill="#007bff"/>
+            <text x="70" y="25" font-family="Arial" font-size="14" fill="#ffffff">変更を保存</text>
+        </g>
+    </g>
+</svg>

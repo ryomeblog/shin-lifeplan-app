@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="80" viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="80" fill="#f8f9fa"/>
+    
+    <!-- ロゴ部分 -->
+    <text x="20" y="50" font-family="Arial" font-size="24" fill="#333">ライフプランアプリ</text>
+    
+    <!-- ライフプラン選択 -->
+    <rect x="200" y="20" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+    <text x="220" y="45" font-family="Arial" font-size="16" fill="#495057">ライフプラン選択 ▼</text>
+    
+    <!-- ナビゲーションメニュー -->
+    <g transform="translate(420, 0)">
+        <!-- ダッシュボード -->
+        <rect x="10" y="20" width="100" height="40" rx="5" fill="#007bff" fill-opacity="0.1"/>
+        <text x="25" y="45" font-family="Arial" font-size="14" fill="#007bff">ダッシュボード</text>
+        
+        <!-- 支出収入 -->
+        <rect x="120" y="20" width="80" height="40" rx="5" fill="transparent"/>
+        <text x="130" y="45" font-family="Arial" font-size="14" fill="#495057">支出収入</text>
+        
+        <!-- カテゴリ -->
+        <rect x="210" y="20" width="70" height="40" rx="5" fill="transparent"/>
+        <text x="220" y="45" font-family="Arial" font-size="14" fill="#495057">カテゴリ</text>
+        
+        <!-- 口座 -->
+        <rect x="290" y="20" width="60" height="40" rx="5" fill="transparent"/>
+        <text x="300" y="45" font-family="Arial" font-size="14" fill="#495057">口座</text>
+        
+        <!-- 予算 -->
+        <rect x="360" y="20" width="60" height="40" rx="5" fill="transparent"/>
+        <text x="370" y="45" font-family="Arial" font-size="14" fill="#495057">予算</text>
+        
+        <!-- レポート -->
+        <rect x="430" y="20" width="70" height="40" rx="5" fill="transparent"/>
+        <text x="440" y="45" font-family="Arial" font-size="14" fill="#495057">レポート</text>
+        
+        <!-- イベント -->
+        <rect x="510" y="20" width="70" height="40" rx="5" fill="transparent"/>
+        <text x="520" y="45" font-family="Arial" font-size="14" fill="#495057">イベント</text>
+        
+        <!-- FIRE計算 -->
+        <rect x="590" y="20" width="80" height="40" rx="5" fill="transparent"/>
+        <text x="600" y="45" font-family="Arial" font-size="14" fill="#495057">FIRE計算</text>
+    </g>
+    
+    <!-- 設定ボタン -->
+    <circle cx="1150" cy="40" r="20" fill="#f8f9fa" stroke="#dee2e6"/>
+    <text x="1140" y="48" font-family="Arial" font-size="20" fill="#495057">⚙</text>
+</svg>

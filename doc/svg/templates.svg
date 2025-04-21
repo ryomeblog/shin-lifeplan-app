@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- テンプレートリストセクション -->
+    <g transform="translate(20, 20)">
+        <rect width="380" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">テンプレート一覧</text>
+        
+        <!-- テンプレートリスト -->
+        <g transform="translate(20, 60)">
+            <!-- テンプレート1 -->
+            <rect width="340" height="120" rx="5" fill="#007bff" fill-opacity="0.1"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#007bff">月次固定費</text>
+            <text x="20" y="50" font-family="Arial" font-size="12" fill="#6c757d">毎月1日</text>
+            <text x="20" y="70" font-family="Arial" font-size="12" fill="#495057">6件の取引</text>
+            <text x="20" y="90" font-family="Arial" font-size="12" fill="#495057">合計: ¥150,000</text>
+            
+            <!-- テンプレート2 -->
+            <g transform="translate(0, 140)">
+                <rect width="340" height="120" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">年間保険料</text>
+                <text x="20" y="50" font-family="Arial" font-size="12" fill="#6c757d">毎年4月1日</text>
+                <text x="20" y="70" font-family="Arial" font-size="12" fill="#495057">2件の取引</text>
+                <text x="20" y="90" font-family="Arial" font-size="12" fill="#495057">合計: ¥120,000</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- テンプレート詳細セクション -->
+    <g transform="translate(420, 20)">
+        <rect width="760" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">月次固定費</text>
+        
+        <!-- 頻度設定 -->
+        <g transform="translate(20, 60)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">実行頻度</text>
+            <rect width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">毎月1日▼</text>
+        </g>
+        
+        <!-- 取引リスト -->
+        <g transform="translate(20, 120)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">取引一覧</text>
+            
+            <!-- ヘッダー -->
+            <rect y="40" width="720" height="40" fill="#f8f9fa"/>
+            <text x="20" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+            <text x="200" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
+            <text x="400" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">口座</text>
+            <text x="600" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+            
+            <!-- 取引1 -->
+            <g transform="translate(0, 80)">
+                <rect width="720" height="60" fill="#ffffff" stroke="#dee2e6"/>
+                <circle cx="40" cy="30" r="15" fill="#007bff"/>
+                <text x="70" y="35" font-family="Arial" font-size="12" fill="#495057">住居費</text>
+                <text x="200" y="35" font-family="Arial" font-size="12" fill="#495057">家賃</text>
+                <text x="400" y="35" font-family="Arial" font-size="12" fill="#495057">銀行口座</text>
+                <text x="600" y="35" font-family="Arial" font-size="12" fill="#dc3545">-¥80,000</text>
+            </g>
+            
+            <!-- 取引2 -->
+            <g transform="translate(0, 140)">
+                <rect width="720" height="60" fill="#ffffff" stroke="#dee2e6"/>
+                <circle cx="40" cy="30" r="15" fill="#28a745"/>
+                <text x="70" y="35" font-family="Arial" font-size="12" fill="#495057">水道光熱費</text>
+                <text x="200" y="35" font-family="Arial" font-size="12" fill="#495057">電気代</text>
+                <text x="400" y="35" font-family="Arial" font-size="12" fill="#495057">クレジットカード</text>
+                <text x="600" y="35" font-family="Arial" font-size="12" fill="#dc3545">-¥12,000</text>
+            </g>
+        </g>
+        
+        <!-- プレビュー -->
+        <g transform="translate(20, 400)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">今月の予定実行日</text>
+            <rect y="40" width="720" height="100" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="70" font-family="Arial" font-size="14" fill="#495057">2025年4月1日（月）</text>
+            <text x="20" y="100" font-family="Arial" font-size="12" fill="#6c757d">全6件 / 合計: -¥150,000</text>
+        </g>
+        
+        <!-- アクションボタン -->
+        <g transform="translate(20, 680)">
+            <rect width="200" height="40" rx="5" fill="#6c757d"/>
+            <text x="40" y="25" font-family="Arial" font-size="14" fill="#ffffff">テンプレート編集</text>
+            
+            <rect x="220" width="200" height="40" rx="5" fill="#007bff"/>
+            <text x="260" y="25" font-family="Arial" font-size="14" fill="#ffffff">今すぐ適用</text>
+        </g>
+    </g>
+    
+    <!-- 新規テンプレート追加ボタン -->
+    <circle cx="340" cy="740" r="30" fill="#007bff"/>
+    <text x="330" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+</svg>

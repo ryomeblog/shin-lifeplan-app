@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- カテゴリリストセクション -->
+    <rect x="20" y="20" width="760" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+    <text x="40" y="50" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">カテゴリ一覧</text>
+    
+    <!-- カテゴリリスト -->
+    <g transform="translate(40, 80)">
+        <!-- 支出カテゴリ -->
+        <text x="0" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">支出カテゴリ</text>
+        
+        <!-- 食費カテゴリグループ -->
+        <g transform="translate(0, 50)">
+            <rect width="700" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="30" cy="30" r="15" fill="#28a745"/>
+            <text x="60" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">食費</text>
+            <text x="580" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥50,000 / 月</text>
+            <text x="670" y="35" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+            
+            <!-- サブカテゴリ -->
+            <g transform="translate(50, 60)">
+                <rect width="650" height="50" fill="#ffffff" stroke="#dee2e6"/>
+                <circle cx="30" cy="25" r="12" fill="#28a745" fill-opacity="0.7"/>
+                <text x="60" y="30" font-family="Arial" font-size="14" fill="#495057">食料品</text>
+                <text x="530" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥30,000 / 月</text>
+            </g>
+            <g transform="translate(50, 110)">
+                <rect width="650" height="50" fill="#ffffff" stroke="#dee2e6"/>
+                <circle cx="30" cy="25" r="12" fill="#28a745" fill-opacity="0.7"/>
+                <text x="60" y="30" font-family="Arial" font-size="14" fill="#495057">外食</text>
+                <text x="530" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥20,000 / 月</text>
+            </g>
+        </g>
+        
+        <!-- 住居費カテゴリグループ -->
+        <g transform="translate(0, 220)">
+            <rect width="700" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="30" cy="30" r="15" fill="#007bff"/>
+            <text x="60" y="35" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">住居費</text>
+            <text x="580" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥100,000 / 月</text>
+            <text x="670" y="35" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+        </g>
+        
+        <!-- 収入カテゴリ -->
+        <g transform="translate(0, 320)">
+            <text x="0" y="30" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">収入カテゴリ</text>
+            
+            <rect y="50" width="700" height="60" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="30" cy="80" r="15" fill="#17a2b8"/>
+            <text x="60" y="85" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">給与</text>
+            <text x="670" y="85" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+        </g>
+    </g>
+    
+    <!-- 統計セクション -->
+    <g transform="translate(800, 20)">
+        <!-- カテゴリ別支出グラフ -->
+        <rect width="380" height="370" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">カテゴリ別支出</text>
+        
+        <!-- 円グラフ -->
+        <circle cx="190" cy="200" r="120" fill="none" stroke="#dee2e6"/>
+        <path d="M190,200 L190,80 A120,120 0 0,1 294,245 Z" fill="#28a745"/>
+        <path d="M190,200 L294,245 A120,120 0 0,1 190,320 Z" fill="#007bff"/>
+        <path d="M190,200 L190,320 A120,120 0 0,1 86,245 Z" fill="#ffc107"/>
+        <path d="M190,200 L86,245 A120,120 0 0,1 190,80 Z" fill="#dc3545"/>
+        
+        <!-- 凡例 -->
+        <g transform="translate(20, 340)">
+            <circle cx="10" cy="0" r="8" fill="#28a745"/>
+            <text x="25" y="5" font-family="Arial" font-size="12" fill="#495057">食費 35%</text>
+            <circle cx="110" cy="0" r="8" fill="#007bff"/>
+            <text x="125" y="5" font-family="Arial" font-size="12" fill="#495057">住居費 30%</text>
+            <circle cx="210" cy="0" r="8" fill="#ffc107"/>
+            <text x="225" y="5" font-family="Arial" font-size="12" fill="#495057">交通費 20%</text>
+            <circle cx="310" cy="0" r="8" fill="#dc3545"/>
+            <text x="325" y="5" font-family="Arial" font-size="12" fill="#495057">その他 15%</text>
+        </g>
+    </g>
+    
+    <!-- 予算設定セクション -->
+    <g transform="translate(800, 410)">
+        <rect width="380" height="370" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">予算設定</text>
+        
+        <!-- 予算スライダー -->
+        <g transform="translate(20, 70)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">食費</text>
+            <rect x="0" y="30" width="340" height="10" rx="5" fill="#e9ecef"/>
+            <rect x="0" y="30" width="170" height="10" rx="5" fill="#28a745"/>
+            <circle cx="170" cy="35" r="10" fill="#28a745"/>
+            <text x="0" y="60" font-family="Arial" font-size="12" fill="#6c757d">¥0</text>
+            <text x="320" y="60" font-family="Arial" font-size="12" fill="#6c757d">¥100,000</text>
+        </g>
+        
+        <g transform="translate(20, 140)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">住居費</text>
+            <rect x="0" y="30" width="340" height="10" rx="5" fill="#e9ecef"/>
+            <rect x="0" y="30" width="240" height="10" rx="5" fill="#007bff"/>
+            <circle cx="240" cy="35" r="10" fill="#007bff"/>
+            <text x="0" y="60" font-family="Arial" font-size="12" fill="#6c757d">¥0</text>
+            <text x="320" y="60" font-family="Arial" font-size="12" fill="#6c757d">¥150,000</text>
+        </g>
+    </g>
+    
+    <!-- 新規カテゴリ追加ボタン -->
+    <circle cx="720" cy="740" r="30" fill="#007bff"/>
+    <text x="710" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+</svg>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- ライフプラン選択セクション -->
+    <rect x="20" y="20" width="1160" height="100" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+    <text x="40" y="50" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">ライフプラン</text>
+    <!-- ライフプランカード -->
+    <g transform="translate(40, 60)">
+        <rect width="200" height="40" rx="5" fill="#007bff" fill-opacity="0.1" stroke="#007bff"/>
+        <text x="20" y="25" font-family="Arial" font-size="14" fill="#007bff">マイホーム計画</text>
+        <rect x="220" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="240" y="25" font-family="Arial" font-size="14" fill="#495057">老後の準備</text>
+        <rect x="440" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="460" y="25" font-family="Arial" font-size="14" fill="#495057">子育て計画</text>
+        <!-- 新規作成ボタン -->
+        <rect x="900" width="40" height="40" rx="5" fill="#28a745"/>
+        <text x="912" y="28" font-family="Arial" font-size="24" fill="#ffffff">+</text>
+    </g>
+    
+    <!-- 純資産セクション -->
+    <g transform="translate(20, 140)">
+        <rect width="1160" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">純資産推移</text>
+        <text x="20" y="80" font-family="Arial" font-size="24" fill="#212529">¥12,500,000</text>
+        <!-- 推移グラフ -->
+        <g transform="translate(20, 100)">
+            <path d="M0,60 L100,40 L200,45 L300,30 L400,20 L500,15 L600,10" 
+                  fill="none" stroke="#007bff" stroke-width="2"/>
+            <!-- X軸 -->
+            <line x1="0" y1="80" x2="600" y2="80" stroke="#dee2e6"/>
+            <!-- Y軸の目盛り -->
+            <text x="-20" y="80" font-family="Arial" font-size="12" fill="#6c757d">0</text>
+            <text x="-20" y="40" font-family="Arial" font-size="12" fill="#6c757d">1000万</text>
+            <text x="-20" y="0" font-family="Arial" font-size="12" fill="#6c757d">2000万</text>
+        </g>
+    </g>
+    
+    <!-- 支出・収入グラフセクション -->
+    <g transform="translate(20, 360)">
+        <!-- 支出円グラフ -->
+        <rect width="570" height="400" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">支出内訳</text>
+        <circle cx="285" cy="200" r="120" fill="none" stroke="#dee2e6"/>
+        <!-- 円グラフのセグメント -->
+        <path d="M285,200 L285,80 A120,120 0 0,1 389,245 Z" fill="#007bff"/>
+        <path d="M285,200 L389,245 A120,120 0 0,1 285,320 Z" fill="#28a745"/>
+        <path d="M285,200 L285,320 A120,120 0 0,1 181,245 Z" fill="#ffc107"/>
+        <path d="M285,200 L181,245 A120,120 0 0,1 285,80 Z" fill="#dc3545"/>
+        <!-- 凡例 -->
+        <g transform="translate(20, 340)">
+            <rect width="20" height="20" fill="#007bff"/>
+            <text x="30" y="15" font-family="Arial" font-size="14" fill="#495057">住居費 35%</text>
+            <rect x="150" width="20" height="20" fill="#28a745"/>
+            <text x="180" y="15" font-family="Arial" font-size="14" fill="#495057">食費 25%</text>
+            <rect x="300" width="20" height="20" fill="#ffc107"/>
+            <text x="330" y="15" font-family="Arial" font-size="14" fill="#495057">交通費 20%</text>
+            <rect x="450" width="20" height="20" fill="#dc3545"/>
+            <text x="480" y="15" font-family="Arial" font-size="14" fill="#495057">その他 20%</text>
+        </g>
+        
+        <!-- 収入円グラフ -->
+        <g transform="translate(590, 0)">
+            <rect width="570" height="400" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">収入内訳</text>
+            <circle cx="285" cy="200" r="120" fill="none" stroke="#dee2e6"/>
+            <!-- 円グラフのセグメント -->
+            <path d="M285,200 L285,80 A120,120 0 0,1 405,200 Z" fill="#007bff"/>
+            <path d="M285,200 L405,200 A120,120 0 0,1 285,320 Z" fill="#28a745"/>
+            <!-- 凡例 -->
+            <g transform="translate(20, 340)">
+                <rect width="20" height="20" fill="#007bff"/>
+                <text x="30" y="15" font-family="Arial" font-size="14" fill="#495057">給与 80%</text>
+                <rect x="150" width="20" height="20" fill="#28a745"/>
+                <text x="180" y="15" font-family="Arial" font-size="14" fill="#495057">副収入 20%</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- クイック取引入力ボタン -->
+    <circle cx="1140" cy="740" r="40" fill="#007bff"/>
+    <text x="1127" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+</svg>
