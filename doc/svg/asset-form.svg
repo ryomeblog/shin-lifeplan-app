@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(20, 20)">
+        <rect width="1160" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">資産を追加</text>
+        
+        <!-- 基本情報 -->
+        <g transform="translate(40, 100)">
+            <!-- 資産名 -->
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">資産名</text>
+            <rect x="0" y="30" width="400" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">資産名を入力...</text>
+        </g>
+        
+        <!-- 年別データ入力 -->
+        <g transform="translate(40, 200)">
+            <text x="0" y="20" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">年別データ</text>
+            
+            <!-- データテーブル -->
+            <g transform="translate(0, 40)">
+                <!-- ヘッダー -->
+                <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">年</text>
+                <text x="200" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
+                <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">年率</text>
+                <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">配当</text>
+                
+                <!-- 2025年（開始年） -->
+                <g transform="translate(0, 50)">
+                    <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2025年</text>
+                    <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
+                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                </g>
+                
+                <!-- 2030年 -->
+                <g transform="translate(0, 110)">
+                    <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2030年</text>
+                    <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
+                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                </g>
+                
+                <!-- 2065年（終了年） -->
+                <g transform="translate(0, 170)">
+                    <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2065年</text>
+                    <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
+                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                </g>
+            </g>
+            
+            <!-- 年の追加ボタン -->
+            <g transform="translate(0, 280)">
+                <rect width="1080" height="50" rx="5" fill="#f8f9fa" stroke="#dee2e6"/>
+                <text x="510" y="30" font-family="Arial" font-size="14" fill="#007bff">＋ 年を追加</text>
+            </g>
+        </g>
+        
+        <!-- 注意書き -->
+        <g transform="translate(40, 580)">
+            <text x="0" y="0" font-family="Arial" font-size="14" fill="#6c757d">※ 開始年と終了年は必須入力です</text>
+            <text x="0" y="25" font-family="Arial" font-size="14" fill="#6c757d">※ 未入力の年は前回入力値が継続するものとして扱われます</text>
+        </g>
+        
+        <!-- ボタン -->
+        <g transform="translate(40, 680)">
+            <!-- キャンセル -->
+            <rect width="200" height="40" rx="5" fill="#6c757d"/>
+            <text x="65" y="25" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+            
+            <!-- 保存 -->
+            <rect x="220" width="200" height="40" rx="5" fill="#007bff"/>
+            <text x="300" y="25" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+        </g>
+    </g>
+</svg>

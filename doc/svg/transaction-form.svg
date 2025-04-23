@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="800" height="700" viewBox="0 0 800 700" xmlns="http://www.w3.org/2000/svg">
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
     <!-- 背景 -->
-    <rect width="800" height="700" fill="#ffffff"/>
+    <rect width="800" height="800" fill="#ffffff"/>
     
     <!-- ヘッダー -->
     <rect x="0" y="0" width="800" height="60" fill="#f8f9fa"/>
@@ -10,12 +10,14 @@
     <!-- 取引タイプ切り替え -->
     <g transform="translate(20, 80)">
         <rect width="760" height="60" rx="30" fill="#f8f9fa"/>
-        <rect width="253" height="60" rx="30" fill="#007bff"/>
-        <rect x="253" width="254" height="60" rx="0" fill="#f8f9fa"/>
-        <rect x="507" width="253" height="60" rx="30" fill="#f8f9fa"/>
-        <text x="106" y="38" font-family="Arial" font-size="16" fill="#ffffff">支出</text>
-        <text x="360" y="38" font-family="Arial" font-size="16" fill="#6c757d">収入</text>
-        <text x="614" y="38" font-family="Arial" font-size="16" fill="#6c757d">振替</text>
+        <rect width="190" height="60" rx="30" fill="#007bff"/>
+        <rect x="190" width="190" height="60" rx="0" fill="#f8f9fa"/>
+        <rect x="380" width="190" height="60" rx="0" fill="#f8f9fa"/>
+        <rect x="570" width="190" height="60" rx="30" fill="#f8f9fa"/>
+        <text x="80" y="38" font-family="Arial" font-size="16" fill="#ffffff">支出</text>
+        <text x="270" y="38" font-family="Arial" font-size="16" fill="#6c757d">収入</text>
+        <text x="460" y="38" font-family="Arial" font-size="16" fill="#6c757d">振替</text>
+        <text x="650" y="38" font-family="Arial" font-size="16" fill="#6c757d">投資</text>
     </g>
     
     <!-- 金額入力 -->
@@ -25,9 +27,17 @@
         <text x="20" y="80" font-family="Arial" font-size="24" fill="#212529">¥</text>
         <text x="45" y="80" font-family="Arial" font-size="24" fill="#212529">0</text>
     </g>
+
+    <!-- 口座選択 -->
+    <g transform="translate(20, 260)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">口座</text>
+        <rect x="0" y="40" width="760" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">口座を選択</text>
+        <text x="720" y="70" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+    </g>
     
     <!-- カテゴリ選択 -->
-    <g transform="translate(20, 260)">
+    <g transform="translate(20, 350)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">カテゴリ</text>
         <g transform="translate(0, 40)">
             <!-- カテゴリグリッド -->
@@ -46,7 +56,7 @@
     </g>
     
     <!-- 頻度設定 -->
-    <g transform="translate(20, 420)">
+    <g transform="translate(20, 510)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">頻度（年に何回）</text>
         <rect x="0" y="40" width="200" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="70" font-family="Arial" font-size="14" fill="#212529">1</text>
@@ -54,7 +64,7 @@
     </g>
     
     <!-- イベント選択 -->
-    <g transform="translate(20, 510)">
+    <g transform="translate(20, 600)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">イベント（任意）</text>
         <rect x="0" y="40" width="760" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">イベントを選択</text>
@@ -62,7 +72,7 @@
     </g>
     
     <!-- ボタン -->
-    <g transform="translate(20, 620)">
+    <g transform="translate(20, 720)">
         <rect width="370" height="60" rx="5" fill="#6c757d"/>
         <text x="160" y="38" font-family="Arial" font-size="16" fill="#ffffff">キャンセル</text>
         

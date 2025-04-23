@@ -3,33 +3,26 @@
     <!-- 背景 -->
     <rect width="1200" height="800" fill="#f8f9fa"/>
     
-    <!-- サイドナビゲーション -->
+    <!-- サイドバー -->
     <g transform="translate(20, 20)">
         <rect width="280" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
-        <!-- プロファイルセクション -->
-        <g transform="translate(20, 20)">
-            <circle cx="40" cy="40" r="40" fill="#007bff"/>
-            <text x="30" y="55" font-family="Arial" font-size="36" fill="#ffffff">@</text>
-            <text x="100" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">@yamada</text>
-        </g>
-        
         <!-- メニュー項目 -->
-        <g transform="translate(20, 120)">
-            <!-- プロファイル -->
+        <g transform="translate(20, 20)">
+            <!-- 基本設定 -->
             <rect width="240" height="50" rx="5" fill="#007bff"/>
-            <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">プロファイル</text>
-            
-            <!-- FIRE計画 -->
-            <g transform="translate(0, 60)">
-                <rect width="240" height="50" rx="5" fill="#ffffff"/>
-                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">FIRE計画</text>
-            </g>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">基本設定</text>
             
             <!-- 詳細設定 -->
-            <g transform="translate(0, 120)">
+            <g transform="translate(0, 60)">
                 <rect width="240" height="50" rx="5" fill="#ffffff"/>
                 <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">詳細設定</text>
+            </g>
+            
+            <!-- FIRE計画 -->
+            <g transform="translate(0, 120)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">FIRE計画</text>
             </g>
         </g>
     </g>
@@ -53,6 +46,21 @@
                 <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">通貨</text>
                 <rect x="0" y="30" width="400" height="40" rx="5" fill="#f8f9fa"/>
                 <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">日本円（JPY）</text>
+            </g>
+
+            <!-- ライフプラン範囲 -->
+            <g transform="translate(0, 200)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">ライフプラン範囲</text>
+                
+                <!-- 開始年 -->
+                <text x="0" y="50" font-family="Arial" font-size="14" fill="#495057">開始年</text>
+                <rect x="0" y="60" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="85" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+                
+                <!-- 終了年 -->
+                <text x="220" y="50" font-family="Arial" font-size="14" fill="#495057">終了年</text>
+                <rect x="220" y="60" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="240" y="85" font-family="Arial" font-size="14" fill="#495057">2065年▼</text>
             </g>
         </g>
         

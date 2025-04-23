@@ -13,7 +13,7 @@
         
         <!-- 口座リスト -->
         <g transform="translate(40, 120)">
-            <!-- 普通預金 -->
+            <!-- 三菱UFJ銀行 -->
             <a href="#account-detail">
                 <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                 <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三菱UFJ銀行</text>
@@ -21,7 +21,7 @@
                 <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥1,250,000</text>
             </a>
             
-            <!-- 投資口座 -->
+            <!-- SBI証券 -->
             <a href="#account-detail" transform="translate(0, 120)">
                 <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                 <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">SBI証券</text>
@@ -29,7 +29,7 @@
                 <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥3,180,000</text>
             </a>
             
-            <!-- クレジットカード -->
+            <!-- 三井住友カード -->
             <a href="#account-detail" transform="translate(0, 240)">
                 <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                 <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三井住友カード</text>
@@ -74,12 +74,17 @@
                 <text x="40" y="60" font-family="Arial" font-size="14" fill="#6c757d">金額を入力</text>
             </g>
             
-            <!-- 日付 -->
+            <!-- 年月選択 -->
             <g transform="translate(0, 300)">
-                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">日付</text>
-                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">2025/04/23</text>
-                <text x="250" y="60" font-family="Arial" font-size="14" fill="#6c757d">📅</text>
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">年月</text>
+                
+                <!-- 年選択 -->
+                <rect x="0" y="30" width="130" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+                
+                <!-- 月選択 -->
+                <rect x="150" y="30" width="130" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="170" y="60" font-family="Arial" font-size="14" fill="#495057">4月▼</text>
             </g>
             
             <!-- メモ -->

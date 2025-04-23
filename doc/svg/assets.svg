@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- コントロール -->
+    <g transform="translate(20, 20)">
+        <rect width="1160" height="60" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- 年選択 -->
+        <g transform="translate(40, 10)">
+            <text x="0" y="25" font-family="Arial" font-size="14" fill="#495057">表示年</text>
+            <rect x="0" y="30" width="120" height="30" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="50" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+        </g>
+    </g>
+    
+    <!-- 保有資産セクション -->
+    <g transform="translate(20, 100)">
+        <rect width="1160" height="380" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">保有資産</text>
+        <text x="40" y="80" font-family="Arial" font-size="16" fill="#28a745">総資産: ¥8,430,000</text>
+        
+        <!-- 資産リスト -->
+        <g transform="translate(40, 120)">
+            <!-- リストヘッダー -->
+            <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
+            <text x="300" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">保有数</text>
+            <text x="500" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">現在値</text>
+            <text x="700" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
+            <text x="900" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">損益</text>
+            
+            <!-- 資産1 -->
+            <g transform="translate(0, 50)">
+                <rect width="1080" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="14" fill="#212529">日本株式インデックス</text>
+                <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">100</text>
+                <text x="500" y="35" font-family="Arial" font-size="14" fill="#495057">¥25,000</text>
+                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥2,500,000</text>
+                <text x="900" y="35" font-family="Arial" font-size="14" fill="#28a745">+¥300,000</text>
+            </g>
+            
+            <!-- 資産2 -->
+            <g transform="translate(0, 120)">
+                <rect width="1080" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="14" fill="#212529">米国株式インデックス</text>
+                <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">200</text>
+                <text x="500" y="35" font-family="Arial" font-size="14" fill="#495057">¥15,000</text>
+                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥3,000,000</text>
+                <text x="900" y="35" font-family="Arial" font-size="14" fill="#dc3545">-¥100,000</text>
+            </g>
+        </g>
+        
+        <!-- 資産追加ボタン -->
+        <g transform="translate(40, 300)">
+            <rect width="1080" height="50" rx="5" fill="#007bff"/>
+            <text x="500" y="32" font-family="Arial" font-size="14" fill="#ffffff">＋ 資産を追加</text>
+        </g>
+    </g>
+    
+    <!-- 資産検索セクション -->
+    <g transform="translate(20, 500)">
+        <rect width="1160" height="280" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- 検索ヘッダー -->
+        <g transform="translate(40, 30)">
+            <text x="0" y="20" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">資産検索</text>
+            
+            <!-- 資産追加ボタン -->
+            <rect x="880" y="-10" width="200" height="40" rx="5" fill="#007bff"/>
+            <text x="950" y="18" font-family="Arial" font-size="14" fill="#ffffff">＋ 新規資産追加</text>
+        </g>
+        
+        <!-- 検索フォーム -->
+        <g transform="translate(40, 80)">
+            <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#6c757d">資産IDまたは資産名で検索...</text>
+        </g>
+        
+        <!-- 検索結果 -->
+        <g transform="translate(40, 150)">
+            <!-- 結果ヘッダー -->
+            <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産ID</text>
+            <text x="200" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
+            <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均年率</text>
+            <text x="800" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均配当</text>
+            
+            <!-- 検索結果1 -->
+            <g transform="translate(0, 50)">
+                <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">JP001</text>
+                <text x="200" y="30" font-family="Arial" font-size="14" fill="#495057">日本株式インデックス</text>
+                <text x="600" y="30" font-family="Arial" font-size="14" fill="#28a745">+7.5%</text>
+                <text x="800" y="30" font-family="Arial" font-size="14" fill="#28a745">2.1%</text>
+            </g>
+        </g>
+    </g>
+</svg>

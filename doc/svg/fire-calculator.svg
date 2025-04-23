@@ -24,12 +24,6 @@
                 <rect width="240" height="50" rx="5" fill="#007bff"/>
                 <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">FIRE計画</text>
             </g>
-            
-            <!-- データ管理 -->
-            <g transform="translate(0, 180)">
-                <rect width="240" height="50" rx="5" fill="#ffffff"/>
-                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">データ管理</text>
-            </g>
         </g>
     </g>
     
@@ -64,24 +58,8 @@
             </g>
         </g>
         
-        <!-- 進捗グラフ -->
-        <g transform="translate(40, 260)">
-            <text x="0" y="0" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">資産形成の進捗</text>
-            
-            <!-- プログレスバー -->
-            <g transform="translate(0, 40)">
-                <rect width="780" height="30" rx="15" fill="#e9ecef"/>
-                <rect width="234" height="30" rx="15" fill="#28a745"/>
-                <text x="360" y="20" font-family="Arial" font-size="14" fill="#ffffff">30%達成</text>
-            </g>
-            
-            <!-- 現在の資産 -->
-            <text x="0" y="100" font-family="Arial" font-size="16" fill="#212529">現在の資産</text>
-            <text x="0" y="130" font-family="Arial" font-size="24" fill="#28a745">¥30,000,000</text>
-        </g>
-        
         <!-- シミュレーション結果 -->
-        <g transform="translate(40, 420)">
+        <g transform="translate(40, 260)">
             <text x="0" y="0" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">シミュレーション結果</text>
             
             <!-- シミュレーショングラフ -->

@@ -6,10 +6,10 @@
     <!-- ロゴ -->
     <text x="20" y="38" font-family="Arial" font-size="24" font-weight="bold" fill="#007bff">LifePlan</text>
     
-    <!-- 選択中の年 -->
+    <!-- ライフプラン選択 -->
     <g transform="translate(150, 0)">
         <rect x="0" y="10" width="160" height="40" rx="5" fill="#f8f9fa"/>
-        <text x="20" y="35" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+        <text x="20" y="35" font-family="Arial" font-size="14" fill="#495057">独身ライフ▼</text>
     </g>
     
     <!-- メニュー -->

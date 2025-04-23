@@ -14,12 +14,14 @@
         
         <!-- タブ切り替え -->
         <g transform="translate(140, 0)">
-            <rect width="300" height="40" rx="20" fill="#007bff"/>
-            <rect x="300" width="300" height="40" rx="0" fill="#f8f9fa"/>
-            <rect x="600" width="300" height="40" rx="20" fill="#f8f9fa"/>
-            <text x="130" y="25" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
-            <text x="430" y="25" font-family="Arial" font-size="14" fill="#495057">収入</text>
-            <text x="730" y="25" font-family="Arial" font-size="14" fill="#495057">振替</text>
+            <rect width="200" height="40" rx="20" fill="#007bff"/>
+            <rect x="200" width="200" height="40" rx="0" fill="#f8f9fa"/>
+            <rect x="400" width="200" height="40" rx="0" fill="#f8f9fa"/>
+            <rect x="600" width="200" height="40" rx="20" fill="#f8f9fa"/>
+            <text x="90" y="25" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
+            <text x="290" y="25" font-family="Arial" font-size="14" fill="#495057">収入</text>
+            <text x="490" y="25" font-family="Arial" font-size="14" fill="#495057">振替</text>
+            <text x="690" y="25" font-family="Arial" font-size="14" fill="#495057">投資</text>
         </g>
     </g>
     
