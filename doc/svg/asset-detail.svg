@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
     <!-- 背景 -->
-    <rect width="1200" height="800" fill="#f8f9fa"/>
+    <rect width="1200" height="900" fill="#f8f9fa"/>
     
     <!-- ヘッダー -->
     <g transform="translate(20, 20)">
@@ -46,7 +46,7 @@
     
     <!-- 配当金リスト -->
     <g transform="translate(20, 460)">
-        <rect width="560" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <rect width="560" height="420" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">配当金履歴</text>
         
         <!-- リストヘッダー -->
@@ -77,24 +77,54 @@
     
     <!-- 実績登録 -->
     <g transform="translate(600, 460)">
-        <rect width="580" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <rect width="580" height="420" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">実績登録</text>
         
-        <!-- JSONエディタ -->
+        <!-- 表示切替タブ -->
         <g transform="translate(40, 60)">
-            <rect width="500" height="200" rx="5" fill="#1e1e1e"/>
-            <text x="20" y="30" font-family="Consolas" font-size="14" fill="#d4d4d4">{</text>
-            <text x="40" y="50" font-family="Consolas" font-size="14" fill="#d4d4d4">"year": 2025,</text>
-            <text x="40" y="70" font-family="Consolas" font-size="14" fill="#d4d4d4">"value": 25000,</text>
-            <text x="40" y="90" font-family="Consolas" font-size="14" fill="#d4d4d4">"rate": 7.5,</text>
-            <text x="40" y="110" font-family="Consolas" font-size="14" fill="#d4d4d4">"dividend": 50000</text>
-            <text x="20" y="130" font-family="Consolas" font-size="14" fill="#d4d4d4">}</text>
+            <rect width="100" height="30" rx="5" fill="#007bff"/>
+            <text x="30" y="20" font-family="Arial" font-size="12" fill="#ffffff">Form</text>
+            
+            <rect x="110" width="100" height="30" rx="5" fill="#f8f9fa"/>
+            <text x="140" y="20" font-family="Arial" font-size="12" fill="#495057">JSON</text>
+        </g>
+        
+        <!-- フォーム表示 -->
+        <g transform="translate(40, 95)">
+            <!-- 年 -->
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">年</text>
+            <rect x="0" y="30" width="480" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+            
+            <!-- 評価額 -->
+            <g transform="translate(0, 90)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">評価額</text>
+                <rect x="0" y="30" width="480" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+            </g>
+            
+            <!-- 年率と配当を横並びに -->
+            <g transform="translate(0, 180)">
+                <!-- 年率 -->
+                <g>
+                    <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">年率</text>
+                    <rect x="0" y="30" width="230" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">%</text>
+                </g>
+                
+                <!-- 配当 -->
+                <g transform="translate(250, 0)">
+                    <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">配当</text>
+                    <rect x="0" y="30" width="230" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+                </g>
+            </g>
         </g>
         
         <!-- 登録ボタン -->
-        <g transform="translate(40, 280)">
-            <rect width="200" height="40" rx="5" fill="#007bff"/>
-            <text x="80" y="25" font-family="Arial" font-size="14" fill="#ffffff">実績を登録</text>
+        <g transform="translate(40, 370)">
+            <rect width="150" height="40" rx="5" fill="#007bff"/>
+            <text x="40" y="25" font-family="Arial" font-size="14" fill="#ffffff">実績を登録</text>
         </g>
     </g>
 </svg>

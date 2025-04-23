@@ -10,8 +10,8 @@
         <!-- 年選択 -->
         <g transform="translate(40, 10)">
             <text x="0" y="25" font-family="Arial" font-size="14" fill="#495057">表示年</text>
-            <rect x="0" y="30" width="120" height="30" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="20" y="50" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+            <rect x="60" y="10" width="120" height="30" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="80" y="30" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
         </g>
     </g>
     
@@ -70,7 +70,7 @@
             <text x="0" y="20" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">資産検索</text>
             
             <!-- 資産追加ボタン -->
-            <rect x="880" y="-10" width="200" height="40" rx="5" fill="#007bff"/>
+            <rect x="930" y="-10" width="140" height="40" rx="5" fill="#007bff"/>
             <text x="950" y="18" font-family="Arial" font-size="14" fill="#ffffff">＋ 新規資産追加</text>
         </g>
         

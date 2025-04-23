@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- ヘッダー -->
+    <g transform="translate(20, 20)">
+        <rect width="1160" height="100" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">米国株式インデックス</text>
+        <text x="40" y="70" font-family="Arial" font-size="16" fill="#6c757d">保有数: 200</text>
+        <text x="200" y="70" font-family="Arial" font-size="16" fill="#6c757d">評価額: ¥3,000,000</text>
+        <text x="400" y="70" font-family="Arial" font-size="16" fill="#dc3545">損益: -¥100,000 (-3.2%)</text>
+    </g>
+    
+    <!-- 資産推移グラフ -->
+    <g transform="translate(20, 140)">
+        <rect width="1160" height="300" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">資産推移</text>
+        
+        <!-- グラフ -->
+        <g transform="translate(40, 60)">
+            <!-- Y軸 -->
+            <line x1="40" y1="0" x2="40" y2="200" stroke="#dee2e6"/>
+            <text x="0" y="20" font-family="Arial" font-size="12" fill="#6c757d">30,000</text>
+            <text x="0" y="110" font-family="Arial" font-size="12" fill="#6c757d">20,000</text>
+            <text x="0" y="200" font-family="Arial" font-size="12" fill="#6c757d">10,000</text>
+            
+            <!-- X軸 -->
+            <line x1="40" y1="200" x2="1080" y2="200" stroke="#dee2e6"/>
+            
+            <!-- グラフライン -->
+            <path d="M40,180 L220,160 L400,140 L580,100 L760,80 L940,40" 
+                  fill="none" stroke="#007bff" stroke-width="2"/>
+            
+            <!-- 取引ポイント -->
+            <!-- 購入ポイント -->
+            <circle cx="220" cy="160" r="6" fill="#28a745"/>
+            <circle cx="580" cy="100" r="6" fill="#28a745"/>
+            <!-- 売却ポイント -->
+            <circle cx="400" cy="140" r="6" fill="#dc3545"/>
+            
+            <!-- 年ラベル -->
+            <text x="40" y="220" font-family="Arial" font-size="12" fill="#6c757d">2025</text>
+            <text x="220" y="220" font-family="Arial" font-size="12" fill="#6c757d">2030</text>
+            <text x="400" y="220" font-family="Arial" font-size="12" fill="#6c757d">2035</text>
+            <text x="580" y="220" font-family="Arial" font-size="12" fill="#6c757d">2040</text>
+            <text x="760" y="220" font-family="Arial" font-size="12" fill="#6c757d">2045</text>
+            <text x="940" y="220" font-family="Arial" font-size="12" fill="#6c757d">2050</text>
+        </g>
+        
+        <!-- 凡例 -->
+        <g transform="translate(900, 40)">
+            <circle cx="0" cy="0" r="6" fill="#28a745"/>
+            <text x="15" y="5" font-family="Arial" font-size="12" fill="#495057">購入</text>
+            <circle cx="80" cy="0" r="6" fill="#dc3545"/>
+            <text x="95" y="5" font-family="Arial" font-size="12" fill="#495057">売却</text>
+        </g>
+    </g>
+    
+    <!-- 取引履歴 -->
+    <g transform="translate(20, 460)">
+        <rect width="1160" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">取引履歴</text>
+        
+        <!-- テーブルヘッダー -->
+        <g transform="translate(40, 60)">
+            <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産ID</text>
+            <text x="180" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
+            <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">アクション</text>
+            <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
+            <text x="800" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">損益</text>
+        </g>
+        
+        <!-- 取引データ -->
+        <g transform="translate(40, 110)">
+            <!-- 取引1 -->
+            <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">US001</text>
+            <text x="180" y="30" font-family="Arial" font-size="14" fill="#495057">米国株式インデックス</text>
+            <text x="400" y="30" font-family="Arial" font-size="14" fill="#28a745">購入</text>
+            <text x="600" y="30" font-family="Arial" font-size="14" fill="#495057">¥1,500,000</text>
+            <text x="800" y="30" font-family="Arial" font-size="14" fill="#28a745">+¥50,000</text>
+            
+            <!-- 取引2 -->
+            <g transform="translate(0, 60)">
+                <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">US001</text>
+                <text x="180" y="30" font-family="Arial" font-size="14" fill="#495057">米国株式インデックス</text>
+                <text x="400" y="30" font-family="Arial" font-size="14" fill="#dc3545">売却</text>
+                <text x="600" y="30" font-family="Arial" font-size="14" fill="#495057">¥500,000</text>
+                <text x="800" y="30" font-family="Arial" font-size="14" fill="#dc3545">-¥20,000</text>
+            </g>
+            
+            <!-- 取引3 -->
+            <g transform="translate(0, 120)">
+                <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">US001</text>
+                <text x="180" y="30" font-family="Arial" font-size="14" fill="#495057">米国株式インデックス</text>
+                <text x="400" y="30" font-family="Arial" font-size="14" fill="#28a745">配当</text>
+                <text x="600" y="30" font-family="Arial" font-size="14" fill="#495057">¥30,000</text>
+                <text x="800" y="30" font-family="Arial" font-size="14" fill="#28a745">+¥30,000</text>
+            </g>
+        </g>
+    </g>
+</svg>
