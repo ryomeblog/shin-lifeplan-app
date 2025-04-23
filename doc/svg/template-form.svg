@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="800" fill="#ffffff"/>
+    
+    <!-- ヘッダー -->
+    <rect x="0" y="0" width="800" height="60" fill="#f8f9fa"/>
+    <text x="20" y="38" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">テンプレート登録</text>
+    
+    <!-- フォーム -->
+    <g transform="translate(40, 100)">
+        <!-- テンプレート名 -->
+        <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">テンプレート名</text>
+        <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">テンプレート名を入力</text>
+        
+        <!-- 実行頻度 -->
+        <g transform="translate(0, 120)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">実行頻度</text>
+            <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">毎月1日▼</text>
+        </g>
+        
+        <!-- 取引リスト -->
+        <g transform="translate(0, 220)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">取引リスト</text>
+            
+            <!-- 取引1 -->
+            <g transform="translate(0, 40)">
+                <rect width="720" height="120" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                
+                <!-- 種類選択 -->
+                <rect x="20" y="20" width="100" height="30" rx="15" fill="#007bff"/>
+                <text x="45" y="40" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
+                
+                <!-- 金額 -->
+                <text x="140" y="40" font-family="Arial" font-size="14" fill="#495057">¥80,000</text>
+                
+                <!-- カテゴリ -->
+                <g transform="translate(240, 20)">
+                    <circle cx="15" cy="15" r="15" fill="#28a745"/>
+                    <text x="40" y="20" font-family="Arial" font-size="14" fill="#495057">住居費</text>
+                </g>
+                
+                <!-- 口座 -->
+                <text x="400" y="40" font-family="Arial" font-size="14" fill="#495057">銀行口座</text>
+                
+                <!-- メモ -->
+                <text x="20" y="80" font-family="Arial" font-size="14" fill="#6c757d">家賃</text>
+                
+                <!-- 削除ボタン -->
+                <circle cx="680" cy="40" r="15" fill="#dc3545"/>
+                <text x="676" y="45" font-family="Arial" font-size="14" fill="#ffffff">×</text>
+            </g>
+            
+            <!-- 取引2 -->
+            <g transform="translate(0, 180)">
+                <rect width="720" height="120" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                
+                <!-- 種類選択 -->
+                <rect x="20" y="20" width="100" height="30" rx="15" fill="#007bff"/>
+                <text x="45" y="40" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
+                
+                <!-- 金額 -->
+                <text x="140" y="40" font-family="Arial" font-size="14" fill="#495057">¥12,000</text>
+                
+                <!-- カテゴリ -->
+                <g transform="translate(240, 20)">
+                    <circle cx="15" cy="15" r="15" fill="#ffc107"/>
+                    <text x="40" y="20" font-family="Arial" font-size="14" fill="#495057">水道光熱費</text>
+                </g>
+                
+                <!-- 口座 -->
+                <text x="400" y="40" font-family="Arial" font-size="14" fill="#495057">クレジットカード</text>
+                
+                <!-- メモ -->
+                <text x="20" y="80" font-family="Arial" font-size="14" fill="#6c757d">電気代</text>
+                
+                <!-- 削除ボタン -->
+                <circle cx="680" cy="40" r="15" fill="#dc3545"/>
+                <text x="676" y="45" font-family="Arial" font-size="14" fill="#ffffff">×</text>
+            </g>
+        </g>
+        
+        <!-- 取引追加ボタン -->
+        <g transform="translate(0, 540)">
+            <rect width="720" height="50" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-dasharray="4"/>
+            <text x="340" y="30" font-family="Arial" font-size="14" fill="#007bff">＋ 取引を追加</text>
+        </g>
+    </g>
+    
+    <!-- ボタン -->
+    <g transform="translate(40, 720)">
+        <rect width="350" height="50" rx="5" fill="#6c757d"/>
+        <text x="150" y="32" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+        
+        <rect x="370" width="350" height="50" rx="5" fill="#007bff"/>
+        <text x="520" y="32" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+    </g>
+</svg>

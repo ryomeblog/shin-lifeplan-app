@@ -3,105 +3,95 @@
     <!-- 背景 -->
     <rect width="1200" height="800" fill="#f8f9fa"/>
     
-    <!-- 口座リストセクション -->
-    <rect x="20" y="20" width="760" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-    <text x="40" y="50" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">口座一覧</text>
-    
-    <!-- 口座リスト -->
-    <g transform="translate(40, 80)">
-        <!-- 現金口座 -->
-        <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-        <rect width="8" height="100" fill="#28a745"/>
-        <text x="30" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">現金</text>
-        <text x="30" y="65" font-family="Arial" font-size="14" fill="#6c757d">現金</text>
-        <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥50,000</text>
-        <circle cx="650" cy="50" r="15" fill="#f8f9fa" stroke="#dee2e6"/>
-        <text x="645" y="55" font-family="Arial" font-size="14" fill="#495057">⋮</text>
+    <!-- 左側：口座一覧 -->
+    <g transform="translate(20, 20)">
+        <rect width="780" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
-        <!-- メイン銀行口座 -->
-        <g transform="translate(0, 120)">
-            <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <rect width="8" height="100" fill="#007bff"/>
-            <text x="30" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">メイン銀行</text>
-            <text x="30" y="65" font-family="Arial" font-size="14" fill="#6c757d">普通預金</text>
-            <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥1,200,000</text>
-            <circle cx="650" cy="50" r="15" fill="#f8f9fa" stroke="#dee2e6"/>
-            <text x="645" y="55" font-family="Arial" font-size="14" fill="#495057">⋮</text>
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">口座一覧</text>
+        <text x="40" y="80" font-family="Arial" font-size="16" fill="#28a745">総資産: ¥5,430,000</text>
+        
+        <!-- 口座リスト -->
+        <g transform="translate(40, 120)">
+            <!-- 普通預金 -->
+            <a href="#account-detail">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三菱UFJ銀行</text>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">普通預金</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥1,250,000</text>
+            </a>
+            
+            <!-- 投資口座 -->
+            <a href="#account-detail" transform="translate(0, 120)">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">SBI証券</text>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">投資口座</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥3,180,000</text>
+            </a>
+            
+            <!-- クレジットカード -->
+            <a href="#account-detail" transform="translate(0, 240)">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三井住友カード</text>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">クレジットカード</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#dc3545">-¥150,000</text>
+            </a>
         </g>
         
-        <!-- クレジットカード -->
-        <g transform="translate(0, 240)">
-            <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <rect width="8" height="100" fill="#dc3545"/>
-            <text x="30" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">クレジットカード</text>
-            <text x="30" y="65" font-family="Arial" font-size="14" fill="#6c757d">カード</text>
-            <text x="500" y="50" font-family="Arial" font-size="20" fill="#dc3545">-¥80,000</text>
-            <circle cx="650" cy="50" r="15" fill="#f8f9fa" stroke="#dee2e6"/>
-            <text x="645" y="55" font-family="Arial" font-size="14" fill="#495057">⋮</text>
-        </g>
-        
-        <!-- 投資口座 -->
-        <g transform="translate(0, 360)">
-            <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <rect width="8" height="100" fill="#ffc107"/>
-            <text x="30" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#495057">投資口座</text>
-            <text x="30" y="65" font-family="Arial" font-size="14" fill="#6c757d">証券</text>
-            <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥500,000</text>
-            <circle cx="650" cy="50" r="15" fill="#f8f9fa" stroke="#dee2e6"/>
-            <text x="645" y="55" font-family="Arial" font-size="14" fill="#495057">⋮</text>
+        <!-- 口座追加ボタン -->
+        <g transform="translate(40, 680)">
+            <rect width="700" height="50" rx="5" fill="#007bff"/>
+            <text x="320" y="32" font-family="Arial" font-size="14" fill="#ffffff">＋ 口座を追加</text>
         </g>
     </g>
     
-    <!-- 資産配分セクション -->
-    <g transform="translate(800, 20)">
-        <rect width="380" height="370" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">資産配分</text>
+    <!-- 右側：振替登録 -->
+    <g transform="translate(820, 20)">
+        <rect width="360" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
-        <!-- 円グラフ -->
-        <circle cx="190" cy="200" r="120" fill="none" stroke="#dee2e6"/>
-        <path d="M190,200 L190,80 A120,120 0 0,1 294,245 Z" fill="#28a745"/>
-        <path d="M190,200 L294,245 A120,120 0 0,1 190,320 Z" fill="#007bff"/>
-        <path d="M190,200 L190,320 A120,120 0 0,1 86,245 Z" fill="#ffc107"/>
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">振替登録</text>
         
-        <!-- 凡例 -->
-        <g transform="translate(20, 340)">
-            <circle cx="10" cy="0" r="8" fill="#28a745"/>
-            <text x="25" y="5" font-family="Arial" font-size="12" fill="#495057">現金 3%</text>
-            <circle cx="110" cy="0" r="8" fill="#007bff"/>
-            <text x="125" y="5" font-family="Arial" font-size="12" fill="#495057">預金 69%</text>
-            <circle cx="210" cy="0" r="8" fill="#ffc107"/>
-            <text x="225" y="5" font-family="Arial" font-size="12" fill="#495057">投資 28%</text>
+        <!-- 振替フォーム -->
+        <g transform="translate(40, 80)">
+            <!-- 振替元 -->
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">振替元</text>
+            <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">三菱UFJ銀行▼</text>
+            
+            <!-- 振替先 -->
+            <g transform="translate(0, 100)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">振替先</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">SBI証券▼</text>
+            </g>
+            
+            <!-- 金額 -->
+            <g transform="translate(0, 200)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">金額</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">¥</text>
+                <text x="40" y="60" font-family="Arial" font-size="14" fill="#6c757d">金額を入力</text>
+            </g>
+            
+            <!-- 日付 -->
+            <g transform="translate(0, 300)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">日付</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">2025/04/23</text>
+                <text x="250" y="60" font-family="Arial" font-size="14" fill="#6c757d">📅</text>
+            </g>
+            
+            <!-- メモ -->
+            <g transform="translate(0, 400)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">メモ（任意）</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">メモを入力...</text>
+            </g>
+            
+            <!-- 振替ボタン -->
+            <rect x="0" y="500" width="280" height="50" rx="5" fill="#007bff"/>
+            <text x="120" y="532" font-family="Arial" font-size="14" fill="#ffffff">振替を実行</text>
         </g>
     </g>
-    
-    <!-- 資金移動セクション -->
-    <g transform="translate(800, 410)">
-        <rect width="380" height="370" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">資金移動</text>
-        
-        <!-- 移動フォーム -->
-        <g transform="translate(20, 70)">
-            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">移動元</text>
-            <rect x="0" y="30" width="340" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="15" y="55" font-family="Arial" font-size="14" fill="#495057">口座を選択</text>
-            <text x="310" y="55" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
-            
-            <text x="0" y="100" font-family="Arial" font-size="14" fill="#495057">移動先</text>
-            <rect x="0" y="110" width="340" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="15" y="135" font-family="Arial" font-size="14" fill="#495057">口座を選択</text>
-            <text x="310" y="135" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
-            
-            <text x="0" y="180" font-family="Arial" font-size="14" fill="#495057">金額</text>
-            <rect x="0" y="190" width="340" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="15" y="215" font-family="Arial" font-size="14" fill="#495057">¥</text>
-            
-            <!-- 移動ボタン -->
-            <rect x="0" y="250" width="340" height="40" rx="5" fill="#007bff"/>
-            <text x="145" y="275" font-family="Arial" font-size="14" fill="#ffffff">移動する</text>
-        </g>
-    </g>
-    
-    <!-- 新規口座追加ボタン -->
-    <circle cx="720" cy="740" r="30" fill="#007bff"/>
-    <text x="710" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
 </svg>
