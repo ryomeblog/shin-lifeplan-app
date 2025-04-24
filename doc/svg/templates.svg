@@ -9,8 +9,10 @@
         <rect width="1160" height="60" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         <rect x="20" y="10" width="200" height="40" rx="20" fill="#007bff"/>
         <rect x="220" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
+        <rect x="420" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
         <text x="85" y="35" font-family="Arial" font-size="14" fill="#ffffff">支出テンプレート</text>
         <text x="285" y="35" font-family="Arial" font-size="14" fill="#495057">収入テンプレート</text>
+        <text x="485" y="35" font-family="Arial" font-size="14" fill="#495057">投資テンプレート</text>
     </g>
     
     <!-- テンプレートリスト -->
@@ -29,6 +31,7 @@
             <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
             <text x="200" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
             <text x="900" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+            <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
             
             <!-- 取引1 -->
             <g transform="translate(0, 40)">
@@ -36,6 +39,9 @@
                 <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">住居費</text>
                 <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">家賃</text>
                 <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥80,000</text>
+                <a href="#edit">
+                    <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                </a>
             </g>
             
             <!-- 取引2 -->
@@ -44,6 +50,9 @@
                 <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">光熱費</text>
                 <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">電気代</text>
                 <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥10,000</text>
+                <a href="#edit">
+                    <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                </a>
             </g>
         </g>
         
@@ -62,6 +71,7 @@
                 <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
                 <text x="200" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
                 <text x="900" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+                <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
                 
                 <!-- 取引1 -->
                 <g transform="translate(0, 40)">
@@ -69,6 +79,9 @@
                     <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">食費</text>
                     <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">スーパーでの買い物</text>
                     <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥30,000</text>
+                    <a href="#edit">
+                        <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                    </a>
                 </g>
                 
                 <!-- 取引2 -->
@@ -77,12 +90,11 @@
                     <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">食費</text>
                     <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">外食費</text>
                     <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥20,000</text>
+                    <a href="#edit">
+                        <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                    </a>
                 </g>
             </g>
         </g>
     </g>
-    
-    <!-- 新規テンプレート追加ボタン -->
-    <circle cx="1140" cy="740" r="40" fill="#007bff"/>
-    <text x="1127" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
 </svg>

@@ -3,102 +3,178 @@
     <!-- 背景 -->
     <rect width="1200" height="800" fill="#f8f9fa"/>
     
-    <!-- 年選択セクション -->
+    <!-- カテゴリ一覧 -->
     <g transform="translate(20, 20)">
-        <rect width="1160" height="80" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        
-        <!-- 年選択プルダウン -->
-        <g transform="translate(40, 20)">
-            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">年選択:</text>
-            <rect x="100" y="10" width="200" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="120" y="35" font-family="Arial" font-size="16" fill="#495057">2025年</text>
-            <text x="260" y="35" font-family="Arial" font-size="16" fill="#495057">▼</text>
-        </g>
-    </g>
-    
-    <!-- 純資産セクション -->
-    <g transform="translate(20, 120)">
-        <rect width="1160" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">純資産推移</text>
-        <text x="40" y="80" font-family="Arial" font-size="24" fill="#212529">¥12,500,000</text>
-        
-        <!-- 年別推移グラフ -->
-        <g transform="translate(40, 100)">
-            <!-- Y軸 -->
-            <line x1="40" y1="0" x2="40" y2="120" stroke="#dee2e6"/>
-            <text x="0" y="10" font-family="Arial" font-size="12" fill="#6c757d">2000万</text>
-            <text x="0" y="60" font-family="Arial" font-size="12" fill="#6c757d">1000万</text>
-            <text x="0" y="110" font-family="Arial" font-size="12" fill="#6c757d">0</text>
-            
-            <!-- X軸 -->
-            <line x1="40" y1="120" x2="1080" y2="120" stroke="#dee2e6"/>
-            
-            <!-- データポイント -->
-            <path d="M40,100 L240,90 L440,70 L640,50 L840,30 L1040,20" 
-                  fill="none" stroke="#007bff" stroke-width="2"/>
-                  
-            <!-- 年ラベル -->
-            <text x="40" y="140" font-family="Arial" font-size="12" fill="#6c757d">2020</text>
-            <text x="240" y="140" font-family="Arial" font-size="12" fill="#6c757d">2021</text>
-            <text x="440" y="140" font-family="Arial" font-size="12" fill="#6c757d">2022</text>
-            <text x="640" y="140" font-family="Arial" font-size="12" fill="#6c757d">2023</text>
-            <text x="840" y="140" font-family="Arial" font-size="12" fill="#6c757d">2024</text>
-            <text x="1040" y="140" font-family="Arial" font-size="12" fill="#6c757d">2025</text>
-        </g>
-    </g>
-    
-    <!-- 支出・収入グラフセクション -->
-    <g transform="translate(20, 380)">
-        <!-- 支出円グラフ -->
-        <rect width="570" height="360" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">支出内訳</text>
-        <text x="40" y="70" font-family="Arial" font-size="16" fill="#dc3545">総支出: -¥2,400,000</text>
-        
-        <!-- クリック可能な円グラフ -->
-        <a href="#transactions">
-            <circle cx="285" cy="200" r="120" fill="none" stroke="#dee2e6"/>
-            <path d="M285,200 L285,80 A120,120 0 0,1 389,245 Z" fill="#007bff"/>
-            <path d="M285,200 L389,245 A120,120 0 0,1 285,320 Z" fill="#28a745"/>
-            <path d="M285,200 L285,320 A120,120 0 0,1 181,245 Z" fill="#ffc107"/>
-            <path d="M285,200 L181,245 A120,120 0 0,1 285,80 Z" fill="#dc3545"/>
-        </a>
-        
-        <!-- 凡例 -->
-        <g transform="translate(40, 340)">
-            <rect width="20" height="20" fill="#007bff"/>
-            <text x="30" y="15" font-family="Arial" font-size="14" fill="#495057">住居費 35%</text>
-            <rect x="150" width="20" height="20" fill="#28a745"/>
-            <text x="180" y="15" font-family="Arial" font-size="14" fill="#495057">食費 25%</text>
-            <rect x="300" width="20" height="20" fill="#ffc107"/>
-            <text x="330" y="15" font-family="Arial" font-size="14" fill="#495057">交通費 20%</text>
-            <rect x="450" width="20" height="20" fill="#dc3545"/>
-            <text x="480" y="15" font-family="Arial" font-size="14" fill="#495057">その他 20%</text>
-        </g>
-        
-        <!-- 収入円グラフ -->
-        <g transform="translate(590, 0)">
-            <rect width="570" height="360" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">収入内訳</text>
-            <text x="40" y="70" font-family="Arial" font-size="16" fill="#28a745">総収入: +¥3,600,000</text>
-            
-            <!-- クリック可能な円グラフ -->
-            <a href="#transactions">
-                <circle cx="285" cy="200" r="120" fill="none" stroke="#dee2e6"/>
-                <path d="M285,200 L285,80 A120,120 0 0,1 405,200 Z" fill="#007bff"/>
-                <path d="M285,200 L405,200 A120,120 0 0,1 285,320 Z" fill="#28a745"/>
-            </a>
-            
-            <!-- 凡例 -->
-            <g transform="translate(40, 340)">
-                <rect width="20" height="20" fill="#007bff"/>
-                <text x="30" y="15" font-family="Arial" font-size="14" fill="#495057">給与 80%</text>
-                <rect x="150" width="20" height="20" fill="#28a745"/>
-                <text x="180" y="15" font-family="Arial" font-size="14" fill="#495057">副収入 20%</text>
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#categories">カテゴリ一覧</a>
+            </text>
+            <!-- タブ切り替え -->
+            <g transform="translate(350, 10)">
+                <rect width="80" height="30" rx="15" fill="#007bff"/>
+                <rect x="80" width="80" height="30" rx="15" fill="#f8f9fa"/>
+                <text x="20" y="20" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
+                <text x="100" y="20" font-family="Arial" font-size="14" fill="#495057">収入</text>
+            </g>
+            <!-- カテゴリリスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">食費</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥50,000</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">交通費</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥30,000</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">住居費</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥100,000</text>
             </g>
         </g>
     </g>
-    
-    <!-- 新規取引追加ボタン -->
-    <circle cx="1140" cy="740" r="40" fill="#007bff"/>
-    <text x="1127" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+
+    <!-- 口座一覧 -->
+    <g transform="translate(610, 20)">
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#accounts">口座一覧</a>
+            </text>
+            <!-- 口座リスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">普通預金</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥1,000,000</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">貯蓄預金</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥2,000,000</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">現金</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥50,000</text>
+            </g>
+        </g>
+    </g>
+
+    <!-- 保有資産 -->
+    <g transform="translate(20, 280)">
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#assets">保有資産</a>
+            </text>
+            <!-- 資産リスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">米国株式</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥3,000,000</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">日本株式</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥2,000,000</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">投資信託</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#212529">¥1,000,000</text>
+            </g>
+        </g>
+    </g>
+
+    <!-- テンプレート一覧 -->
+    <g transform="translate(610, 280)">
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#templates">テンプレート一覧</a>
+            </text>
+            <!-- タブ切り替え -->
+            <g transform="translate(250, 10)">
+                <rect width="80" height="30" rx="15" fill="#007bff"/>
+                <rect x="80" width="80" height="30" rx="15" fill="#f8f9fa"/>
+                <rect x="160" width="80" height="30" rx="15" fill="#f8f9fa"/>
+                <text x="20" y="20" font-family="Arial" font-size="14" fill="#ffffff">支出</text>
+                <text x="100" y="20" font-family="Arial" font-size="14" fill="#495057">収入</text>
+                <text x="180" y="20" font-family="Arial" font-size="14" fill="#495057">投資</text>
+            </g>
+            <!-- テンプレートリスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">月末家賃支払い</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥100,000</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">水道光熱費</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥20,000</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">食費</text>
+                <text x="430" y="30" font-family="Arial" font-size="16" fill="#dc3545">-¥50,000</text>
+            </g>
+        </g>
+    </g>
+
+    <!-- 年選択 -->
+    <g transform="translate(20, 540)">
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#events">年選択</a>
+            </text>
+            <!-- 年リスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">2023年</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#dc3545">支出: -¥5,000,000</text>
+                <text x="300" y="15" font-family="Arial" font-size="14" fill="#28a745">収入: +¥8,000,000</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">2024年</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#dc3545">支出: -¥5,200,000</text>
+                <text x="300" y="15" font-family="Arial" font-size="14" fill="#28a745">収入: +¥8,500,000</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">2025年</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#dc3545">支出: -¥5,500,000</text>
+                <text x="300" y="15" font-family="Arial" font-size="14" fill="#28a745">収入: +¥9,000,000</text>
+            </g>
+        </g>
+    </g>
+
+    <!-- 家族管理 -->
+    <g transform="translate(610, 540)">
+        <rect width="570" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <g transform="translate(20, 20)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">
+                <a href="#family">家族管理</a>
+            </text>
+            <!-- 家族リスト -->
+            <g transform="translate(0, 50)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">山田太郎</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#495057">35歳 / 寿命 85歳</text>
+            </g>
+            <g transform="translate(0, 110)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">山田花子</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#495057">32歳 / 寿命 88歳</text>
+            </g>
+            <g transform="translate(0, 170)">
+                <rect width="530" height="50" rx="5" fill="#f8f9fa"/>
+                <text x="20" y="30" font-family="Arial" font-size="16" fill="#212529">山田一郎</text>
+                <text x="300" y="30" font-family="Arial" font-size="14" fill="#495057">5歳 / 寿命 85歳</text>
+            </g>
+        </g>
+    </g>
 </svg>
