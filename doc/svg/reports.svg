@@ -6,102 +6,115 @@
     <!-- ヘッダーセクション -->
     <rect x="20" y="20" width="1160" height="80" rx="10" fill="#ffffff" stroke="#dee2e6"/>
     
-    <!-- 年間選択 -->
+    <!-- 表示切替 -->
     <g transform="translate(40, 40)">
-        <text x="0" y="20" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">期間：</text>
-        <rect x="60" width="120" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="80" y="25" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
-        
-        <!-- 表示切替 -->
-        <g transform="translate(600, 0)">
-            <rect width="100" height="40" rx="20" fill="#007bff"/>
-            <rect x="100" width="100" height="40" rx="20" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="25" y="25" font-family="Arial" font-size="14" fill="#ffffff">月次</text>
-            <text x="125" y="25" font-family="Arial" font-size="14" fill="#495057">年次</text>
-        </g>
+        <rect width="100" height="40" rx="20" fill="#007bff"/>
+        <rect x="100" width="100" height="40" rx="20" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="30" y="25" font-family="Arial" font-size="14" fill="#ffffff">口座</text>
+        <text x="130" y="25" font-family="Arial" font-size="14" fill="#495057">資産</text>
     </g>
     
-    <!-- カテゴリ別比較セクション -->
+    <!-- 支出カテゴリ円グラフ（左上） -->
     <g transform="translate(20, 120)">
-        <rect width="1160" height="400" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">カテゴリ別支出</text>
+        <rect width="570" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">支出カテゴリ割合</text>
         
-        <!-- スクロール可能なエリア -->
-        <g transform="translate(40, 60)">
-            <!-- スクロールのヒント -->
-            <text x="1000" y="20" font-family="Arial" font-size="14" fill="#6c757d">→ スクロール</text>
+        <!-- 円グラフ -->
+        <g transform="translate(285, 180)">
+            <!-- 食費 30% -->
+            <path d="M0,0 L86.6,-50 A100,100 0 0,1 86.6,50 Z" fill="#28a745"/>
+            <!-- 住居費 25% -->
+            <path d="M0,0 L86.6,50 A100,100 0 0,1 0,100 Z" fill="#007bff"/>
+            <!-- 交通費 20% -->
+            <path d="M0,0 L0,100 A100,100 0 0,1 -86.6,50 Z" fill="#ffc107"/>
+            <!-- その他 25% -->
+            <path d="M0,0 L-86.6,50 A100,100 0 0,1 -86.6,-50 Z" fill="#dc3545"/>
+        </g>
+        
+        <!-- 凡例 -->
+        <g transform="translate(40, 280)">
+            <rect width="10" height="10" fill="#28a745"/>
+            <text x="20" y="10" font-family="Arial" font-size="12" fill="#495057">食費 (30%)</text>
             
-            <!-- カテゴリバー -->
-            <g transform="translate(0, 40)">
-                <!-- 住居費 -->
-                <rect width="200" height="200" fill="#ffffff" stroke="#dee2e6"/>
-                <rect x="20" y="20" width="160" height="120" fill="#e9ecef"/>
-                <rect x="20" y="60" width="160" height="80" fill="#007bff"/>
-                <text x="20" y="160" font-family="Arial" font-size="14" fill="#495057">住居費</text>
-                <text x="20" y="180" font-family="Arial" font-size="14" fill="#007bff">¥960,000</text>
-                
-                <!-- 食費 -->
-                <g transform="translate(220, 0)">
-                    <rect width="200" height="200" fill="#ffffff" stroke="#dee2e6"/>
-                    <rect x="20" y="20" width="160" height="120" fill="#e9ecef"/>
-                    <rect x="20" y="80" width="160" height="60" fill="#28a745"/>
-                    <text x="20" y="160" font-family="Arial" font-size="14" fill="#495057">食費</text>
-                    <text x="20" y="180" font-family="Arial" font-size="14" fill="#28a745">¥720,000</text>
-                </g>
-                
-                <!-- 交通費 -->
-                <g transform="translate(440, 0)">
-                    <rect width="200" height="200" fill="#ffffff" stroke="#dee2e6"/>
-                    <rect x="20" y="20" width="160" height="120" fill="#e9ecef"/>
-                    <rect x="20" y="90" width="160" height="50" fill="#ffc107"/>
-                    <text x="20" y="160" font-family="Arial" font-size="14" fill="#495057">交通費</text>
-                    <text x="20" y="180" font-family="Arial" font-size="14" fill="#ffc107">¥600,000</text>
-                </g>
-                
-                <!-- その他のカテゴリ（スクロールで表示） -->
-                <g transform="translate(660, 0)">
-                    <rect width="200" height="200" fill="#ffffff" stroke="#dee2e6"/>
-                    <rect x="20" y="20" width="160" height="120" fill="#e9ecef"/>
-                    <rect x="20" y="100" width="160" height="40" fill="#dc3545"/>
-                    <text x="20" y="160" font-family="Arial" font-size="14" fill="#495057">その他</text>
-                    <text x="20" y="180" font-family="Arial" font-size="14" fill="#dc3545">¥480,000</text>
-                </g>
-            </g>
+            <rect x="120" width="10" height="10" fill="#007bff"/>
+            <text x="140" y="10" font-family="Arial" font-size="12" fill="#495057">住居費 (25%)</text>
             
-            <!-- Y軸ラベル -->
-            <text x="-30" y="40" font-family="Arial" font-size="12" fill="#6c757d">100万円</text>
-            <text x="-30" y="100" font-family="Arial" font-size="12" fill="#6c757d">50万円</text>
-            <text x="-30" y="160" font-family="Arial" font-size="12" fill="#6c757d">0円</text>
+            <rect x="240" width="10" height="10" fill="#ffc107"/>
+            <text x="260" y="10" font-family="Arial" font-size="12" fill="#495057">交通費 (20%)</text>
+            
+            <rect x="360" width="10" height="10" fill="#dc3545"/>
+            <text x="380" y="10" font-family="Arial" font-size="12" fill="#495057">その他 (25%)</text>
         </g>
     </g>
     
-    <!-- 月次推移セクション -->
-    <g transform="translate(20, 540)">
-        <rect width="1160" height="240" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">月次推移</text>
+    <!-- 収入カテゴリ円グラフ（右上） -->
+    <g transform="translate(610, 120)">
+        <rect width="570" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">収入カテゴリ割合</text>
+        
+        <!-- 円グラフ -->
+        <g transform="translate(285, 180)">
+            <!-- 給与 70% -->
+            <path d="M0,0 L100,0 A100,100 0 0,1 -34.2,93.97 Z" fill="#28a745"/>
+            <!-- 投資 20% -->
+            <path d="M0,0 L-34.2,93.97 A100,100 0 0,1 -93.97,-34.2 Z" fill="#007bff"/>
+            <!-- その他 10% -->
+            <path d="M0,0 L-93.97,-34.2 A100,100 0 0,1 100,0 Z" fill="#ffc107"/>
+        </g>
+        
+        <!-- 凡例 -->
+        <g transform="translate(40, 280)">
+            <rect width="10" height="10" fill="#28a745"/>
+            <text x="20" y="10" font-family="Arial" font-size="12" fill="#495057">給与 (70%)</text>
+            
+            <rect x="120" width="10" height="10" fill="#007bff"/>
+            <text x="140" y="10" font-family="Arial" font-size="12" fill="#495057">投資 (20%)</text>
+            
+            <rect x="240" width="10" height="10" fill="#ffc107"/>
+            <text x="260" y="10" font-family="Arial" font-size="12" fill="#495057">その他 (10%)</text>
+        </g>
+    </g>
+    
+    <!-- 収支推移グラフ（下部） -->
+    <g transform="translate(20, 460)">
+        <rect width="1160" height="320" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">年間収支推移</text>
         
         <!-- 折れ線グラフ -->
-        <g transform="translate(40, 60)">
+        <g transform="translate(40, 80)">
             <!-- Y軸 -->
-            <line x1="40" y1="0" x2="40" y2="140" stroke="#dee2e6"/>
-            <text x="0" y="20" font-family="Arial" font-size="12" fill="#6c757d">20万円</text>
-            <text x="0" y="80" font-family="Arial" font-size="12" fill="#6c757d">10万円</text>
-            <text x="0" y="140" font-family="Arial" font-size="12" fill="#6c757d">0円</text>
+            <line x1="40" y1="0" x2="40" y2="200" stroke="#dee2e6"/>
+            <text x="0" y="20" font-family="Arial" font-size="12" fill="#6c757d">500万円</text>
+            <text x="0" y="110" font-family="Arial" font-size="12" fill="#6c757d">250万円</text>
+            <text x="0" y="200" font-family="Arial" font-size="12" fill="#6c757d">0円</text>
             
             <!-- X軸 -->
-            <line x1="40" y1="140" x2="1080" y2="140" stroke="#dee2e6"/>
+            <line x1="40" y1="200" x2="1080" y2="200" stroke="#dee2e6"/>
             
-            <!-- データライン -->
-            <path d="M40,80 L220,100 L400,90 L580,70 L760,85 L940,95" 
-                  fill="none" stroke="#007bff" stroke-width="2"/>
-                  
-            <!-- 月ラベル -->
-            <text x="40" y="160" font-family="Arial" font-size="12" fill="#6c757d">1月</text>
-            <text x="220" y="160" font-family="Arial" font-size="12" fill="#6c757d">2月</text>
-            <text x="400" y="160" font-family="Arial" font-size="12" fill="#6c757d">3月</text>
-            <text x="580" y="160" font-family="Arial" font-size="12" fill="#6c757d">4月</text>
-            <text x="760" y="160" font-family="Arial" font-size="12" fill="#6c757d">5月</text>
-            <text x="940" y="160" font-family="Arial" font-size="12" fill="#6c757d">6月</text>
+            <!-- データライン（収入） -->
+            <path d="M40,80 L240,70 L440,60 L640,50 L840,40 L1040,30" 
+                  fill="none" stroke="#28a745" stroke-width="2"/>
+            
+            <!-- データライン（支出） -->
+            <path d="M40,120 L240,130 L440,140 L640,150 L840,160 L1040,170" 
+                  fill="none" stroke="#dc3545" stroke-width="2"/>
+            
+            <!-- 年ラベル -->
+            <text x="40" y="220" font-family="Arial" font-size="12" fill="#6c757d">2020</text>
+            <text x="240" y="220" font-family="Arial" font-size="12" fill="#6c757d">2021</text>
+            <text x="440" y="220" font-family="Arial" font-size="12" fill="#6c757d">2022</text>
+            <text x="640" y="220" font-family="Arial" font-size="12" fill="#6c757d">2023</text>
+            <text x="840" y="220" font-family="Arial" font-size="12" fill="#6c757d">2024</text>
+            <text x="1040" y="220" font-family="Arial" font-size="12" fill="#6c757d">2025</text>
+        </g>
+        
+        <!-- 凡例 -->
+        <g transform="translate(900, 40)">
+            <rect width="10" height="10" fill="#28a745"/>
+            <text x="20" y="10" font-family="Arial" font-size="12" fill="#495057">収入</text>
+            
+            <rect x="100" width="10" height="10" fill="#dc3545"/>
+            <text x="120" y="10" font-family="Arial" font-size="12" fill="#495057">支出</text>
         </g>
     </g>
 </svg>

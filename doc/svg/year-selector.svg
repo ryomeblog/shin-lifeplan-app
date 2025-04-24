@@ -19,7 +19,7 @@
         </g>
         
         <!-- アクションボタン -->
-        <g transform="translate(600, 30)">
+        <g transform="translate(500, 30)">
             <rect width="120" height="60" rx="5" fill="#007bff"/>
             <text x="35" y="35" font-family="Arial" font-size="14" fill="#ffffff">取引一覧</text>
             
@@ -45,7 +45,7 @@
             </g>
             
             <!-- アクションボタン -->
-            <g transform="translate(600, 30)">
+            <g transform="translate(500, 30)">
                 <rect width="120" height="60" rx="5" fill="#007bff"/>
                 <text x="35" y="35" font-family="Arial" font-size="14" fill="#ffffff">取引一覧</text>
                 
@@ -72,7 +72,7 @@
             </g>
             
             <!-- アクションボタン -->
-            <g transform="translate(600, 30)">
+            <g transform="translate(500, 30)">
                 <rect width="120" height="60" rx="5" fill="#007bff"/>
                 <text x="35" y="35" font-family="Arial" font-size="14" fill="#ffffff">取引一覧</text>
                 
@@ -86,11 +86,5 @@
                 <text x="455" y="35" font-family="Arial" font-size="14" fill="#ffffff">イベント</text>
             </g>
         </g>
-    </g>
-    
-    <!-- 新規年追加ボタン -->
-    <g transform="translate(40, 680)">
-        <rect width="200" height="60" rx="30" fill="#007bff"/>
-        <text x="70" y="38" font-family="Arial" font-size="16" fill="#ffffff">＋ 新規年追加</text>
     </g>
 </svg>

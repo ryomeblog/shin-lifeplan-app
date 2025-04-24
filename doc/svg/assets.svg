@@ -57,7 +57,7 @@
         <!-- 資産追加ボタン -->
         <g transform="translate(40, 300)">
             <rect width="1080" height="50" rx="5" fill="#007bff"/>
-            <text x="500" y="32" font-family="Arial" font-size="14" fill="#ffffff">＋ 資産を追加</text>
+            <text x="500" y="32" font-family="Arial" font-size="14" fill="#ffffff">＋ 保有資産を追加</text>
         </g>
     </g>
     
@@ -85,7 +85,8 @@
             <!-- 結果ヘッダー -->
             <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
             <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産ID</text>
-            <text x="200" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
+            <text x="150" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
+            <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
             <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均年率</text>
             <text x="800" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均配当</text>
             
@@ -93,7 +94,8 @@
             <g transform="translate(0, 50)">
                 <rect width="1080" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                 <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">JP001</text>
-                <text x="200" y="30" font-family="Arial" font-size="14" fill="#495057">日本株式インデックス</text>
+                <text x="150" y="30" font-family="Arial" font-size="14" fill="#495057">日本株式インデックス</text>
+                <text x="400" y="30" font-family="Arial" font-size="14" fill="#495057">¥2,500,000</text>
                 <text x="600" y="30" font-family="Arial" font-size="14" fill="#28a745">+7.5%</text>
                 <text x="800" y="30" font-family="Arial" font-size="14" fill="#28a745">2.1%</text>
             </g>

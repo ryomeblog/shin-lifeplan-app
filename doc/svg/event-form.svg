@@ -8,7 +8,7 @@
     <text x="20" y="38" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">イベント登録</text>
     
     <!-- フォーム -->
-    <g transform="translate(40, 100)">
+    <g transform="translate(40, 70)">
         <!-- イベント名 -->
         <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">イベント名</text>
         <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>

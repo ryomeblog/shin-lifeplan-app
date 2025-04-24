@@ -8,8 +8,8 @@
     
     <!-- 口座基本情報 -->
     <g transform="translate(40, 40)">
-        <text x="0" y="0" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">三菱UFJ銀行</text>
-        <text x="0" y="30" font-family="Arial" font-size="16" fill="#6c757d">残高: ¥1,250,000</text>
+        <text x="0" y="30" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">三菱UFJ銀行</text>
+        <text x="0" y="60" font-family="Arial" font-size="16" fill="#6c757d">残高: ¥1,250,000</text>
         
         <!-- 編集ボタン -->
         <rect x="1000" y="0" width="100" height="40" rx="5" fill="#007bff"/>
