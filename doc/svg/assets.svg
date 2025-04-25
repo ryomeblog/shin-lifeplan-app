@@ -29,8 +29,8 @@
             <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
             <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
             <text x="300" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">保有数</text>
-            <text x="500" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">現在値</text>
-            <text x="700" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
+            <text x="500" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">購入時の評価額</text>
+            <text x="700" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">現在の評価額</text>
             <text x="900" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">損益</text>
             
             <!-- 資産1 -->
@@ -39,7 +39,7 @@
                 <text x="20" y="35" font-family="Arial" font-size="14" fill="#212529">日本株式インデックス</text>
                 <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">100</text>
                 <text x="500" y="35" font-family="Arial" font-size="14" fill="#495057">¥25,000</text>
-                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥2,500,000</text>
+                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥28,000</text>
                 <text x="900" y="35" font-family="Arial" font-size="14" fill="#28a745">+¥300,000</text>
             </g>
             
@@ -49,7 +49,7 @@
                 <text x="20" y="35" font-family="Arial" font-size="14" fill="#212529">米国株式インデックス</text>
                 <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">200</text>
                 <text x="500" y="35" font-family="Arial" font-size="14" fill="#495057">¥15,000</text>
-                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥3,000,000</text>
+                <text x="700" y="35" font-family="Arial" font-size="14" fill="#495057">¥16,000</text>
                 <text x="900" y="35" font-family="Arial" font-size="14" fill="#dc3545">-¥100,000</text>
             </g>
         </g>
