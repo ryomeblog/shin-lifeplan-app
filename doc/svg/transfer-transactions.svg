@@ -16,7 +16,7 @@
         <g transform="translate(140, 0)">
             <rect width="200" height="40" rx="20" fill="#f8f9fa"/>
             <rect x="200" width="200" height="40" rx="0" fill="#f8f9fa"/>
-            <rect x="400" width="200" height="40" rx="0" fill="#007bff"/>
+            <rect x="400" width="200" height="40" rx="20" fill="#007bff"/>
             <rect x="600" width="200" height="40" rx="20" fill="#f8f9fa"/>
             <text x="90" y="25" font-family="Arial" font-size="14" fill="#495057">支出</text>
             <text x="290" y="25" font-family="Arial" font-size="14" fill="#495057">収入</text>
