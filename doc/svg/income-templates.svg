@@ -38,17 +38,21 @@
             
             <!-- ヘッダー -->
             <rect width="1080" height="40" fill="#f8f9fa"/>
-            <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
-            <text x="200" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
-            <text x="900" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+            <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">口座</text>
+            <text x="180" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+            <text x="340" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
+            <text x="500" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">昇給率</text>
+            <text x="800" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">収入金額</text>
             <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
             
             <!-- 取引1 -->
             <g transform="translate(0, 40)">
                 <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">給与収入</text>
-                <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">月給</text>
-                <text x="900" y="25" font-family="Arial" font-size="14" fill="#28a745">¥300,000</text>
+                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">普通預金</text>
+                <text x="180" y="25" font-family="Arial" font-size="14" fill="#495057">給与収入</text>
+                <text x="340" y="25" font-family="Arial" font-size="14" fill="#495057">月給</text>
+                <text x="500" y="25" font-family="Arial" font-size="14" fill="#495057">3%</text>
+                <text x="800" y="25" font-family="Arial" font-size="14" fill="#28a745">¥300,000</text>
                 <a href="#edit">
                     <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
                 </a>
@@ -71,17 +75,21 @@
                 
                 <!-- ヘッダー -->
                 <rect width="1080" height="40" fill="#f8f9fa"/>
-                <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
-                <text x="200" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
-                <text x="900" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+                <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">口座</text>
+                <text x="180" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+                <text x="340" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
+                <text x="500" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">昇給率</text>
+                <text x="800" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">収入金額</text>
                 <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
                 
                 <!-- 取引1 -->
                 <g transform="translate(0, 40)">
                     <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">賞与</text>
-                    <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">年2回</text>
-                    <text x="900" y="25" font-family="Arial" font-size="14" fill="#28a745">¥600,000</text>
+                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">普通預金</text>
+                    <text x="180" y="25" font-family="Arial" font-size="14" fill="#495057">賞与</text>
+                    <text x="340" y="25" font-family="Arial" font-size="14" fill="#495057">年2回</text>
+                    <text x="500" y="25" font-family="Arial" font-size="14" fill="#495057">5%</text>
+                    <text x="800" y="25" font-family="Arial" font-size="14" fill="#28a745">¥600,000</text>
                     <a href="#edit">
                         <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
                     </a>

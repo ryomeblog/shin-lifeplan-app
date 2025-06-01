@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="700" viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="600" height="700" fill="#f8f9fa"/>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(0, 0)">
+        <rect width="600" height="700" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">投資テンプレート登録</text>
+        
+        <!-- 取引種別 -->
+        <g transform="translate(40, 80)">
+            <!-- セグメントコントロール -->
+            <rect width="500" height="40" rx="5" fill="#f8f9fa"/>
+            <!-- 支出 -->
+            <rect width="166" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="65" y="25" font-family="Arial" font-size="14" fill="#495057">支出</text>
+            <!-- 収入 -->
+            <rect x="166" width="166" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="231" y="25" font-family="Arial" font-size="14" fill="#495057">収入</text>
+            <!-- 投資 -->
+            <rect x="332" width="168" height="40" rx="5" fill="#007bff"/>
+            <text x="397" y="25" font-family="Arial" font-size="14" fill="#ffffff">投資</text>
+        </g>
+        
+        <!-- フォーム -->
+        <g transform="translate(40, 140)">
+            <!-- カテゴリ -->
+            <g>
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">カテゴリ</text>
+                <rect x="0" y="30" width="500" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">投資先を選択▼</text>
+            </g>
+            
+            <!-- 投資金額 -->
+            <g transform="translate(0, 90)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">投資金額</text>
+                <rect x="0" y="30" width="500" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
+            </g>
+            
+            <!-- 投資元口座 -->
+            <g transform="translate(0, 180)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">投資元口座</text>
+                <rect x="0" y="30" width="500" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">口座を選択▼</text>
+            </g>
+            
+            <!-- 数量 -->
+            <g transform="translate(0, 270)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">数量</text>
+                <rect x="0" y="30" width="500" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">0</text>
+                <text x="450" y="55" font-family="Arial" font-size="14" fill="#6c757d">株 / 口</text>
+            </g>
+            
+            <!-- メモ -->
+            <g transform="translate(0, 360)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">メモ（任意）</text>
+                <rect x="0" y="30" width="500" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#6c757d">メモを入力</text>
+            </g>
+        </g>
+        
+        <!-- ボタン -->
+        <g transform="translate(40, 640)">
+            <!-- キャンセル -->
+            <rect width="240" height="40" rx="5" fill="#6c757d"/>
+            <text x="85" y="25" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+            
+            <!-- 保存 -->
+            <rect x="260" width="240" height="40" rx="5" fill="#007bff"/>
+            <text x="360" y="25" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+        </g>
+    </g>
+</svg>

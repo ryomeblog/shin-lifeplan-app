@@ -108,6 +108,9 @@
 ##### 収入テンプレートフォーム
 [![収入テンプレートフォーム](./svg/income-template-form.svg)](./svg/income-template-form.svg)
 
+##### 投資テンプレートフォーム
+[![投資テンプレートフォーム](./svg/investment-template-form.svg)](./svg/investment-template-form.svg)
+
 ### 8. レポート・分析
 #### レポート
 [![レポート](./svg/reports.svg)](./svg/reports.svg)
