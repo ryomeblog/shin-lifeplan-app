@@ -7,12 +7,12 @@
     <g transform="translate(20, 20)">
         <!-- タブ切り替え -->
         <rect width="1160" height="60" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <rect x="20" y="10" width="200" height="40" rx="20" fill="#007bff"/>
+        <rect x="20" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
         <rect x="220" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
-        <rect x="420" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
-        <text x="85" y="35" font-family="Arial" font-size="14" fill="#ffffff">支出テンプレート</text>
+        <rect x="420" y="10" width="200" height="40" rx="20" fill="#007bff"/>
+        <text x="85" y="35" font-family="Arial" font-size="14" fill="#495057">支出テンプレート</text>
         <text x="285" y="35" font-family="Arial" font-size="14" fill="#495057">収入テンプレート</text>
-        <text x="485" y="35" font-family="Arial" font-size="14" fill="#495057">投資テンプレート</text>
+        <text x="485" y="35" font-family="Arial" font-size="14" fill="#ffffff">投資テンプレート</text>
         
         <!-- 新規登録ボタン -->
         <a href="#new">
@@ -23,9 +23,9 @@
     
     <!-- テンプレートリスト -->
     <g transform="translate(20, 100)">
-        <!-- 固定費テンプレート -->
+        <!-- 投資信託テンプレート -->
         <rect width="1160" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">固定費</text>
+        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">投資信託</text>
         <text x="120" y="40" font-family="Arial" font-size="14" fill="#6c757d">年12回</text>
         <a href="#add">
             <circle cx="1120" cy="30" r="12" fill="#007bff"/>
@@ -34,7 +34,7 @@
         
         <!-- テンプレート内容 -->
         <g transform="translate(40, 60)">
-            <rect width="1080" height="120" fill="#f8f9fa" rx="5"/>
+            <rect width="1080" height="80" fill="#f8f9fa" rx="5"/>
             
             <!-- ヘッダー -->
             <rect width="1080" height="40" fill="#f8f9fa"/>
@@ -46,30 +46,19 @@
             <!-- 取引1 -->
             <g transform="translate(0, 40)">
                 <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">住居費</text>
-                <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">家賃</text>
-                <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥80,000</text>
-                <a href="#edit">
-                    <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
-                </a>
-            </g>
-            
-            <!-- 取引2 -->
-            <g transform="translate(0, 80)">
-                <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">光熱費</text>
-                <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">電気代</text>
-                <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥10,000</text>
+                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">投資信託積立</text>
+                <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">毎月積立</text>
+                <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥50,000</text>
                 <a href="#edit">
                     <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
                 </a>
             </g>
         </g>
         
-        <!-- 食費テンプレート -->
+        <!-- 株式投資テンプレート -->
         <g transform="translate(0, 220)">
             <rect width="1160" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">食費</text>
+            <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">株式投資</text>
             <text x="120" y="40" font-family="Arial" font-size="14" fill="#6c757d">年12回</text>
             <a href="#add">
                 <circle cx="1120" cy="30" r="12" fill="#007bff"/>
@@ -78,7 +67,7 @@
             
             <!-- テンプレート内容 -->
             <g transform="translate(40, 60)">
-                <rect width="1080" height="120" fill="#f8f9fa" rx="5"/>
+                <rect width="1080" height="80" fill="#f8f9fa" rx="5"/>
                 
                 <!-- ヘッダー -->
                 <rect width="1080" height="40" fill="#f8f9fa"/>
@@ -90,20 +79,9 @@
                 <!-- 取引1 -->
                 <g transform="translate(0, 40)">
                     <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">食費</text>
-                    <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">スーパーでの買い物</text>
+                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">株式投資</text>
+                    <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">毎月積立</text>
                     <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥30,000</text>
-                    <a href="#edit">
-                        <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
-                    </a>
-                </g>
-                
-                <!-- 取引2 -->
-                <g transform="translate(0, 80)">
-                    <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">食費</text>
-                    <text x="200" y="25" font-family="Arial" font-size="14" fill="#495057">外食費</text>
-                    <text x="900" y="25" font-family="Arial" font-size="14" fill="#dc3545">-¥20,000</text>
                     <a href="#edit">
                         <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
                     </a>
