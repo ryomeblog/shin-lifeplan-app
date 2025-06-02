@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(40, 20)">
+        <rect width="1120" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">ライフプラン作成</text>
+        
+        <!-- ライフプラン範囲設定 -->
+        <g transform="translate(40, 80)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">ライフプラン範囲設定</text>
+            
+            <!-- 開始年齢 -->
+            <g transform="translate(0, 50)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">開始年齢</text>
+                <rect x="0" y="30" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">35歳▼</text>
+            </g>
+            
+            <!-- 終了年齢 -->
+            <g transform="translate(220, 50)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">終了年齢</text>
+                <rect x="0" y="30" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">65歳▼</text>
+            </g>
+        </g>
+        
+        <!-- 家族構成設定 -->
+        <g transform="translate(40, 240)">
+            <text x="0" y="30" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">家族構成設定</text>
+            
+            <!-- テーブルヘッダー -->
+            <g transform="translate(0, 50)">
+                <rect width="900" height="40" rx="5" fill="#f8f9fa" stroke="#dee2e6"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">名前</text>
+                <text x="220" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">生年月日</text>
+                <text x="420" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">寿命設定</text>
+                <text x="620" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">操作</text>
+            </g>
+            
+            <!-- 家族メンバーリスト -->
+            <g transform="translate(0, 90)">
+                <!-- メンバー1 -->
+                <rect width="900" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">山田 太郎</text>
+                <text x="220" y="30" font-family="Arial" font-size="14" fill="#495057">1990/01/01</text>
+                <text x="420" y="30" font-family="Arial" font-size="14" fill="#495057">80歳</text>
+                    <rect x="570" y="10" width="80" height="30" rx="5" fill="#007bff"/>
+                    <text x="590" y="30" font-family="Arial" font-size="14" fill="#ffffff">編集</text>
+                    <rect x="670" y="10" width="80" height="30" rx="5" fill="#dc3545"/>
+                    <text x="690" y="30" font-family="Arial" font-size="14" fill="#ffffff">削除</text>
+                
+                <!-- メンバー2 -->
+                <g transform="translate(0, 60)">
+                    <rect width="900" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">山田 花子</text>
+                    <text x="220" y="30" font-family="Arial" font-size="14" fill="#495057">1993/05/15</text>
+                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#495057">85歳</text>
+                    <rect x="570" y="10" width="80" height="30" rx="5" fill="#007bff"/>
+                    <text x="590" y="30" font-family="Arial" font-size="14" fill="#ffffff">編集</text>
+                    <rect x="670" y="10" width="80" height="30" rx="5" fill="#dc3545"/>
+                    <text x="690" y="30" font-family="Arial" font-size="14" fill="#ffffff">削除</text>
+                </g>
+            </g>
+            
+            <!-- 追加ボタン -->
+            <g transform="translate(0, 220)">
+                <rect width="900" height="40" rx="5" fill="#ffffff" stroke="#007bff"/>
+                <text x="415" y="25" font-family="Arial" font-size="14" fill="#007bff">＋ 家族メンバーを追加</text>
+            </g>
+        </g>
+        
+        <!-- FIRE計画設定 -->
+        <g transform="translate(40, 460)">
+            <text x="0" y="80" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">FIRE計画設定</text>
+            
+            <!-- 必要資産額 -->
+            <g transform="translate(0, 50)">
+                <text x="0" y="70" font-family="Arial" font-size="14" fill="#495057">必要資産額</text>
+                <rect x="0" y="80" width="400" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="105" font-family="Arial" font-size="14" fill="#495057">¥100,000,000</text>
+            </g>
+        </g>
+        
+        <!-- ボタングループ -->
+        <g transform="translate(40, 680)">
+            <!-- キャンセルボタン -->
+            <rect width="120" height="40" rx="5" fill="#ffffff" stroke="#6c757d"/>
+            <text x="30" y="25" font-family="Arial" font-size="14" fill="#6c757d">キャンセル</text>
+            
+            <!-- 保存ボタン -->
+            <g transform="translate(140, 0)">
+                <rect width="120" height="40" rx="5" fill="#007bff"/>
+                <text x="45" y="25" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+            </g>
+        </g>
+    </g>
+</svg>
