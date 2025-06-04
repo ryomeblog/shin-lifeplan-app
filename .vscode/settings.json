@@ -1,5 +1,7 @@
 {
-    "workbench.editorAssociations": {
-        "*.svg": "default"
-    }
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }
