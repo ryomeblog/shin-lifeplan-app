@@ -16,16 +16,16 @@
             
             <!-- 開始年齢 -->
             <g transform="translate(0, 50)">
-                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">開始年齢</text>
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">開始年</text>
                 <rect x="0" y="30" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">35歳▼</text>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
             </g>
             
             <!-- 終了年齢 -->
             <g transform="translate(220, 50)">
-                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">終了年齢</text>
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">終了年</text>
                 <rect x="0" y="30" width="180" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">65歳▼</text>
+                <text x="20" y="55" font-family="Arial" font-size="14" fill="#495057">2055年▼</text>
             </g>
         </g>
         
