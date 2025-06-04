@@ -13,9 +13,6 @@
 #### ヘッダー
 [![ヘッダー](./svg/header.svg)](./svg/header.svg)
 
-#### 年選択
-[![年選択](./svg/year-selector.svg)](./svg/year-selector.svg)
-
 ### 2. メイン画面
 #### ダッシュボード
 [![ダッシュボード](./svg/dashboard.svg)](./svg/dashboard.svg)
@@ -119,8 +116,13 @@
 [![投資テンプレートフォーム](./svg/investment-template-form.svg)](./svg/investment-template-form.svg)
 
 ### 8. レポート・分析
+
 #### レポート
+##### 口座タブ
 [![レポート](./svg/reports.svg)](./svg/reports.svg)
+
+##### 資産タブ
+[![資産レポート](./svg/reports-assets.svg)](./svg/reports-assets.svg)
 
 ### 9. 設定
 #### 設定一覧
@@ -129,5 +131,5 @@
 #### 設定詳細
 [![設定詳細](./svg/settings-detail.svg)](./svg/settings-detail.svg)
 
-#### FIRE計算機
-[![FIRE計算機](./svg/settings-fire-calculator.svg)](./svg/settings-fire-calculator.svg)
+#### FIRE計画
+[![FIRE計画](./svg/settings-fire-calculator.svg)](./svg/settings-fire-calculator.svg)

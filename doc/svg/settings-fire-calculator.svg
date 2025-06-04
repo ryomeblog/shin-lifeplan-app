@@ -54,7 +54,14 @@
             <!-- 必要資産額 -->
             <g transform="translate(400, 30)">
                 <text x="0" y="0" font-family="Arial" font-size="16" fill="#212529">必要資産額</text>
-                <text x="0" y="30" font-family="Arial" font-size="24" fill="#007bff">¥100,000,000</text>
+                <!-- 入力フィールド背景 -->
+                <rect x="0" y="10" width="240" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <!-- 金額記号 -->
+                <text x="10" y="35" font-family="Arial" font-size="24" fill="#007bff">¥</text>
+                <!-- 入力フィールドプレースホルダー -->
+                <text x="35" y="35" font-family="Arial" font-size="24" fill="#007bff">100,000,000</text>
+                <!-- フォーカス時の青枠表現用 -->
+                <rect x="0" y="10" width="240" height="40" rx="5" fill="transparent" stroke="#007bff" stroke-width="2" opacity="0"/>
             </g>
         </g>
         

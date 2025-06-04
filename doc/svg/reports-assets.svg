@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- ヘッダーセクション -->
+    <rect x="20" y="20" width="1160" height="80" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+    
+    <!-- 表示切替 -->
+    <g transform="translate(40, 40)">
+        <rect width="100" height="40" rx="20" fill="#ffffff" stroke="#dee2e6"/>
+        <rect x="100" width="100" height="40" rx="20" fill="#007bff"/>
+        <text x="30" y="25" font-family="Arial" font-size="14" fill="#495057">口座</text>
+        <text x="130" y="25" font-family="Arial" font-size="14" fill="#ffffff">資産</text>
+    </g>
+    
+    <!-- 資産推移グラフ -->
+    <g transform="translate(20, 120)">
+        <rect width="1160" height="660" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">資産推移</text>
+        
+        <!-- グラフエリア -->
+        <g transform="translate(80, 80)">
+            <!-- Y軸（左：資産額） -->
+            <line x1="40" y1="0" x2="40" y2="500" stroke="#dee2e6"/>
+            <text x="0" y="20" font-family="Arial" font-size="12" fill="#6c757d">1億円</text>
+            <text x="0" y="170" font-family="Arial" font-size="12" fill="#6c757d">5000万円</text>
+            <text x="0" y="320" font-family="Arial" font-size="12" fill="#6c757d">2500万円</text>
+            <text x="0" y="500" font-family="Arial" font-size="12" fill="#6c757d">0円</text>
+            
+            <!-- Y軸（右：増加率） -->
+            <g transform="translate(1000, 0)">
+                <line x1="0" y1="0" x2="0" y2="500" stroke="#dee2e6"/>
+                <text x="10" y="20" font-family="Arial" font-size="12" fill="#6c757d">20%</text>
+                <text x="10" y="170" font-family="Arial" font-size="12" fill="#6c757d">10%</text>
+                <text x="10" y="320" font-family="Arial" font-size="12" fill="#6c757d">5%</text>
+                <text x="10" y="500" font-family="Arial" font-size="12" fill="#6c757d">0%</text>
+            </g>
+            
+            <!-- X軸 -->
+            <line x1="40" y1="500" x2="1000" y2="500" stroke="#dee2e6"/>
+            
+            <!-- グリッド線 -->
+            <line x1="40" y1="20" x2="1000" y2="20" stroke="#dee2e6" stroke-dasharray="4"/>
+            <line x1="40" y1="170" x2="1000" y2="170" stroke="#dee2e6" stroke-dasharray="4"/>
+            <line x1="40" y1="320" x2="1000" y2="320" stroke="#dee2e6" stroke-dasharray="4"/>
+            
+            <!-- 棒グラフ（資産総額） -->
+            <rect x="80" y="450" width="40" height="50" fill="#007bff" opacity="0.8"/>
+            <rect x="200" y="400" width="40" height="100" fill="#007bff" opacity="0.8"/>
+            <rect x="320" y="350" width="40" height="150" fill="#007bff" opacity="0.8"/>
+            <rect x="440" y="250" width="40" height="250" fill="#007bff" opacity="0.8"/>
+            <rect x="560" y="150" width="40" height="350" fill="#007bff" opacity="0.8"/>
+            <rect x="680" y="100" width="40" height="400" fill="#007bff" opacity="0.8"/>
+            <rect x="800" y="50" width="40" height="450" fill="#007bff" opacity="0.8"/>
+            
+            <!-- 折れ線グラフ（増加率） -->
+            <path d="M100,400 L220,350 L340,300 L460,200 L580,150 L700,100 L820,80" 
+                  fill="none" stroke="#28a745" stroke-width="2"/>
+            
+            <!-- データポイント -->
+            <circle cx="100" cy="400" r="4" fill="#28a745"/>
+            <circle cx="220" cy="350" r="4" fill="#28a745"/>
+            <circle cx="340" cy="300" r="4" fill="#28a745"/>
+            <circle cx="460" cy="200" r="4" fill="#28a745"/>
+            <circle cx="580" cy="150" r="4" fill="#28a745"/>
+            <circle cx="700" cy="100" r="4" fill="#28a745"/>
+            <circle cx="820" cy="80" r="4" fill="#28a745"/>
+            
+            <!-- 年ラベル -->
+            <text x="90" y="520" font-family="Arial" font-size="12" fill="#6c757d">2025</text>
+            <text x="210" y="520" font-family="Arial" font-size="12" fill="#6c757d">2030</text>
+            <text x="330" y="520" font-family="Arial" font-size="12" fill="#6c757d">2035</text>
+            <text x="450" y="520" font-family="Arial" font-size="12" fill="#6c757d">2040</text>
+            <text x="570" y="520" font-family="Arial" font-size="12" fill="#6c757d">2045</text>
+            <text x="690" y="520" font-family="Arial" font-size="12" fill="#6c757d">2050</text>
+            <text x="810" y="520" font-family="Arial" font-size="12" fill="#6c757d">2055</text>
+        </g>
+        
+        <!-- 凡例 -->
+        <g transform="translate(900, 40)">
+            <rect width="10" height="10" fill="#007bff" opacity="0.8"/>
+            <text x="20" y="10" font-family="Arial" font-size="12" fill="#495057">資産総額</text>
+            
+            <rect x="100" width="10" height="10" fill="#28a745"/>
+            <text x="120" y="10" font-family="Arial" font-size="12" fill="#495057">増加率</text>
+        </g>
+    </g>
+</svg>
