@@ -9,6 +9,10 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'prettier',
+    'plugin:storybook/recommended',
+    'plugin:storybook/recommended',
+    'plugin:storybook/recommended',
+    'plugin:storybook/recommended',
   ],
   parserOptions: {
     ecmaVersion: 'latest',
