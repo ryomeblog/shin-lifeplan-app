@@ -41,7 +41,12 @@
 [![振替取引フォーム](./svg/transfer-form.svg)](./svg/transfer-form.svg)
 
 ##### 投資取引フォーム
-[![投資取引フォーム](./svg/investment-form.svg)](./svg/investment-form.svg)
+
+###### 買付フォーム
+[![投資取引買付フォーム](./svg/investment-form.svg)](./svg/investment-form.svg)
+
+###### 売却フォーム
+[![投資取引売却フォーム](./svg/investment-sell-form.svg)](./svg/investment-sell-form.svg)
 
 ### 3. カテゴリ管理
 #### カテゴリ一覧
