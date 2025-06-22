@@ -4,32 +4,173 @@ import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
+import { getCategories, saveCategories } from '../../utils/storage';
 
 const Categories = () => {
-  const [expenseCategories, setExpenseCategories] = useState([
-    { id: 'exp_1', name: '食費', color: '#007bff' },
-    { id: 'exp_2', name: '消耗品', color: '#28a745' },
-    { id: 'exp_3', name: '耐久消耗品', color: '#dc3545' },
-    { id: 'exp_4', name: '交際費', color: '#ffc107' },
-    { id: 'exp_5', name: '住居費', color: '#17a2b8' },
-    { id: 'exp_6', name: '水道光熱費', color: '#6f42c1' },
-    { id: 'exp_7', name: '通信費', color: '#e83e8c' },
-    { id: 'exp_8', name: '保険', color: '#fd7e14' },
-    { id: 'exp_9', name: '税金', color: '#20c997' },
-    { id: 'exp_10', name: 'その他', color: '#6c757d' },
-  ]);
-
-  const [incomeCategories, setIncomeCategories] = useState([
-    { id: 'inc_1', name: '利子所得', color: '#007bff' },
-    { id: 'inc_2', name: '配当所得', color: '#28a745' },
-    { id: 'inc_3', name: '不動産所得', color: '#dc3545' },
-    { id: 'inc_4', name: '事業所得', color: '#ffc107' },
-    { id: 'inc_5', name: '給与所得', color: '#17a2b8' },
-    { id: 'inc_6', name: '退職所得', color: '#6f42c1' },
-    { id: 'inc_7', name: '山林所得', color: '#e83e8c' },
-    { id: 'inc_8', name: '譲渡所得', color: '#fd7e14' },
-    { id: 'inc_9', name: '一時所得', color: '#20c997' },
-    { id: 'inc_10', name: '雑所得', color: '#6c757d' },
+  // データ設計に合わせて単一のcategories配列で管理
+  const [categories, setCategories] = useState([
+    // 支出カテゴリ（デフォルト）
+    {
+      id: 'cat_001',
+      name: '食費',
+      type: 'expense',
+      color: '#007bff',
+      displayOrder: 1,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_002',
+      name: '消耗品',
+      type: 'expense',
+      color: '#28a745',
+      displayOrder: 2,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_003',
+      name: '耐久消耗品',
+      type: 'expense',
+      color: '#dc3545',
+      displayOrder: 3,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_004',
+      name: '交際費',
+      type: 'expense',
+      color: '#ffc107',
+      displayOrder: 4,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_005',
+      name: '住居費',
+      type: 'expense',
+      color: '#17a2b8',
+      displayOrder: 5,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_006',
+      name: '水道光熱費',
+      type: 'expense',
+      color: '#6f42c1',
+      displayOrder: 6,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_007',
+      name: '通信費',
+      type: 'expense',
+      color: '#e83e8c',
+      displayOrder: 7,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_008',
+      name: '保険',
+      type: 'expense',
+      color: '#fd7e14',
+      displayOrder: 8,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_009',
+      name: '税金',
+      type: 'expense',
+      color: '#20c997',
+      displayOrder: 9,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_010',
+      name: 'その他',
+      type: 'expense',
+      color: '#6c757d',
+      displayOrder: 10,
+      createdAt: new Date().toISOString(),
+    },
+    // 収入カテゴリ（デフォルト）
+    {
+      id: 'cat_011',
+      name: '利子所得',
+      type: 'income',
+      color: '#007bff',
+      displayOrder: 1,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_012',
+      name: '配当所得',
+      type: 'income',
+      color: '#28a745',
+      displayOrder: 2,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_013',
+      name: '不動産所得',
+      type: 'income',
+      color: '#dc3545',
+      displayOrder: 3,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_014',
+      name: '事業所得',
+      type: 'income',
+      color: '#ffc107',
+      displayOrder: 4,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_015',
+      name: '給与所得',
+      type: 'income',
+      color: '#17a2b8',
+      displayOrder: 5,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_016',
+      name: '退職所得',
+      type: 'income',
+      color: '#6f42c1',
+      displayOrder: 6,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_017',
+      name: '山林所得',
+      type: 'income',
+      color: '#e83e8c',
+      displayOrder: 7,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_018',
+      name: '譲渡所得',
+      type: 'income',
+      color: '#fd7e14',
+      displayOrder: 8,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_019',
+      name: '一時所得',
+      type: 'income',
+      color: '#20c997',
+      displayOrder: 9,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'cat_020',
+      name: '雑所得',
+      type: 'income',
+      color: '#6c757d',
+      displayOrder: 10,
+      createdAt: new Date().toISOString(),
+    },
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,32 +194,36 @@ const Categories = () => {
     '#6c757d',
   ];
 
-  // ローカルストレージからカテゴリを読み込み
+  // データ設計に合わせたカテゴリデータの読み込み
   useEffect(() => {
     try {
-      const savedExpense = localStorage.getItem('expenseCategories');
-      const savedIncome = localStorage.getItem('incomeCategories');
-
-      if (savedExpense) {
-        setExpenseCategories(JSON.parse(savedExpense));
-      }
-      if (savedIncome) {
-        setIncomeCategories(JSON.parse(savedIncome));
+      const savedCategories = getCategories();
+      if (savedCategories.length > 0) {
+        setCategories(savedCategories);
       }
     } catch (error) {
       console.error('カテゴリ読み込みエラー:', error);
     }
   }, []);
 
-  // ローカルストレージに保存
-  const saveToLocalStorage = (expense, income) => {
-    try {
-      localStorage.setItem('expenseCategories', JSON.stringify(expense));
-      localStorage.setItem('incomeCategories', JSON.stringify(income));
-    } catch (error) {
-      console.error('カテゴリ保存エラー:', error);
+  // データ設計に合わせたカテゴリ保存
+  const saveToStorage = (categoriesData) => {
+    const success = saveCategories(categoriesData);
+    if (!success) {
+      console.error('カテゴリ保存エラー');
     }
+    return success;
   };
+
+  // 支出カテゴリをdisplayOrderでソートして取得
+  const expenseCategories = categories
+    .filter((cat) => cat.type === 'expense')
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+
+  // 収入カテゴリをdisplayOrderでソートして取得
+  const incomeCategories = categories
+    .filter((cat) => cat.type === 'income')
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 
   const handleAddCategory = (type) => {
     setEditingCategory(null);
@@ -90,26 +235,37 @@ const Categories = () => {
     setIsModalOpen(true);
   };
 
-  const handleEditCategory = (category, type) => {
+  const handleEditCategory = (category) => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
       color: category.color,
-      type: type,
+      type: category.type,
     });
     setIsModalOpen(true);
   };
 
-  const handleDeleteCategory = (categoryId, type) => {
-    if (type === 'expense') {
-      const updated = expenseCategories.filter((cat) => cat.id !== categoryId);
-      setExpenseCategories(updated);
-      saveToLocalStorage(updated, incomeCategories);
-    } else {
-      const updated = incomeCategories.filter((cat) => cat.id !== categoryId);
-      setIncomeCategories(updated);
-      saveToLocalStorage(expenseCategories, updated);
-    }
+  const handleDeleteCategory = (categoryId) => {
+    const updated = categories.filter((cat) => cat.id !== categoryId);
+    setCategories(updated);
+    saveToStorage(updated);
+  };
+
+  // IDを生成する関数（データ設計に合わせてcat_プレフィックス）
+  const generateCategoryId = () => {
+    const maxId = categories.reduce((max, cat) => {
+      const numPart = parseInt(cat.id.replace('cat_', ''), 10);
+      return numPart > max ? numPart : max;
+    }, 0);
+    return `cat_${String(maxId + 1).padStart(3, '0')}`;
+  };
+
+  // 表示順序を生成する関数
+  const generateDisplayOrder = (type) => {
+    const sameTyeCategories = categories.filter((cat) => cat.type === type);
+    return sameTyeCategories.length > 0
+      ? Math.max(...sameTyeCategories.map((cat) => cat.displayOrder)) + 1
+      : 1;
   };
 
   const handleSaveCategory = () => {
@@ -118,41 +274,30 @@ const Categories = () => {
       return;
     }
 
+    // データ設計に合わせたカテゴリデータ構造
     const categoryData = {
-      id: editingCategory?.id || `${formData.type === 'expense' ? 'exp' : 'inc'}_${Date.now()}`,
+      id: editingCategory?.id || generateCategoryId(),
       name: formData.name,
+      type: formData.type,
       color: formData.color,
+      displayOrder: editingCategory?.displayOrder || generateDisplayOrder(formData.type),
+      createdAt: editingCategory?.createdAt || new Date().toISOString(),
     };
 
-    if (formData.type === 'expense') {
-      let updated;
-      if (editingCategory) {
-        updated = expenseCategories.map((cat) =>
-          cat.id === editingCategory.id ? categoryData : cat
-        );
-      } else {
-        updated = [...expenseCategories, categoryData];
-      }
-      setExpenseCategories(updated);
-      saveToLocalStorage(updated, incomeCategories);
+    let updated;
+    if (editingCategory) {
+      updated = categories.map((cat) => (cat.id === editingCategory.id ? categoryData : cat));
     } else {
-      let updated;
-      if (editingCategory) {
-        updated = incomeCategories.map((cat) =>
-          cat.id === editingCategory.id ? categoryData : cat
-        );
-      } else {
-        updated = [...incomeCategories, categoryData];
-      }
-      setIncomeCategories(updated);
-      saveToLocalStorage(expenseCategories, updated);
+      updated = [...categories, categoryData];
     }
 
+    setCategories(updated);
+    saveToStorage(updated);
     setIsModalOpen(false);
     setEditingCategory(null);
   };
 
-  const CategoryItem = ({ category, type, onEdit, onDelete }) => (
+  const CategoryItem = ({ category, onEdit, onDelete }) => (
     <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
       <div className="flex items-center space-x-3">
         <div className="w-6 h-6 rounded-full" style={{ backgroundColor: category.color }}></div>
@@ -162,7 +307,7 @@ const Categories = () => {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => onEdit(category, type)}
+          onClick={() => onEdit(category)}
           className="flex items-center space-x-1"
         >
           <HiPencilSquare className="h-4 w-4" />
@@ -171,7 +316,7 @@ const Categories = () => {
         <Button
           size="sm"
           variant="outline"
-          onClick={() => onDelete(category.id, type)}
+          onClick={() => onDelete(category.id)}
           className="flex items-center space-x-1 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
         >
           <HiTrash className="h-4 w-4" />
@@ -209,7 +354,6 @@ const Categories = () => {
                 <CategoryItem
                   key={category.id}
                   category={category}
-                  type="expense"
                   onEdit={handleEditCategory}
                   onDelete={handleDeleteCategory}
                 />
@@ -243,7 +387,6 @@ const Categories = () => {
                 <CategoryItem
                   key={category.id}
                   category={category}
-                  type="income"
                   onEdit={handleEditCategory}
                   onDelete={handleDeleteCategory}
                 />

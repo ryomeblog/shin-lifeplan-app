@@ -5,6 +5,7 @@ import PlanRangeSettings from '../layout/PlanRangeSettings';
 import FamilySettings from '../layout/FamilySettings';
 import FireSettings from '../layout/FireSettings';
 import FamilyMemberModal from '../forms/FamilyMemberModal';
+import { saveLifePlan, setActiveLifePlanId } from '../../utils/storage';
 
 const LifePlanCreate = ({ initialData = null }) => {
   const navigate = useNavigate();
@@ -153,22 +154,18 @@ const LifePlanCreate = ({ initialData = null }) => {
     };
 
     try {
-      // ローカルストレージからライフプランリストを取得
-      const existingPlans = JSON.parse(localStorage.getItem('lifePlans') || '[]');
+      // ライフプランを保存
+      const saveSuccess = saveLifePlan(lifePlanData);
 
-      // 既存プランの場合は更新、新規の場合は追加
-      const updatedPlans = initialData
-        ? existingPlans.map((plan) => (plan.id === lifePlanData.id ? lifePlanData : plan))
-        : [...existingPlans, lifePlanData];
+      if (saveSuccess) {
+        // アクティブなライフプランとして設定
+        setActiveLifePlanId(lifePlanData.id);
 
-      // ローカルストレージに保存
-      localStorage.setItem('lifePlans', JSON.stringify(updatedPlans));
-
-      // アクティブなライフプランとして設定
-      localStorage.setItem('activeLifePlan', lifePlanData.id);
-
-      console.log('ライフプランデータを保存:', lifePlanData);
-      navigate('/dashboard');
+        console.log('ライフプランデータを保存:', lifePlanData);
+        navigate('/dashboard');
+      } else {
+        throw new Error('Failed to save life plan');
+      }
     } catch (error) {
       console.error('ライフプラン保存エラー:', error);
       alert('保存に失敗しました。もう一度お試しください。');

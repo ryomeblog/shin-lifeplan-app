@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { HiCog6Tooth, HiChevronDown } from 'react-icons/hi2';
+import { getLifePlans, getActiveLifePlanId, setActiveLifePlanId } from '../../utils/storage';
 
 const Header = () => {
   const location = useLocation();
@@ -8,22 +9,22 @@ const Header = () => {
   const [lifePlans, setLifePlans] = useState([]);
   const [showPlanDropdown, setShowPlanDropdown] = useState(false);
 
-  // ローカルストレージからライフプランを読み込み
+  // ストレージからライフプランを読み込み
   useEffect(() => {
     try {
-      const plans = JSON.parse(localStorage.getItem('lifePlans') || '[]');
+      const plans = getLifePlans();
       setLifePlans(plans);
 
       // 選択されたプランがある場合は設定
-      const activePlan = localStorage.getItem('activeLifePlan');
-      if (activePlan && plans.length > 0) {
-        const plan = plans.find((p) => p.id === activePlan);
+      const activePlanId = getActiveLifePlanId();
+      if (activePlanId && plans.length > 0) {
+        const plan = plans.find((p) => p.id === activePlanId);
         if (plan) {
           setSelectedPlan(plan.name);
         }
       } else if (plans.length > 0) {
         setSelectedPlan(plans[0].name);
-        localStorage.setItem('activeLifePlan', plans[0].id);
+        setActiveLifePlanId(plans[0].id);
       }
     } catch (error) {
       console.error('ライフプラン読み込みエラー:', error);
@@ -45,7 +46,7 @@ const Header = () => {
 
   const handlePlanSelect = (plan) => {
     setSelectedPlan(plan.name);
-    localStorage.setItem('activeLifePlan', plan.id);
+    setActiveLifePlanId(plan.id);
     setShowPlanDropdown(false);
     // ページリロードして新しいプランのデータを反映
     window.location.reload();

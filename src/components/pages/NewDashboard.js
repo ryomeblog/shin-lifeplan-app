@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../ui/Card';
+import { getActiveLifePlan } from '../../utils/storage';
 
 const NewDashboard = () => {
   const [activeLifePlan, setActiveLifePlan] = useState(null);
@@ -10,9 +11,7 @@ const NewDashboard = () => {
   useEffect(() => {
     // アクティブなライフプランを取得
     try {
-      const activePlanId = localStorage.getItem('activeLifePlan');
-      const lifePlans = JSON.parse(localStorage.getItem('lifePlans') || '[]');
-      const plan = lifePlans.find((p) => p.id === activePlanId);
+      const plan = getActiveLifePlan();
       setActiveLifePlan(plan);
     } catch (error) {
       console.error('ライフプラン読み込みエラー:', error);

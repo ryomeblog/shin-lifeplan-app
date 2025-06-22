@@ -5,8 +5,10 @@ import Home from './components/pages/Home';
 import LifePlanCreate from './components/pages/LifePlanCreate';
 import Dashboard from './components/pages/NewDashboard';
 import Transactions from './components/pages/Transactions';
-import Accounts from './components/pages/NewAccounts';
+import Accounts from './components/pages/Accounts';
 import Assets from './components/pages/Assets';
+import AssetDetail from './components/pages/AssetDetail';
+import HoldingAssetDetail from './components/pages/HoldingAssetDetail';
 import Reports from './components/pages/Reports';
 import Settings from './components/pages/Settings';
 import Events from './components/pages/Events';
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
       {
         path: 'assets',
         element: <Assets />,
+      },
+      {
+        path: 'assets/:assetId',
+        element: <AssetDetail />,
+      },
+      {
+        path: 'holding-assets/:holdingId',
+        element: <HoldingAssetDetail />,
       },
       {
         path: 'reports',
