@@ -1,13 +1,17 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import LifePlanCreate from './components/layout/LifePlanCreate';
-import Dashboard from './components/pages/Dashboard';
+import Home from './components/pages/Home';
+import LifePlanCreate from './components/pages/LifePlanCreate';
+import Dashboard from './components/pages/NewDashboard';
 import Transactions from './components/pages/Transactions';
-import Accounts from './components/pages/Accounts';
+import Accounts from './components/pages/NewAccounts';
 import Assets from './components/pages/Assets';
 import Reports from './components/pages/Reports';
 import Settings from './components/pages/Settings';
+import Events from './components/pages/Events';
+import Templates from './components/pages/Templates';
+import Categories from './components/pages/Categories';
 import NotFound from './components/pages/NotFound';
 
 // レイアウトラッパーコンポーネント
@@ -19,29 +23,15 @@ const LayoutWrapper = () => {
   );
 };
 
-// ライフプラン作成ページ用のハンドラー
-const LifePlanCreatePage = () => {
-  const handleSave = (lifePlanData) => {
-    console.log('ライフプランデータを保存:', lifePlanData);
-    // 将来的にはダッシュボードに遷移
-    // navigate('/dashboard');
-    alert('ライフプランが保存されました！');
-  };
-
-  const handleCancel = () => {
-    if (window.confirm('作成をキャンセルしますか？')) {
-      console.log('ライフプラン作成をキャンセル');
-    }
-  };
-
-  return <LifePlanCreate onSave={handleSave} onCancel={handleCancel} />;
-};
-
 // ルーター設定
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <LifePlanCreatePage />,
+    element: <Home />,
+  },
+  {
+    path: '/create',
+    element: <LifePlanCreate />,
   },
   {
     path: '/',
@@ -66,6 +56,18 @@ const router = createBrowserRouter([
       {
         path: 'reports',
         element: <Reports />,
+      },
+      {
+        path: 'events',
+        element: <Events />,
+      },
+      {
+        path: 'templates',
+        element: <Templates />,
+      },
+      {
+        path: 'categories',
+        element: <Categories />,
       },
       {
         path: 'settings',

@@ -1,32 +1,26 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import LifePlanCreate from './LifePlanCreate';
 
 export default {
-  title: 'Layout/LifePlanCreate',
+  title: 'Pages/LifePlanCreate',
   component: LifePlanCreate,
   parameters: {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
+  decorators: [
+    (Story) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
 };
 
 // デフォルトのストーリー（新規作成）
 export const Default = {
-  render: () => {
-    const handleSave = (lifePlanData) => {
-      console.log('ライフプランが保存されました:', lifePlanData);
-      alert('ライフプランが保存されました！');
-    };
-
-    const handleCancel = () => {
-      console.log('キャンセルされました');
-      if (window.confirm('変更内容が失われます。よろしいですか？')) {
-        alert('キャンセルされました');
-      }
-    };
-
-    return <LifePlanCreate onSave={handleSave} onCancel={handleCancel} />;
-  },
+  render: () => <LifePlanCreate />,
 };
 
 // 既存データを編集する場合
@@ -64,19 +58,7 @@ export const EditMode = {
       createdAt: '2024-01-01T00:00:00.000Z',
     };
 
-    const handleSave = (lifePlanData) => {
-      console.log('ライフプランが更新されました:', lifePlanData);
-      alert('ライフプランが更新されました！');
-    };
-
-    const handleCancel = () => {
-      console.log('編集がキャンセルされました');
-      alert('編集がキャンセルされました');
-    };
-
-    return (
-      <LifePlanCreate onSave={handleSave} onCancel={handleCancel} initialData={existingData} />
-    );
+    return <LifePlanCreate initialData={existingData} />;
   },
 };
 
@@ -90,24 +72,15 @@ export const EmptyState = {
       familyMembers: [],
     };
 
-    const handleSave = (lifePlanData) => {
-      console.log('保存試行:', lifePlanData);
-      // この場合、バリデーションエラーが発生するはず
-    };
-
-    const handleCancel = () => {
-      console.log('キャンセル');
-    };
-
     return (
       <div className="space-y-4">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mx-6">
           <p className="text-sm text-yellow-800">
             <strong>注意:</strong> この状態で保存ボタンを押すと、
             「少なくとも1人の家族メンバーを追加してください」というバリデーションエラーが表示されます。
           </p>
         </div>
-        <LifePlanCreate onSave={handleSave} onCancel={handleCancel} initialData={emptyData} />
+        <LifePlanCreate initialData={emptyData} />
       </div>
     );
   },
@@ -173,18 +146,7 @@ export const LargeFamily = {
       ],
     };
 
-    const handleSave = (lifePlanData) => {
-      console.log('大家族のライフプラン保存:', lifePlanData);
-      alert('大家族のライフプランが保存されました！');
-    };
-
-    const handleCancel = () => {
-      console.log('キャンセル');
-    };
-
-    return (
-      <LifePlanCreate onSave={handleSave} onCancel={handleCancel} initialData={largeFamilyData} />
-    );
+    return <LifePlanCreate initialData={largeFamilyData} />;
   },
 };
 
@@ -213,23 +175,14 @@ export const WithoutFIRE = {
       ],
     };
 
-    const handleSave = (lifePlanData) => {
-      console.log('FIRE計画なしのライフプラン保存:', lifePlanData);
-      alert('ライフプランが保存されました（FIRE計画なし）');
-    };
-
-    const handleCancel = () => {
-      console.log('キャンセル');
-    };
-
     return (
       <div className="space-y-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mx-6">
           <p className="text-sm text-blue-800">
             <strong>参考:</strong> FIRE目標金額が空の場合、FIRE機能は無効として保存されます。
           </p>
         </div>
-        <LifePlanCreate onSave={handleSave} onCancel={handleCancel} initialData={noFireData} />
+        <LifePlanCreate initialData={noFireData} />
       </div>
     );
   },
@@ -238,39 +191,9 @@ export const WithoutFIRE = {
 // インタラクティブなデモ
 export const InteractiveDemo = {
   render: () => {
-    const handleSave = (lifePlanData) => {
-      // より詳細な保存データの表示
-      const summary = {
-        基本情報: {
-          期間: `${lifePlanData.settings.planStartYear}年 - ${lifePlanData.settings.planEndYear}年`,
-          年数: `${lifePlanData.settings.planEndYear - lifePlanData.settings.planStartYear}年間`,
-        },
-        FIRE計画: {
-          目標金額: lifePlanData.settings.fireSettings.isEnabled
-            ? `¥${lifePlanData.settings.fireSettings.targetAmount.toLocaleString()}`
-            : '設定なし',
-          有効: lifePlanData.settings.fireSettings.isEnabled ? 'はい' : 'いいえ',
-        },
-        家族構成: lifePlanData.familyMembers.map((member) => ({
-          名前: member.name,
-          年齢: new Date().getFullYear() - new Date(member.birthDate).getFullYear(),
-          寿命設定: `${member.lifeExpectancy}歳`,
-        })),
-      };
-
-      console.log('保存されたライフプラン:', summary);
-      alert(`ライフプランが保存されました！\n\n詳細はコンソールをご確認ください。`);
-    };
-
-    const handleCancel = () => {
-      if (window.confirm('作成中のライフプランが失われます。本当にキャンセルしますか？')) {
-        alert('キャンセルされました。トップページに戻ります。');
-      }
-    };
-
     return (
       <div className="space-y-4">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mx-6">
           <h3 className="font-semibold text-green-800 mb-2">インタラクティブデモ</h3>
           <ul className="text-sm text-green-700 space-y-1">
             <li>• 家族メンバーを追加・編集・削除してみてください</li>
@@ -279,7 +202,7 @@ export const InteractiveDemo = {
             <li>• バリデーションエラーも確認できます</li>
           </ul>
         </div>
-        <LifePlanCreate onSave={handleSave} onCancel={handleCancel} />
+        <LifePlanCreate />
       </div>
     );
   },
