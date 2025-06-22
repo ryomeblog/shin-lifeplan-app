@@ -3,20 +3,8 @@
     <!-- 背景 -->
     <rect width="1200" height="800" fill="#f8f9fa"/>
     
-    <!-- コントロール -->
-    <g transform="translate(20, 20)">
-        <rect width="1160" height="60" rx="10" fill="#ffffff" stroke="#dee2e6"/>
-        
-        <!-- 年選択 -->
-        <g transform="translate(40, 10)">
-            <text x="0" y="25" font-family="Arial" font-size="14" fill="#495057">表示年</text>
-            <rect x="60" y="10" width="120" height="30" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-            <text x="80" y="30" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
-        </g>
-    </g>
-    
     <!-- 保有資産セクション -->
-    <g transform="translate(20, 100)">
+    <g transform="translate(20, 20)">
         <rect width="1160" height="380" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
         <!-- ヘッダー -->
@@ -30,7 +18,7 @@
             <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
             <text x="300" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">保有数</text>
             <text x="500" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">購入時の評価額</text>
-            <text x="700" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">現在の評価額</text>
+            <text x="700" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均評価額</text>
             <text x="900" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">損益</text>
             
             <!-- 資産1 -->
@@ -62,7 +50,7 @@
     </g>
     
     <!-- 資産検索セクション -->
-    <g transform="translate(20, 500)">
+    <g transform="translate(20, 450)">
         <rect width="1160" height="280" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
         <!-- 検索ヘッダー -->
@@ -86,7 +74,7 @@
             <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
             <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産ID</text>
             <text x="150" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">資産名</text>
-            <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
+            <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均評価額</text>
             <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均年率</text>
             <text x="800" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">平均配当</text>
             

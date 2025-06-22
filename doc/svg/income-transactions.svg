@@ -97,4 +97,8 @@
             </g>
         </g>
     </g>
+
+    <!-- 新規追加ボタン -->
+    <circle cx="1140" cy="740" r="40" fill="#007bff"/>
+    <text x="1127" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
 </svg>

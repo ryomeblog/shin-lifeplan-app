@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="1000" viewBox="0 0 1200 1000" xmlns="http://www.w3.org/2000/svg">
     <!-- 背景 -->
-    <rect width="1200" height="800" fill="#f8f9fa"/>
+    <rect width="1200" height="1000" fill="#f8f9fa"/>
     
     <!-- サイドバー -->
     <g transform="translate(20, 20)">
-        <rect width="280" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <rect width="280" height="960" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
         <!-- メニュー項目 -->
         <g transform="translate(20, 20)">
@@ -29,7 +29,7 @@
     
     <!-- メインコンテンツ -->
     <g transform="translate(320, 20)">
-        <rect width="860" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <rect width="860" height="960" rx="10" fill="#ffffff" stroke="#dee2e6"/>
         
         <!-- プロファイル設定 -->
         <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">プロファイル設定</text>
@@ -64,8 +64,68 @@
             </g>
         </g>
         
+        <!-- ライフプラン一覧 -->
+        <g transform="translate(40, 420)">
+            <text x="0" y="20" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">ライフプラン一覧</text>
+            
+            <!-- テーブルコンテナ（スクロール領域） -->
+            <rect x="0" y="40" width="780" height="200" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            
+            <!-- テーブルヘッダー -->
+            <g transform="translate(0, 40)">
+                <rect width="780" height="40" fill="#f8f9fa"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">ライフプラン名</text>
+                <text x="650" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">操作</text>
+            </g>
+            
+            <!-- テーブル行 -->
+            <!-- 行1 -->
+            <g transform="translate(0, 80)">
+                <rect width="780" height="35" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="22" font-family="Arial" font-size="14" fill="#495057">我が家のライフプラン</text>
+                <rect x="650" y="7" width="60" height="20" rx="3" fill="#dc3545"/>
+                <text x="670" y="19" font-family="Arial" font-size="12" fill="#ffffff">削除</text>
+            </g>
+            
+            <!-- 行2 -->
+            <g transform="translate(0, 115)">
+                <rect width="780" height="35" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="22" font-family="Arial" font-size="14" fill="#495057">独身プラン2025</text>
+                <rect x="650" y="7" width="60" height="20" rx="3" fill="#dc3545"/>
+                <text x="670" y="19" font-family="Arial" font-size="12" fill="#ffffff">削除</text>
+            </g>
+            
+            <!-- 行3 -->
+            <g transform="translate(0, 150)">
+                <rect width="780" height="35" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="22" font-family="Arial" font-size="14" fill="#495057">結婚後ライフプラン</text>
+                <rect x="650" y="7" width="60" height="20" rx="3" fill="#dc3545"/>
+                <text x="670" y="19" font-family="Arial" font-size="12" fill="#ffffff">削除</text>
+            </g>
+            
+            <!-- 行4 -->
+            <g transform="translate(0, 185)">
+                <rect width="780" height="35" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="22" font-family="Arial" font-size="14" fill="#495057">FIRE達成プラン</text>
+                <rect x="650" y="7" width="60" height="20" rx="3" fill="#dc3545"/>
+                <text x="670" y="19" font-family="Arial" font-size="12" fill="#ffffff">削除</text>
+            </g>
+            
+            <!-- 行5 -->
+            <g transform="translate(0, 220)">
+                <rect width="780" height="35" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="22" font-family="Arial" font-size="14" fill="#495057">退職後プラン</text>
+                <rect x="650" y="7" width="60" height="20" rx="3" fill="#dc3545"/>
+                <text x="670" y="19" font-family="Arial" font-size="12" fill="#ffffff">削除</text>
+            </g>
+            
+            <!-- スクロールバー -->
+            <rect x="765" y="80" width="8" height="120" rx="4" fill="#e9ecef"/>
+            <rect x="766" y="85" width="6" height="40" rx="3" fill="#6c757d"/>
+        </g>
+        
         <!-- 保存ボタン -->
-        <g transform="translate(40, 680)">
+        <g transform="translate(40, 900)">
             <rect width="200" height="40" rx="5" fill="#007bff"/>
             <text x="70" y="25" font-family="Arial" font-size="14" fill="#ffffff">変更を保存</text>
         </g>

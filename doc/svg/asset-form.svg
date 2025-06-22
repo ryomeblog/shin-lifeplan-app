@@ -28,8 +28,6 @@
                 <rect width="1080" height="40" rx="5" fill="#f8f9fa"/>
                 <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">年</text>
                 <text x="200" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">評価額</text>
-                <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">年率</text>
-                <text x="600" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">配当</text>
                 
                 <!-- 2025年（開始年） -->
                 <g transform="translate(0, 50)">
@@ -37,10 +35,6 @@
                     <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2025年</text>
                     <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                     <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
-                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
-                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
                     <!-- 削除ボタン -->
                     <text x="1040" y="30" font-family="Arial" font-size="14" fill="#dc3545">×</text>
                 </g>
@@ -51,10 +45,6 @@
                     <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2030年</text>
                     <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                     <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
-                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
-                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
                     <!-- 削除ボタン -->
                     <text x="1040" y="30" font-family="Arial" font-size="14" fill="#dc3545">×</text>
                 </g>
@@ -65,10 +55,6 @@
                     <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">2065年</text>
                     <rect x="200" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
                     <text x="220" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
-                    <rect x="400" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="420" y="30" font-family="Arial" font-size="14" fill="#6c757d">%</text>
-                    <rect x="600" y="5" width="160" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
-                    <text x="620" y="30" font-family="Arial" font-size="14" fill="#6c757d">¥</text>
                     <!-- 削除ボタン -->
                     <text x="1040" y="30" font-family="Arial" font-size="14" fill="#dc3545">×</text>
                 </g>

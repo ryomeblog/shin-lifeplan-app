@@ -20,8 +20,17 @@
         <text x="650" y="38" font-family="Arial" font-size="16" fill="#ffffff">投資</text>
     </g>
     
-    <!-- 投資先選択 -->
+    <!-- 買付・売却選択 -->
     <g transform="translate(20, 160)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">取引種別</text>
+        <rect x="0" y="40" width="380" height="50" rx="25" fill="#e9ecef" stroke="#dee2e6"/>
+        <rect x="0" y="45" width="185" height="40" rx="20" fill="#20c997"/>
+        <text x="90" y="68" font-family="Arial" font-size="14" fill="#ffffff">買付</text>
+        <text x="280" y="68" font-family="Arial" font-size="14" fill="#6c757d">売却</text>
+    </g>
+    
+    <!-- 投資先選択 -->
+    <g transform="translate(20, 240)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">投資先選択</text>
         <rect x="0" y="40" width="760" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="70" font-family="Arial" font-size="14" fill="#212529">米国株式（VOO）</text>
@@ -30,7 +39,7 @@
     </g>
 
     <!-- 投資元口座選択 -->
-    <g transform="translate(20, 300)">
+    <g transform="translate(20, 380)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">投資元口座</text>
         <rect x="0" y="40" width="760" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">口座を選択</text>
@@ -38,7 +47,7 @@
     </g>
 
     <!-- 数量入力 -->
-    <g transform="translate(20, 390)">
+    <g transform="translate(20, 470)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">数量</text>
         <rect x="0" y="40" width="760" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="80" font-family="Arial" font-size="24" fill="#212529">0</text>
@@ -46,7 +55,7 @@
     </g>
 
     <!-- 投資金額計算結果 -->
-    <g transform="translate(20, 490)">
+    <g transform="translate(20, 570)">
         <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">投資金額</text>
         <rect x="0" y="40" width="760" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
         <text x="20" y="80" font-family="Arial" font-size="24" fill="#20c997">¥0</text>
