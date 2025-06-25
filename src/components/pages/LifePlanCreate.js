@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
+import Input from '../ui/Input';
+import Card from '../ui/Card';
 import PlanRangeSettings from '../layout/PlanRangeSettings';
 import FamilySettings from '../layout/FamilySettings';
 import FireSettings from '../layout/FireSettings';
@@ -11,11 +13,15 @@ const LifePlanCreate = ({ initialData = null }) => {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
+  // ライフプラン名入力用のref（uncontrolled component）
+  const planNameRef = useRef(null);
+
   // フォームの状態管理
   const [formData, setFormData] = useState({
-    planStartYear: initialData?.planStartYear || currentYear,
-    planEndYear: initialData?.planEndYear || currentYear + 30,
-    fireTargetAmount: initialData?.fireTargetAmount || '',
+    planName: initialData?.name || '',
+    planStartYear: initialData?.settings?.planStartYear || currentYear,
+    planEndYear: initialData?.settings?.planEndYear || currentYear + 30,
+    fireTargetAmount: initialData?.settings?.fireSettings?.targetAmount || '',
   });
 
   // 家族メンバーの状態管理
@@ -31,7 +37,7 @@ const LifePlanCreate = ({ initialData = null }) => {
   // バリデーションエラーの状態管理
   const [errors, setErrors] = useState({});
 
-  // フォーム入力処理
+  // フォーム入力処理（年や金額など、即座に反映したいもの用）
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -44,6 +50,25 @@ const LifePlanCreate = ({ initialData = null }) => {
         ...prev,
         [field]: '',
       }));
+    }
+  };
+
+  // ライフプラン名のブラー処理（フォーカスが離れた時に実際のフォームデータを更新）
+  const handlePlanNameBlur = () => {
+    if (planNameRef.current) {
+      const value = planNameRef.current.value;
+      setFormData((prev) => ({
+        ...prev,
+        planName: value,
+      }));
+
+      // エラーをクリア
+      if (errors.planName) {
+        setErrors((prev) => ({
+          ...prev,
+          planName: '',
+        }));
+      }
     }
   };
 
@@ -107,6 +132,12 @@ const LifePlanCreate = ({ initialData = null }) => {
   const validateForm = () => {
     const newErrors = {};
 
+    // ライフプラン名の検証（refから現在の値を取得）
+    const currentPlanName = planNameRef.current?.value || formData.planName;
+    if (!currentPlanName.trim()) {
+      newErrors.planName = 'ライフプラン名を入力してください';
+    }
+
     // 開始年・終了年の検証
     if (formData.planStartYear >= formData.planEndYear) {
       newErrors.planEndYear = '終了年は開始年より後である必要があります';
@@ -131,14 +162,27 @@ const LifePlanCreate = ({ initialData = null }) => {
 
   // 保存処理
   const handleSave = () => {
+    // 保存前にrefから最新のプラン名を取得してフォームデータに反映
+    if (planNameRef.current) {
+      const currentPlanName = planNameRef.current.value;
+      setFormData((prev) => ({
+        ...prev,
+        planName: currentPlanName,
+      }));
+    }
+
     if (!validateForm()) {
       return;
     }
 
+    // 最新のプラン名を取得（refから直接取得）
+    const finalPlanName = planNameRef.current?.value?.trim() || formData.planName.trim();
+
     const lifePlanData = {
       id: initialData?.id || `lp_${Date.now()}`,
-      name: initialData?.name || 'ライフプラン',
+      name: finalPlanName,
       settings: {
+        currency: 'JPY',
         planStartYear: formData.planStartYear,
         planEndYear: formData.planEndYear,
         fireSettings: {
@@ -147,8 +191,18 @@ const LifePlanCreate = ({ initialData = null }) => {
             : 0,
           isEnabled: Boolean(formData.fireTargetAmount),
         },
+        displaySettings: {
+          dateFormat: 'YYYY-MM-DD',
+          numberFormat: 'comma',
+        },
       },
       familyMembers: familyMembers,
+      accounts: initialData?.accounts || [],
+      categories: initialData?.categories || [],
+      assetInfo: initialData?.assetInfo || [],
+      holdingAssets: initialData?.holdingAssets || [],
+      templates: initialData?.templates || [],
+      yearlyData: initialData?.yearlyData || [],
       createdAt: initialData?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -187,6 +241,26 @@ const LifePlanCreate = ({ initialData = null }) => {
         </div>
 
         <div className="space-y-6">
+          {/* ライフプラン名設定 */}
+          <Card title="ライフプラン名">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ライフプラン名 <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  ref={planNameRef}
+                  type="text"
+                  defaultValue={formData.planName}
+                  onBlur={handlePlanNameBlur}
+                  placeholder="例：独身ライフプラン、夫婦ライフプラン"
+                  error={errors.planName}
+                />
+                {errors.planName && <p className="mt-1 text-sm text-red-600">{errors.planName}</p>}
+              </div>
+            </div>
+          </Card>
+
           {/* ライフプラン範囲設定 */}
           <PlanRangeSettings
             formData={formData}

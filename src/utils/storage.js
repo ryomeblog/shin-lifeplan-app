@@ -8,94 +8,96 @@ const getDefaultData = () => ({
     createdAt: new Date().toISOString(),
     lastBackup: new Date().toISOString(),
   },
-  lifeplan: {
-    id: 'lp_001',
-    name: 'マイライフプラン',
-    settings: {
-      currency: 'JPY',
-      planStartYear: 2025,
-      planEndYear: 2065,
-      fireSettings: {
-        targetAmount: 50000000,
-        isEnabled: true,
+  lifeplan: [
+    {
+      id: 'lp_001',
+      name: 'マイライフプラン',
+      settings: {
+        currency: 'JPY',
+        planStartYear: 2025,
+        planEndYear: 2065,
+        fireSettings: {
+          targetAmount: 50000000,
+          isEnabled: true,
+        },
+        displaySettings: {
+          dateFormat: 'YYYY-MM-DD',
+          numberFormat: 'comma',
+        },
       },
-      displaySettings: {
-        dateFormat: 'YYYY-MM-DD',
-        numberFormat: 'comma',
-      },
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  familyMembers: [],
-  accounts: [],
-  categories: [],
-  assetInfo: [
-    {
-      id: 'ai_001',
-      name: '日本株式インデックス',
-      symbol: 'JP001',
-      description: 'インデックス投資信託',
-      currency: 'JPY',
-      priceHistory: [
-        { year: 2025, price: 25000 },
-        { year: 2030, price: 28000 },
-        { year: 2035, price: 32000 },
-        { year: 2040, price: 35000 },
-        { year: 2045, price: 38000 },
-        { year: 2050, price: 42000 },
+      familyMembers: [],
+      accounts: [],
+      categories: [],
+      assetInfo: [
+        {
+          id: 'ai_001',
+          name: '日本株式インデックス',
+          symbol: 'JP001',
+          description: 'インデックス投資信託',
+          currency: 'JPY',
+          priceHistory: [
+            { year: 2025, price: 25000 },
+            { year: 2030, price: 28000 },
+            { year: 2035, price: 32000 },
+            { year: 2040, price: 35000 },
+            { year: 2045, price: 38000 },
+            { year: 2050, price: 42000 },
+          ],
+          dividendHistory: [
+            { year: 2025, dividendPerShare: 500 },
+            { year: 2030, dividendPerShare: 600 },
+          ],
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'ai_002',
+          name: '米国株式インデックス',
+          symbol: 'US001',
+          description: 'S&P500連動ETF',
+          currency: 'JPY',
+          priceHistory: [
+            { year: 2025, price: 15000 },
+            { year: 2030, price: 16000 },
+            { year: 2035, price: 18000 },
+            { year: 2040, price: 20000 },
+            { year: 2045, price: 22000 },
+            { year: 2050, price: 25000 },
+          ],
+          dividendHistory: [
+            { year: 2025, dividendPerShare: 300 },
+            { year: 2030, dividendPerShare: 350 },
+          ],
+          createdAt: new Date().toISOString(),
+        },
       ],
-      dividendHistory: [
-        { year: 2025, dividendPerShare: 500 },
-        { year: 2030, dividendPerShare: 600 },
+      holdingAssets: [
+        {
+          id: 'ha_001',
+          assetId: 'ai_001',
+          quantity: 100,
+          purchaseYear: 2025,
+          sellYear: null,
+          accountId: 'acc_001',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          id: 'ha_002',
+          assetId: 'ai_002',
+          quantity: 200,
+          purchaseYear: 2025,
+          sellYear: null,
+          accountId: 'acc_002',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       ],
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'ai_002',
-      name: '米国株式インデックス',
-      symbol: 'US001',
-      description: 'S&P500連動ETF',
-      currency: 'JPY',
-      priceHistory: [
-        { year: 2025, price: 15000 },
-        { year: 2030, price: 16000 },
-        { year: 2035, price: 18000 },
-        { year: 2040, price: 20000 },
-        { year: 2045, price: 22000 },
-        { year: 2050, price: 25000 },
-      ],
-      dividendHistory: [
-        { year: 2025, dividendPerShare: 300 },
-        { year: 2030, dividendPerShare: 350 },
-      ],
-      createdAt: new Date().toISOString(),
-    },
-  ],
-  holdingAssets: [
-    {
-      id: 'ha_001',
-      assetId: 'ai_001',
-      quantity: 100,
-      purchaseYear: 2025,
-      sellYear: null,
-      accountId: 'acc_001',
+      templates: [],
+      yearlyData: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
-    {
-      id: 'ha_002',
-      assetId: 'ai_002',
-      quantity: 200,
-      purchaseYear: 2025,
-      sellYear: null,
-      accountId: 'acc_002',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
   ],
-  templates: [],
-  yearlyData: [],
 });
 
 /**
@@ -145,25 +147,351 @@ export const saveData = (data) => {
 const mergeWithDefaults = (storedData) => {
   const defaultData = getDefaultData();
 
+  // ライフプランデータの構造チェックと移行
+  let lifeplans = storedData.lifeplan || [];
+
+  // 古い構造からの移行処理
+  if (storedData.familyMembers || storedData.accounts || storedData.categories) {
+    console.log('Migrating old data structure to new format...');
+
+    // 既存のライフプランがある場合は更新、ない場合は新規作成
+    if (lifeplans.length > 0) {
+      lifeplans = lifeplans.map((plan) => ({
+        ...defaultData.lifeplan[0],
+        ...plan,
+        familyMembers: storedData.familyMembers || plan.familyMembers || [],
+        accounts: storedData.accounts || plan.accounts || [],
+        categories: storedData.categories || plan.categories || [],
+        assetInfo: storedData.assetInfo || plan.assetInfo || defaultData.lifeplan[0].assetInfo,
+        holdingAssets: storedData.holdingAssets || plan.holdingAssets || [],
+        templates: storedData.templates || plan.templates || [],
+        yearlyData: storedData.yearlyData || plan.yearlyData || [],
+      }));
+    } else {
+      // 新しいライフプランを作成
+      lifeplans = [
+        {
+          ...defaultData.lifeplan[0],
+          familyMembers: storedData.familyMembers || [],
+          accounts: storedData.accounts || [],
+          categories: storedData.categories || [],
+          assetInfo: storedData.assetInfo || defaultData.lifeplan[0].assetInfo,
+          holdingAssets: storedData.holdingAssets || [],
+          templates: storedData.templates || [],
+          yearlyData: storedData.yearlyData || [],
+        },
+      ];
+    }
+  }
+
   return {
     metadata: { ...defaultData.metadata, ...storedData.metadata },
-    lifeplan: { ...defaultData.lifeplan, ...storedData.lifeplan },
-    familyMembers: storedData.familyMembers || defaultData.familyMembers,
-    accounts: storedData.accounts || defaultData.accounts,
-    categories: storedData.categories || defaultData.categories,
-    assetInfo: storedData.assetInfo || defaultData.assetInfo,
-    holdingAssets: storedData.holdingAssets || defaultData.holdingAssets,
-    templates: storedData.templates || defaultData.templates,
-    yearlyData: storedData.yearlyData || defaultData.yearlyData,
+    lifeplan: lifeplans.length > 0 ? lifeplans : defaultData.lifeplan,
   };
 };
 
+// === ライフプラン管理 ===
+
 /**
- * 資産情報を取得
+ * ライフプランリストを取得
+ */
+export const getLifePlans = () => {
+  const data = loadData();
+  const lifeplan = data.lifeplan;
+
+  // 配列でない場合は空配列を返す
+  if (!Array.isArray(lifeplan)) {
+    return [];
+  }
+
+  return lifeplan;
+};
+
+/**
+ * ライフプランを保存
+ */
+export const saveLifePlan = (lifePlan) => {
+  try {
+    const data = loadData();
+    let existingPlans = data.lifeplan;
+
+    // 既存データが配列でない場合は空配列で初期化
+    if (!Array.isArray(existingPlans)) {
+      existingPlans = [];
+    }
+
+    const updatedPlans = existingPlans.find((p) => p.id === lifePlan.id)
+      ? existingPlans.map((p) => (p.id === lifePlan.id ? lifePlan : p))
+      : [...existingPlans, lifePlan];
+
+    data.lifeplan = updatedPlans;
+    return saveData(data);
+  } catch (error) {
+    console.error('Failed to save life plan:', error);
+    return false;
+  }
+};
+
+/**
+ * ライフプランを更新
+ */
+export const updateLifePlan = (lifePlan) => {
+  try {
+    const data = loadData();
+    let existingPlans = data.lifeplan;
+
+    // 既存データが配列でない場合は空配列で初期化
+    if (!Array.isArray(existingPlans)) {
+      existingPlans = [];
+    }
+
+    const updatedPlans = existingPlans.map((p) => (p.id === lifePlan.id ? lifePlan : p));
+    data.lifeplan = updatedPlans;
+    return saveData(data);
+  } catch (error) {
+    console.error('Failed to update life plan:', error);
+    return false;
+  }
+};
+
+/**
+ * ライフプランを削除
+ */
+export const deleteLifePlan = (planId) => {
+  try {
+    const data = loadData();
+    let existingPlans = data.lifeplan;
+
+    // 既存データが配列でない場合は空配列で初期化
+    if (!Array.isArray(existingPlans)) {
+      existingPlans = [];
+    }
+
+    // 削除対象のプランがアクティブプランの場合、アクティブプランをクリア
+    const activeLifePlanId = getActiveLifePlanId();
+    if (activeLifePlanId === planId) {
+      localStorage.removeItem('activeLifePlan');
+    }
+
+    const updatedPlans = existingPlans.filter((p) => p.id !== planId);
+    data.lifeplan = updatedPlans;
+    return saveData(data);
+  } catch (error) {
+    console.error('Failed to delete life plan:', error);
+    return false;
+  }
+};
+
+/**
+ * アクティブなライフプランIDを取得
+ */
+export const getActiveLifePlanId = () => {
+  return localStorage.getItem('activeLifePlan');
+};
+
+/**
+ * アクティブなライフプランを設定
+ */
+export const setActiveLifePlanId = (planId) => {
+  try {
+    localStorage.setItem('activeLifePlan', planId);
+    return true;
+  } catch (error) {
+    console.error('Failed to set active life plan:', error);
+    return false;
+  }
+};
+
+/**
+ * アクティブなライフプランを取得
+ */
+export const getActiveLifePlan = () => {
+  try {
+    const activePlanId = getActiveLifePlanId();
+    const lifePlans = getLifePlans();
+
+    // 配列であることを確認してからfindを実行
+    if (Array.isArray(lifePlans)) {
+      return lifePlans.find((p) => p.id === activePlanId) || lifePlans[0] || null;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Failed to get active life plan:', error);
+    return null;
+  }
+};
+
+/**
+ * ライフプラン設定を取得
+ */
+export const getLifePlanSettings = () => {
+  const activeLifePlan = getActiveLifePlan();
+  return activeLifePlan?.settings || getDefaultData().lifeplan[0].settings;
+};
+
+// === カテゴリ管理 ===
+
+/**
+ * カテゴリを取得（アクティブなライフプランから）
+ */
+export const getCategories = () => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    return [];
+  }
+
+  // レガシーデータの移行処理
+  if (!activeLifePlan.categories) {
+    try {
+      const legacyCategories = JSON.parse(localStorage.getItem('categories') || '[]');
+      if (legacyCategories.length > 0) {
+        // レガシーデータをアクティブなライフプランに移行
+        const updatedPlan = { ...activeLifePlan, categories: legacyCategories };
+        updateLifePlan(updatedPlan);
+        return legacyCategories;
+      }
+    } catch (error) {
+      console.error('Failed to migrate legacy categories:', error);
+    }
+  }
+
+  return activeLifePlan.categories || [];
+};
+
+/**
+ * カテゴリを保存（アクティブなライフプランに）
+ */
+export const saveCategories = (categories) => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    console.error('No active life plan found');
+    return false;
+  }
+
+  const updatedPlan = {
+    ...activeLifePlan,
+    categories,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updateLifePlan(updatedPlan);
+};
+
+// === 口座管理 ===
+
+/**
+ * 口座を取得（アクティブなライフプランから）
+ */
+export const getAccounts = () => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    return [];
+  }
+
+  // レガシーデータの移行処理
+  if (!activeLifePlan.accounts) {
+    try {
+      const legacyAccounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+      if (legacyAccounts.length > 0) {
+        // レガシーデータをアクティブなライフプランに移行
+        const updatedPlan = { ...activeLifePlan, accounts: legacyAccounts };
+        updateLifePlan(updatedPlan);
+        return legacyAccounts;
+      }
+    } catch (error) {
+      console.error('Failed to migrate legacy accounts:', error);
+    }
+  }
+
+  return activeLifePlan.accounts || [];
+};
+
+/**
+ * 口座を保存（アクティブなライフプランに）
+ */
+export const saveAccounts = (accounts) => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    console.error('No active life plan found');
+    return false;
+  }
+
+  const updatedPlan = {
+    ...activeLifePlan,
+    accounts,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updateLifePlan(updatedPlan);
+};
+
+/**
+ * 単一の口座を追加または更新
+ */
+export const saveAccount = (account) => {
+  const accounts = getAccounts();
+  const existingIndex = accounts.findIndex((a) => a.id === account.id);
+
+  let updatedAccounts;
+  if (existingIndex >= 0) {
+    // 既存の口座を更新
+    updatedAccounts = accounts.map((a, index) =>
+      index === existingIndex ? { ...account, updatedAt: new Date().toISOString() } : a
+    );
+  } else {
+    // 新しい口座を追加
+    updatedAccounts = [...accounts, { ...account, createdAt: new Date().toISOString() }];
+  }
+
+  return saveAccounts(updatedAccounts);
+};
+
+// === 家族メンバー管理 ===
+
+/**
+ * 家族メンバーを取得（アクティブなライフプランから）
+ */
+export const getFamilyMembers = () => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    return [];
+  }
+
+  return activeLifePlan.familyMembers || [];
+};
+
+/**
+ * 家族メンバーを保存（アクティブなライフプランに）
+ */
+export const saveFamilyMembers = (familyMembers) => {
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    console.error('No active life plan found');
+    return false;
+  }
+
+  const updatedPlan = {
+    ...activeLifePlan,
+    familyMembers,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updateLifePlan(updatedPlan);
+};
+
+// === 資産情報管理 ===
+
+/**
+ * 資産情報を取得（アクティブなライフプランから）
  */
 export const getAssetInfo = () => {
-  const data = loadData();
-  return data.assetInfo || [];
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    return [];
+  }
+
+  return activeLifePlan.assetInfo || [];
 };
 
 /**
@@ -175,35 +503,43 @@ export const getAssetById = (assetId) => {
 };
 
 /**
- * 資産情報を保存
+ * 資産情報を保存（アクティブなライフプランに）
  */
 export const saveAssetInfo = (assetInfoArray) => {
-  const data = loadData();
-  data.assetInfo = assetInfoArray;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    console.error('No active life plan found');
+    return false;
+  }
+
+  const updatedPlan = {
+    ...activeLifePlan,
+    assetInfo: assetInfoArray,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updateLifePlan(updatedPlan);
 };
 
 /**
  * 単一の資産を追加または更新
  */
 export const saveAsset = (asset) => {
-  const data = loadData();
-  const assetInfo = data.assetInfo || [];
-
+  const assetInfo = getAssetInfo();
   const existingIndex = assetInfo.findIndex((a) => a.id === asset.id);
 
+  let updatedAssetInfo;
   if (existingIndex >= 0) {
     // 既存の資産を更新
-    assetInfo[existingIndex] = { ...asset, updatedAt: new Date().toISOString() };
+    updatedAssetInfo = assetInfo.map((a, index) =>
+      index === existingIndex ? { ...asset, updatedAt: new Date().toISOString() } : a
+    );
   } else {
     // 新しい資産を追加
-    assetInfo.push({ ...asset, createdAt: new Date().toISOString() });
+    updatedAssetInfo = [...assetInfo, { ...asset, createdAt: new Date().toISOString() }];
   }
 
-  data.assetInfo = assetInfo;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
+  return saveAssetInfo(updatedAssetInfo);
 };
 
 /**
@@ -211,58 +547,79 @@ export const saveAsset = (asset) => {
  */
 export const deleteAsset = (assetId) => {
   try {
-    const data = loadData();
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      console.error('No active life plan found');
+      return false;
+    }
 
     // 資産情報から削除
-    data.assetInfo = data.assetInfo.filter((asset) => asset.id !== assetId);
+    const updatedAssetInfo = activeLifePlan.assetInfo.filter((asset) => asset.id !== assetId);
 
     // 関連する保有資産を削除
-    data.holdingAssets = data.holdingAssets.filter((holding) => holding.assetId !== assetId);
+    const updatedHoldingAssets = activeLifePlan.holdingAssets.filter(
+      (holding) => holding.assetId !== assetId
+    );
 
     // 関連する取引を削除（年次データから）
-    data.yearlyData = data.yearlyData.map((yearData) => ({
+    const updatedYearlyData = activeLifePlan.yearlyData.map((yearData) => ({
       ...yearData,
-      transactions: yearData.transactions.filter(
-        (transaction) =>
-          !transaction.holdingAssetId ||
-          !data.holdingAssets.some(
-            (holding) => holding.id === transaction.holdingAssetId && holding.assetId === assetId
-          )
-      ),
+      transactions:
+        yearData.transactions?.filter(
+          (transaction) =>
+            !transaction.holdingAssetId ||
+            !updatedHoldingAssets.some(
+              (holding) => holding.id === transaction.holdingAssetId && holding.assetId === assetId
+            )
+        ) || [],
     }));
 
-    data.lifeplan.updatedAt = new Date().toISOString();
-    return saveData(data);
+    const updatedPlan = {
+      ...activeLifePlan,
+      assetInfo: updatedAssetInfo,
+      holdingAssets: updatedHoldingAssets,
+      yearlyData: updatedYearlyData,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return updateLifePlan(updatedPlan);
   } catch (error) {
     console.error('Failed to delete asset:', error);
     return false;
   }
 };
 
+// === 保有資産管理 ===
+
 /**
- * 保有資産を取得
+ * 保有資産を取得（アクティブなライフプランから）
  */
 export const getHoldingAssets = () => {
-  const data = loadData();
-  return data.holdingAssets || [];
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    return [];
+  }
+
+  return activeLifePlan.holdingAssets || [];
 };
 
 /**
- * 保有資産を保存
+ * 保有資産を保存（アクティブなライフプランに）
  */
 export const saveHoldingAssets = (holdingAssetsArray) => {
-  const data = loadData();
-  data.holdingAssets = holdingAssetsArray;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
-};
+  const activeLifePlan = getActiveLifePlan();
+  if (!activeLifePlan) {
+    console.error('No active life plan found');
+    return false;
+  }
 
-/**
- * ライフプラン設定を取得
- */
-export const getLifePlanSettings = () => {
-  const data = loadData();
-  return data.lifeplan?.settings || getDefaultData().lifeplan.settings;
+  const updatedPlan = {
+    ...activeLifePlan,
+    holdingAssets: holdingAssetsArray,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updateLifePlan(updatedPlan);
 };
 
 /**
@@ -304,186 +661,6 @@ export const importData = (file) => {
   });
 };
 
-// === ライフプラン管理 ===
-
-/**
- * ライフプランリストを取得
- */
-export const getLifePlans = () => {
-  try {
-    return JSON.parse(localStorage.getItem('lifePlans') || '[]');
-  } catch (error) {
-    console.error('Failed to load life plans:', error);
-    return [];
-  }
-};
-
-/**
- * ライフプランを保存
- */
-export const saveLifePlan = (lifePlan) => {
-  try {
-    const existingPlans = getLifePlans();
-    const updatedPlans = existingPlans.find((p) => p.id === lifePlan.id)
-      ? existingPlans.map((p) => (p.id === lifePlan.id ? lifePlan : p))
-      : [...existingPlans, lifePlan];
-
-    localStorage.setItem('lifePlans', JSON.stringify(updatedPlans));
-    return true;
-  } catch (error) {
-    console.error('Failed to save life plan:', error);
-    return false;
-  }
-};
-
-/**
- * アクティブなライフプランIDを取得
- */
-export const getActiveLifePlanId = () => {
-  return localStorage.getItem('activeLifePlan');
-};
-
-/**
- * アクティブなライフプランを設定
- */
-export const setActiveLifePlanId = (planId) => {
-  try {
-    localStorage.setItem('activeLifePlan', planId);
-    return true;
-  } catch (error) {
-    console.error('Failed to set active life plan:', error);
-    return false;
-  }
-};
-
-/**
- * アクティブなライフプランを取得
- */
-export const getActiveLifePlan = () => {
-  try {
-    const activePlanId = getActiveLifePlanId();
-    const lifePlans = getLifePlans();
-    return lifePlans.find((p) => p.id === activePlanId) || null;
-  } catch (error) {
-    console.error('Failed to get active life plan:', error);
-    return null;
-  }
-};
-
-// === カテゴリ管理 ===
-
-/**
- * カテゴリを取得
- */
-export const getCategories = () => {
-  const data = loadData();
-  if (data.categories && data.categories.length > 0) {
-    return data.categories;
-  }
-
-  // 新しいデータ構造にカテゴリがない場合、レガシーから移行
-  try {
-    const legacyCategories = JSON.parse(localStorage.getItem('categories') || '[]');
-    if (legacyCategories.length > 0) {
-      data.categories = legacyCategories;
-      saveData(data);
-      return legacyCategories;
-    }
-  } catch (error) {
-    console.error('Failed to migrate legacy categories:', error);
-  }
-
-  return [];
-};
-
-/**
- * カテゴリを保存
- */
-export const saveCategories = (categories) => {
-  const data = loadData();
-  data.categories = categories;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
-};
-
-// === 口座管理 ===
-
-/**
- * 口座を取得
- */
-export const getAccounts = () => {
-  const data = loadData();
-  if (data.accounts && data.accounts.length > 0) {
-    return data.accounts;
-  }
-
-  // 新しいデータ構造に口座がない場合、レガシーから移行
-  try {
-    const legacyAccounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-    if (legacyAccounts.length > 0) {
-      data.accounts = legacyAccounts;
-      saveData(data);
-      return legacyAccounts;
-    }
-  } catch (error) {
-    console.error('Failed to migrate legacy accounts:', error);
-  }
-
-  return [];
-};
-
-/**
- * 口座を保存
- */
-export const saveAccounts = (accounts) => {
-  const data = loadData();
-  data.accounts = accounts;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
-};
-
-/**
- * 単一の口座を追加または更新
- */
-export const saveAccount = (account) => {
-  const data = loadData();
-  const accounts = data.accounts || [];
-
-  const existingIndex = accounts.findIndex((a) => a.id === account.id);
-
-  if (existingIndex >= 0) {
-    // 既存の口座を更新
-    accounts[existingIndex] = { ...account, updatedAt: new Date().toISOString() };
-  } else {
-    // 新しい口座を追加
-    accounts.push({ ...account, createdAt: new Date().toISOString() });
-  }
-
-  data.accounts = accounts;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
-};
-
-// === 家族メンバー管理 ===
-
-/**
- * 家族メンバーを取得
- */
-export const getFamilyMembers = () => {
-  const data = loadData();
-  return data.familyMembers || [];
-};
-
-/**
- * 家族メンバーを保存
- */
-export const saveFamilyMembers = (familyMembers) => {
-  const data = loadData();
-  data.familyMembers = familyMembers;
-  data.lifeplan.updatedAt = new Date().toISOString();
-  return saveData(data);
-};
-
 // === レガシーLocalStorageクリーンアップ ===
 
 /**
@@ -493,6 +670,7 @@ export const cleanupLegacyStorage = () => {
   const legacyKeys = [
     'categories',
     'accounts',
+    'lifePlans',
     // 必要に応じて他のキーも追加
   ];
 
