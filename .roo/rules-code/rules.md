@@ -53,7 +53,34 @@ const handleBlur = () => {
 | チェックボックス     | controlled            | 状態変更は即座に反映が必要 |
 | 検索フィールド       | debounce + controlled | リアルタイム検索が必要     |
 
-### 1.3 uncontrolled component実装テンプレート
+### 1.3 Selectコンポーネントの正しい使用方法
+
+Selectコンポーネントは**controlled component**として使用し、**onChangeでeventオブジェクトを受け取る**ことを統一する。
+
+#### ✅ 正しい実装
+
+```javascript
+<Select
+  value={formData.year}
+  onChange={(e) => setFormData(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+  options={yearOptions}
+/>
+```
+
+#### ❌ 避けるべき実装
+
+```javascript
+// 悪い例：valueを直接受け取る（動作が不安定）
+<Select
+  value={formData.year}
+  onChange={(value) => setFormData(prev => ({ ...prev, year: parseInt(value) }))}
+  options={yearOptions}
+/>
+```
+
+**重要:** Selectコンポーネントでは必ずeventオブジェクト（e）を受け取り、`e.target.value`で値を取得する。これにより、他のフォーム要素との一貫性を保ち、予期しない動作を防ぐ。
+
+### 1.4 uncontrolled component実装テンプレート
 
 ```javascript
 import React, { useState, useRef } from 'react';
@@ -67,6 +94,7 @@ const MyFormComponent = () => {
   const [formData, setFormData] = useState({
     textField: '',
     numberField: 0,
+    selectField: defaultValue, // Selectは controlled
   });
 
   // ブラー処理
@@ -84,12 +112,18 @@ const MyFormComponent = () => {
     }
   };
 
+  // Select用のchange処理
+  const handleSelectChange = (e) => {
+    setFormData(prev => ({ ...prev, selectField: parseInt(e.target.value) }));
+  };
+
   // 保存処理（最新値の取得）
   const handleSave = () => {
     // 保存前にrefから最新値を取得
     const finalData = {
       textField: textInputRef.current?.value || formData.textField,
       numberField: parseFloat(numberInputRef.current?.value) || formData.numberField,
+      selectField: formData.selectField, // controlledなのでstateから取得
     };
     
     // バリデーション・保存処理
@@ -111,6 +145,12 @@ const MyFormComponent = () => {
         defaultValue={formData.numberField}
         onBlur={handleNumberBlur}
         placeholder="数値を入力"
+      />
+      
+      <Select
+        value={formData.selectField}
+        onChange={handleSelectChange}
+        options={selectOptions}
       />
       
       <Button onClick={handleSave}>保存</Button>
