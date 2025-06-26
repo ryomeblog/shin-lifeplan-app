@@ -5,7 +5,7 @@ import { getLifePlans, getActiveLifePlanId, setActiveLifePlanId } from '../../ut
 
 const Header = () => {
   const location = useLocation();
-  const [selectedPlan, setSelectedPlan] = useState('独身ライフ');
+  const [selectedPlan, setSelectedPlan] = useState('ライフプラン未選択');
   const [lifePlans, setLifePlans] = useState([]);
   const [showPlanDropdown, setShowPlanDropdown] = useState(false);
 

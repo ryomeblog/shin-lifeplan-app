@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { HiPencilSquare, HiArrowLeft } from 'react-icons/hi2';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { getActiveLifePlan } from '../../utils/storage';
+import { getActiveLifePlan, calculateAccountBalance, getCategories } from '../../utils/storage';
 
 const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, formatCurrency }) => {
   const [balanceHistory, setBalanceHistory] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [activeTab, setActiveTab] = useState('all');
 
-  // 年次データから残高履歴を計算
+  // 年次データから残高履歴と取引履歴を計算
   useEffect(() => {
-    const calculateBalanceHistory = () => {
+    const calculateData = () => {
       try {
         const plan = getActiveLifePlan();
+        const categories = getCategories();
 
         if (!plan || !plan.yearlyData) {
           // データがない場合は初期残高を基に履歴を生成
@@ -20,26 +34,73 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
             history.push({
               year,
               balance: account.initialBalance,
+              formattedBalance: formatCurrency(account.initialBalance),
             });
           }
-          setBalanceHistory(history.slice(0, 10)); // 10年分に制限
+          setBalanceHistory(history);
+          setTransactions([]);
+          setFilteredTransactions([]);
           return;
         }
 
-        // 年次データから残高を計算
+        // 残高履歴を計算
         const history = [];
+        const allTransactions = [];
         let currentBalance = account.initialBalance;
 
         for (let year = planSettings.planStartYear; year <= planSettings.planEndYear; year++) {
           const yearData = plan.yearlyData.find((yd) => yd.year === year);
 
           if (yearData && yearData.transactions) {
-            // その年の取引を適用
+            // その年の取引を処理
             yearData.transactions.forEach((transaction) => {
-              if (transaction.fromAccountId === account.id) {
-                currentBalance -= transaction.amount;
-              } else if (transaction.toAccountId === account.id) {
-                currentBalance += transaction.amount;
+              const amount = transaction.amount || 0;
+              const frequency = transaction.frequency || 1;
+              const totalAmount = amount * frequency;
+
+              // 該当口座に関連する取引のみ処理
+              let isRelevant = false;
+              let balanceChange = 0;
+              let transactionType = transaction.type;
+
+              if (transaction.type === 'expense' && transaction.toAccountId === account.id) {
+                // 支出：該当口座から出金
+                balanceChange = -Math.abs(totalAmount);
+                isRelevant = true;
+              } else if (transaction.type === 'income' && transaction.toAccountId === account.id) {
+                // 収入：該当口座に入金
+                balanceChange = Math.abs(totalAmount);
+                isRelevant = true;
+              } else if (transaction.type === 'transfer') {
+                if (transaction.fromAccountId === account.id) {
+                  // 振替送金元：出金
+                  balanceChange = -Math.abs(totalAmount);
+                  isRelevant = true;
+                  transactionType = 'transfer_out';
+                } else if (transaction.toAccountId === account.id) {
+                  // 振替送金先：入金
+                  balanceChange = Math.abs(totalAmount);
+                  isRelevant = true;
+                  transactionType = 'transfer_in';
+                }
+              }
+
+              if (isRelevant) {
+                currentBalance += balanceChange;
+
+                // カテゴリ名を取得
+                const category = categories.find((cat) => cat.id === transaction.categoryId);
+                const categoryName = category?.name || '-';
+
+                // 取引履歴に追加
+                allTransactions.push({
+                  ...transaction,
+                  transactionType,
+                  balanceChange,
+                  balanceAfter: currentBalance,
+                  categoryName,
+                  year,
+                });
               }
             });
           }
@@ -47,26 +108,136 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
           history.push({
             year,
             balance: currentBalance,
+            formattedBalance: formatCurrency(currentBalance),
           });
         }
 
-        setBalanceHistory(history.slice(0, 10)); // 10年分に制限
+        // 取引を新しい順にソート
+        allTransactions.sort((a, b) => {
+          if (a.year !== b.year) {
+            return b.year - a.year;
+          }
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        setBalanceHistory(history);
+        setTransactions(allTransactions);
+        setFilteredTransactions(allTransactions);
       } catch (error) {
-        console.error('残高履歴計算エラー:', error);
+        console.error('データ計算エラー:', error);
         // エラー時は初期残高で履歴を生成
         const history = [];
         for (let year = planSettings.planStartYear; year <= planSettings.planEndYear; year++) {
           history.push({
             year,
             balance: account.initialBalance,
+            formattedBalance: formatCurrency(account.initialBalance),
           });
         }
-        setBalanceHistory(history.slice(0, 10));
+        setBalanceHistory(history);
+        setTransactions([]);
+        setFilteredTransactions([]);
       }
     };
 
-    calculateBalanceHistory();
-  }, [account, planSettings]);
+    calculateData();
+  }, [account, planSettings, formatCurrency]);
+
+  // タブ切り替え時のフィルタリング
+  useEffect(() => {
+    if (activeTab === 'all') {
+      setFilteredTransactions(transactions);
+    } else {
+      const filtered = transactions.filter((transaction) => {
+        switch (activeTab) {
+          case 'expense':
+            return transaction.type === 'expense';
+          case 'income':
+            return transaction.type === 'income';
+          case 'transfer':
+            return transaction.type === 'transfer';
+          case 'investment':
+            return transaction.type === 'investment';
+          default:
+            return true;
+        }
+      });
+      setFilteredTransactions(filtered);
+    }
+  }, [activeTab, transactions]);
+
+  // 現在残高を取得
+  const currentBalance = calculateAccountBalance(account.id);
+
+  // 取引タイプに応じた表示名を取得
+  const getTransactionTypeName = (transaction) => {
+    switch (transaction.transactionType || transaction.type) {
+      case 'expense':
+        return '支出';
+      case 'income':
+        return '収入';
+      case 'transfer_out':
+        return '振替出金';
+      case 'transfer_in':
+        return '振替入金';
+      case 'transfer':
+        return '振替';
+      case 'investment':
+        return '投資';
+      default:
+        return '-';
+    }
+  };
+
+  // 取引金額の表示色を取得
+  const getAmountColor = (balanceChange) => {
+    if (balanceChange > 0) return 'text-green-600';
+    if (balanceChange < 0) return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  // 日付フォーマット
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+    } catch {
+      return '-';
+    }
+  };
+
+  // カスタムツールチップ
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-300 rounded-lg shadow-lg">
+          <p className="font-semibold">{`${label}年`}</p>
+          <p className="text-blue-600">{`残高: ${formatCurrency(payload[0].value)}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Y軸の金額フォーマット
+  const formatYAxisLabel = (value) => {
+    if (Math.abs(value) >= 1000000) {
+      return `${(value / 1000000).toFixed(0)}M`;
+    } else if (Math.abs(value) >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value.toLocaleString();
+  };
+
+  // 統計情報を計算
+  const minBalance =
+    balanceHistory.length > 0 ? Math.min(...balanceHistory.map((h) => h.balance)) : 0;
+  const maxBalance =
+    balanceHistory.length > 0 ? Math.max(...balanceHistory.map((h) => h.balance)) : 0;
 
   return (
     <div className="max-w-7xl mx-auto p-4 lg:p-6">
@@ -83,13 +254,16 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         <Card>
           <div className="flex justify-between items-center p-4">
             <div>
-              <p className="text-sm text-gray-600">初期残高</p>
+              <p className="text-sm text-gray-600">現在残高</p>
               <p
                 className={`text-2xl font-bold ${
-                  account.initialBalance >= 0 ? 'text-gray-900' : 'text-red-600'
+                  currentBalance >= 0 ? 'text-gray-900' : 'text-red-600'
                 }`}
               >
-                {formatCurrency(account.initialBalance)}
+                {formatCurrency(currentBalance)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                初期残高: {formatCurrency(account.initialBalance)}
               </p>
               {account.memo && <p className="text-sm text-gray-600 mt-1">{account.memo}</p>}
             </div>
@@ -110,27 +284,65 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         </Card>
       </div>
 
-      {/* 残高推移グラフ */}
+      {/* 残高推移グラフ（Recharts） */}
       <Card title="残高推移" className="mb-6">
         <div className="p-4">
-          <div className="h-64 flex items-end space-x-2 border-b border-gray-200">
-            {balanceHistory.map((item) => {
-              const maxBalance = Math.max(...balanceHistory.map((h) => Math.abs(h.balance)));
-              const height = maxBalance > 0 ? (Math.abs(item.balance) / maxBalance) * 200 : 50;
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={balanceHistory}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 60,
+                  bottom: 20,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="year" tick={{ fontSize: 12 }} stroke="#6b7280" />
+                <YAxis tickFormatter={formatYAxisLabel} tick={{ fontSize: 12 }} stroke="#6b7280" />
+                <Tooltip content={<CustomTooltip />} />
 
-              return (
-                <div key={item.year} className="flex-1 flex flex-col items-center">
-                  <div className="text-xs text-gray-600 mb-2">{formatCurrency(item.balance)}</div>
-                  <div
-                    className={`w-full rounded-t ${
-                      item.balance >= 0 ? 'bg-blue-500' : 'bg-red-500'
-                    }`}
-                    style={{ height: `${height}px` }}
-                  ></div>
-                  <div className="text-xs text-gray-600 mt-2">{item.year}</div>
-                </div>
-              );
-            })}
+                {/* 0円ライン */}
+                {minBalance < 0 && maxBalance > 0 && (
+                  <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="5 5" strokeWidth={2} />
+                )}
+
+                <Line
+                  type="monotone"
+                  dataKey="balance"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  dot={{
+                    fill: '#3b82f6',
+                    strokeWidth: 2,
+                    stroke: '#ffffff',
+                    r: 4,
+                  }}
+                  activeDot={{
+                    r: 6,
+                    stroke: '#3b82f6',
+                    strokeWidth: 2,
+                    fill: '#ffffff',
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
+            <div>
+              期間: {planSettings.planStartYear}年 〜 {planSettings.planEndYear}年
+            </div>
+            {balanceHistory.length > 0 && (
+              <div>
+                最低残高:{' '}
+                <span className={minBalance < 0 ? 'text-red-600' : 'text-gray-700'}>
+                  {formatCurrency(minBalance)}
+                </span>{' '}
+                | 最高残高: <span className="text-blue-600">{formatCurrency(maxBalance)}</span>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -140,21 +352,23 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         <div className="p-4">
           {/* タブ */}
           <div className="flex space-x-1 mb-4 bg-gray-100 p-1 rounded-lg">
-            <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium">
-              全て
-            </button>
-            <button className="flex-1 px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-white">
-              支出
-            </button>
-            <button className="flex-1 px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-white">
-              収入
-            </button>
-            <button className="flex-1 px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-white">
-              振替
-            </button>
-            <button className="flex-1 px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-white">
-              投資
-            </button>
+            {[
+              { id: 'all', label: '全て' },
+              { id: 'expense', label: '支出' },
+              { id: 'income', label: '収入' },
+              { id: 'transfer', label: '振替' },
+              { id: 'investment', label: '投資' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* 取引テーブル */}
@@ -183,42 +397,50 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {/* サンプルデータ - 実際のデータに置き換える */}
-                <tr>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">2025/04/20</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">家賃支払い</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">住居費</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">支出</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">-¥80,000</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(account.initialBalance - 80000)}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">2025/04/15</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    振替（メイン→貯金）
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">-</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">振替</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-yellow-600">¥100,000</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(account.initialBalance + 20000)}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">2025/04/10</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">給与振込</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">給与</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">収入</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600">+¥300,000</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(account.initialBalance + 200000)}
-                  </td>
-                </tr>
+                {filteredTransactions.length > 0 ? (
+                  filteredTransactions.slice(0, 50).map((transaction, index) => (
+                    <tr key={`${transaction.id}-${index}`}>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(transaction.createdAt)}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {transaction.title || transaction.description || '-'}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {transaction.categoryName}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {getTransactionTypeName(transaction)}
+                      </td>
+                      <td
+                        className={`px-4 py-4 whitespace-nowrap text-sm font-medium ${getAmountColor(transaction.balanceChange)}`}
+                      >
+                        {transaction.balanceChange > 0 ? '+' : ''}
+                        {formatCurrency(transaction.balanceChange)}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatCurrency(transaction.balanceAfter)}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                      {activeTab === 'all'
+                        ? 'この口座に関連する取引はありません'
+                        : `この口座に関連する${activeTab === 'expense' ? '支出' : activeTab === 'income' ? '収入' : activeTab === 'transfer' ? '振替' : '投資'}取引はありません`}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+
+          {filteredTransactions.length > 50 && (
+            <div className="mt-4 text-center text-sm text-gray-500">
+              最新50件を表示しています（全{filteredTransactions.length}件）
+            </div>
+          )}
         </div>
       </Card>
     </div>
