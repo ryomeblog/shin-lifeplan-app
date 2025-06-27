@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiPlay, HiArrowDownTray } from 'react-icons/hi2';
 import Button from '../ui/Button';
+import { importData } from '../../utils/storage';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -11,8 +12,24 @@ const Home = () => {
   };
 
   const handleImport = () => {
-    // 将来的にはファイルインポート機能を実装
-    alert('データインポート機能は今後実装予定です');
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          await importData(file);
+          alert('データをインポートしました');
+          // インポート成功後、ダッシュボードに遷移
+          navigate('/dashboard');
+        } catch (error) {
+          console.error('インポートエラー:', error);
+          alert('インポートに失敗しました。正しいJSONファイルを選択してください。');
+        }
+      }
+    };
+    input.click();
   };
 
   return (
