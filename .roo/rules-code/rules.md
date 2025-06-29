@@ -16,8 +16,8 @@ const [value, setValue] = useState('');
 
 <Input
   value={value}
-  onChange={(e) => setValue(e.target.value)}  // 毎回実行される
-/>
+  onChange={(e) => setValue(e.target.value)} // 毎回実行される
+/>;
 ```
 
 #### ✅ 推奨実装（Uncontrolled Component with ref）
@@ -31,7 +31,7 @@ const inputRef = useRef(null);
 const handleBlur = () => {
   if (inputRef.current) {
     const value = inputRef.current.value;
-    setFormData(prev => ({ ...prev, fieldName: value }));
+    setFormData((prev) => ({ ...prev, fieldName: value }));
   }
 };
 
@@ -40,7 +40,7 @@ const handleBlur = () => {
   defaultValue={initialValue}
   onBlur={handleBlur}
   // onChangeは使用しない
-/>
+/>;
 ```
 
 ### 1.2 実装パターンの選択基準
@@ -62,7 +62,7 @@ Selectコンポーネントは**controlled component**として使用し、**onC
 ```javascript
 <Select
   value={formData.year}
-  onChange={(e) => setFormData(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+  onChange={(e) => setFormData((prev) => ({ ...prev, year: parseInt(e.target.value) }))}
   options={yearOptions}
 />
 ```
@@ -73,7 +73,7 @@ Selectコンポーネントは**controlled component**として使用し、**onC
 // 悪い例：valueを直接受け取る（動作が不安定）
 <Select
   value={formData.year}
-  onChange={(value) => setFormData(prev => ({ ...prev, year: parseInt(value) }))}
+  onChange={(value) => setFormData((prev) => ({ ...prev, year: parseInt(value) }))}
   options={yearOptions}
 />
 ```
@@ -89,7 +89,7 @@ const MyFormComponent = () => {
   // ref定義
   const textInputRef = useRef(null);
   const numberInputRef = useRef(null);
-  
+
   // フォームデータ
   const [formData, setFormData] = useState({
     textField: '',
@@ -101,20 +101,20 @@ const MyFormComponent = () => {
   const handleTextBlur = () => {
     if (textInputRef.current) {
       const value = textInputRef.current.value;
-      setFormData(prev => ({ ...prev, textField: value }));
+      setFormData((prev) => ({ ...prev, textField: value }));
     }
   };
 
   const handleNumberBlur = () => {
     if (numberInputRef.current) {
       const value = parseFloat(numberInputRef.current.value) || 0;
-      setFormData(prev => ({ ...prev, numberField: value }));
+      setFormData((prev) => ({ ...prev, numberField: value }));
     }
   };
 
   // Select用のchange処理
   const handleSelectChange = (e) => {
-    setFormData(prev => ({ ...prev, selectField: parseInt(e.target.value) }));
+    setFormData((prev) => ({ ...prev, selectField: parseInt(e.target.value) }));
   };
 
   // 保存処理（最新値の取得）
@@ -125,7 +125,7 @@ const MyFormComponent = () => {
       numberField: parseFloat(numberInputRef.current?.value) || formData.numberField,
       selectField: formData.selectField, // controlledなのでstateから取得
     };
-    
+
     // バリデーション・保存処理
     console.log('保存データ:', finalData);
   };
@@ -138,7 +138,7 @@ const MyFormComponent = () => {
         onBlur={handleTextBlur}
         placeholder="テキストを入力"
       />
-      
+
       <Input
         ref={numberInputRef}
         type="number"
@@ -146,13 +146,9 @@ const MyFormComponent = () => {
         onBlur={handleNumberBlur}
         placeholder="数値を入力"
       />
-      
-      <Select
-        value={formData.selectField}
-        onChange={handleSelectChange}
-        options={selectOptions}
-      />
-      
+
+      <Select value={formData.selectField} onChange={handleSelectChange} options={selectOptions} />
+
       <Button onClick={handleSave}>保存</Button>
     </form>
   );
@@ -173,7 +169,7 @@ const generateYearOptions = () => {
     const settings = getLifePlanSettings();
     const startYear = settings.planStartYear;
     const endYear = settings.planEndYear;
-    
+
     const years = [];
     for (let year = startYear; year <= endYear; year++) {
       years.push({ value: year, label: `${year}年` });
@@ -207,21 +203,23 @@ const categories = data.categories; // 全体データから直接取得（古�
 ### 3.1 プロップスの設計
 
 #### 必須プロップス
+
 - `onSave`: データ保存時のコールバック関数
 - `initialData`: 初期データ（編集時）
 
 #### オプショナルプロップス
+
 - `onCancel`: キャンセル時のコールバック関数
 - `isEditing`: 編集モード判定フラグ
 - `disabled`: 無効化フラグ
 
 ```javascript
-const MyFormComponent = ({ 
-  onSave,           // required
-  initialData,      // required
-  onCancel,         // optional
+const MyFormComponent = ({
+  onSave, // required
+  initialData, // required
+  onCancel, // optional
   isEditing = false, // optional with default
-  disabled = false   // optional with default
+  disabled = false, // optional with default
 }) => {
   // コンポーネント実装
 };
@@ -236,19 +234,19 @@ const [errors, setErrors] = useState({});
 // バリデーション関数
 const validateForm = () => {
   const newErrors = {};
-  
+
   if (!formData.requiredField?.trim()) {
     newErrors.requiredField = '必須項目です';
   }
-  
+
   setErrors(newErrors);
   return Object.keys(newErrors).length === 0;
 };
 
 // エラー表示
-{errors.fieldName && (
-  <p className="mt-1 text-sm text-red-600">{errors.fieldName}</p>
-)}
+{
+  errors.fieldName && <p className="mt-1 text-sm text-red-600">{errors.fieldName}</p>;
+}
 ```
 
 ## 4. インポート順序規約
@@ -277,6 +275,7 @@ import { API_ENDPOINTS } from '../../constants';
 ```
 
 # 使用ライブラリについて
+
 - Recharts
   - PieChartWithCustomizedLabel：円グラフ
     - https://recharts.org/en-US/examples/PieChartWithCustomizedLabel
@@ -334,18 +333,19 @@ src/
 ├── utils/                # ユーティリティ関数
 ├── index.css             # メインCSS
 ├── index.js              # エントリーポイント
-├── logo.svg              # ロゴファイル
 ```
 
 ## 各フォルダの詳細
 
 ### `components/`
+
 - **`ui/`**: 再利用可能な基本UIコンポーネント
 - **`layout/`**: レイアウト構成要素（ヘッダー、設定系）
 - **`forms/`**: フォーム関連コンポーネント
 - **`pages/`**: 各画面のメインコンポーネント
 
 ### その他のフォルダ
+
 - **`assets/`**: 静的ファイル（画像、スタイルなど）
 - **`constants/`**: アプリ全体で使用する定数
 - **`hooks/`**: カスタムReactフック
@@ -357,18 +357,21 @@ src/
 ## 設計方針
 
 ### 1. コンポーネント分類
+
 - **UI**: 汎用的な再利用可能コンポーネント（Button、Input、Modalなど）
 - **Layout**: アプリケーション全体のレイアウト構成要素
 - **Forms**: フォーム専用コンポーネント
 - **Pages**: 各画面のメインコンポーネント（Router.jsでルーティング）
 
 ### 2. 命名規則
+
 - **コンポーネント**: PascalCase（例: `TransactionList.js`）
 - **フック**: camelCase + use接頭辞（例: `useTransactions.js`）
 - **サービス**: camelCase（例: `apiService.js`）
 - **ストア**: camelCase（例: `transactionStore.js`）
 
 ### 3. インポート規則
+
 `components/ui/index.js` で一括エクスポートにより、きれいなインポートパスを提供
 
 ```javascript
@@ -470,6 +473,7 @@ import Button from 'components/ui/Button';
 | createdAt      | ISO8601 | ○    | 作成日時                 | "2024-01-01T00:00:00.000Z" |
 
 **寿命の設定指針：**
+
 - 男性：80-85歳
 - 女性：85-90歳
 - 健康状態や家族歴を考慮して調整
@@ -487,6 +491,7 @@ import Button from 'components/ui/Button';
 | createdAt      | ISO8601 | ○    | 作成日時         | "2024-01-01T00:00:00.000Z" |
 
 **口座の種類例：**
+
 - 普通預金、定期預金
 - 証券口座
 - クレジットカード口座
@@ -506,15 +511,18 @@ import Button from 'components/ui/Button';
 | createdAt    | ISO8601 | ○    | 作成日時             | "2024-01-01T00:00:00.000Z" |
 
 **カテゴリタイプ：**
+
 - expense：支出
 - income：収入
 
 **推奨カテゴリ例：**
 
 支出カテゴリ：
+
 - 食費、住宅費、光熱費、通信費、交通費、医療費、保険料、教育費、娯楽費
 
 収入カテゴリ：
+
 - 給与、ボーナス、副業収入、投資収益、年金
 
 ## 6. 資産情報（assetInfo）
@@ -560,6 +568,7 @@ import Button from 'components/ui/Button';
 | updatedAt    | ISO8601 | ○    | 更新日時                 | "2024-03-15T00:00:00.000Z" |
 
 **sellYearについて：**
+
 - null：現在も保有中
 - 年数：その年に売却済み
 
@@ -582,6 +591,7 @@ import Button from 'components/ui/Button';
 | createdAt      | ISO8601       | ○    | 作成日時                       | "2023-01-01T00:00:00.000Z" |
 
 **取引タイプ：**
+
 - expense：支出
 - income：収入
 - investment：投資
@@ -605,6 +615,7 @@ import Button from 'components/ui/Button';
 | updatedAt      | ISO8601       | ○    | 更新日時                       | "2024-01-01T00:00:00.000Z" |
 
 **年間発生回数の例：**
+
 - 月次：12回
 - 半年ごと：2回
 - 年次：1回
@@ -644,6 +655,7 @@ import Button from 'components/ui/Button';
 | updatedAt      | ISO8601       | ○    | 更新日時                   | "2024-01-25T12:00:00.000Z" |
 
 **取引タイプ：**
+
 - expense：支出
 - income：収入
 - investment：投資
@@ -663,6 +675,7 @@ import Button from 'components/ui/Button';
 | createdAt      | ISO8601       | ○    | 作成日時               | "2024-01-01T00:00:00.000Z" |
 
 **イベントの活用例：**
+
 - 住宅購入（複数の取引をまとめる）
 - 投資開始
 - 転職
