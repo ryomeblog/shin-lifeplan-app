@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pt-[60px]">{children}</main>
     </div>
   );
 };
