@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import TransactionForm from '../forms/TransactionForm';
-import { getCategories, updateTransaction, deleteTransaction } from '../../utils/storage';
+import {
+  getCategories,
+  updateTransaction,
+  deleteTransaction,
+  getAccounts,
+} from '../../utils/storage';
 
 const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -11,6 +16,15 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
 
   // カテゴリデータを取得
   const categories = getCategories();
+
+  // 口座データを取得
+  const accounts = getAccounts();
+
+  // accountId から口座名を取得する関数
+  const getAccountName = (accountId) => {
+    const account = accounts.find((acc) => acc.id === accountId);
+    return account ? account.name : '不明な口座';
+  };
 
   // 取引タイプに応じた金額の色とプレフィックスを取得
   const getAmountStyle = (amount, transactionType) => {
@@ -198,7 +212,7 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
                 <div>
                   <div className="font-medium text-gray-900">
                     {type === 'transfer'
-                      ? `${transaction.fromAccountName || '口座A'} → ${transaction.toAccountName || '口座B'}`
+                      ? `${getAccountName(transaction.fromAccountId)} → ${getAccountName(transaction.toAccountId)}`
                       : transaction.assetName || transaction.title || '投資銘柄'}
                   </div>
                   {type === 'investment' && (

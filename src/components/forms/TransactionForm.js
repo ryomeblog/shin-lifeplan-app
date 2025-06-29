@@ -313,7 +313,7 @@ const TransactionForm = ({
     }
 
     // 最新の値を取得
-    const finalTitle = titleRef.current ? titleRef.current.value.trim() : formData.title.trim();
+    let finalTitle = titleRef.current ? titleRef.current.value.trim() : formData.title.trim();
     const finalAmount = amountRef.current
       ? parseFloat(amountRef.current.value) || 0
       : formData.amount;
@@ -324,6 +324,13 @@ const TransactionForm = ({
     const finalDetailMemo = detailMemoRef.current
       ? detailMemoRef.current.value
       : formData.detailMemo;
+
+    // 振替の場合は口座名からタイトルを自動生成
+    if (formData.type === 'transfer') {
+      const fromAccount = accounts.find((acc) => acc.id === formData.fromAccountId);
+      const toAccount = accounts.find((acc) => acc.id === formData.toAccountId);
+      finalTitle = `${fromAccount?.name || '不明な口座'} → ${toAccount?.name || '不明な口座'}`;
+    }
 
     const transactionData = {
       id: isEditing ? transaction.id : `txn_${Date.now()}`,
@@ -506,29 +513,31 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* 口座選択 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {formData.type === 'income'
-            ? '入金口座'
-            : formData.type === 'investment'
-              ? '投資元口座'
-              : '口座'}
-        </label>
-        <Select
-          value={formData.accountId}
-          onChange={(e) => handleInputChange('accountId', e.target.value)}
-          options={[
-            { value: '', label: '口座を選択' },
-            ...accounts.map((account) => ({
-              value: account.id,
-              label: account.name,
-            })),
-          ]}
-          error={errors.accountId}
-        />
-        {errors.accountId && <p className="mt-1 text-sm text-red-600">{errors.accountId}</p>}
-      </div>
+      {/* 口座選択（振替以外） */}
+      {formData.type !== 'transfer' && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {formData.type === 'income'
+              ? '入金口座'
+              : formData.type === 'investment'
+                ? '投資元口座'
+                : '口座'}
+          </label>
+          <Select
+            value={formData.accountId}
+            onChange={(e) => handleInputChange('accountId', e.target.value)}
+            options={[
+              { value: '', label: '口座を選択' },
+              ...accounts.map((account) => ({
+                value: account.id,
+                label: account.name,
+              })),
+            ]}
+            error={errors.accountId}
+          />
+          {errors.accountId && <p className="mt-1 text-sm text-red-600">{errors.accountId}</p>}
+        </div>
+      )}
 
       {/* 振替の場合：送金元・送金先口座 */}
       {formData.type === 'transfer' && (
@@ -654,18 +663,20 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* イベント選択（任意） */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">イベント（任意）</label>
-        <Select
-          value={formData.eventId}
-          onChange={(e) => handleInputChange('eventId', e.target.value)}
-          options={[
-            { value: '', label: 'イベントを選択' },
-            // TODO: イベントデータを取得して表示
-          ]}
-        />
-      </div>
+      {/* イベント選択（任意、振替以外） */}
+      {formData.type !== 'transfer' && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">イベント（任意）</label>
+          <Select
+            value={formData.eventId}
+            onChange={(e) => handleInputChange('eventId', e.target.value)}
+            options={[
+              { value: '', label: 'イベントを選択' },
+              // TODO: イベントデータを取得して表示
+            ]}
+          />
+        </div>
+      )}
 
       {/* メモ入力（振替・投資の場合） */}
       {(formData.type === 'transfer' || formData.type === 'investment') && (
