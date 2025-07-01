@@ -10,10 +10,9 @@ const AssetSearchList = ({
   filteredAssets,
   onAssetClick,
   onAddAsset,
-  calculateCurrentPrice,
   calculateAverageReturn,
   calculateAverageDividend,
-  formatCurrency,
+  calculateAveragePrice,
 }) => {
   return (
     <Card
@@ -39,35 +38,37 @@ const AssetSearchList = ({
         </div>
 
         {/* 検索結果ヘッダー */}
-        <div className="grid grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg font-medium text-gray-700">
+        <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg font-medium text-gray-700">
           <div>資産ID</div>
           <div>資産名</div>
-          <div>現在評価額</div>
           <div>平均年率</div>
-          <div>平均配当</div>
+          <div>平均配当利回り</div>
         </div>
 
         {/* 検索結果 */}
-        {filteredAssets.map((asset) => (
-          <div
-            key={asset.id}
-            className="grid grid-cols-5 gap-4 p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
-            onClick={() => onAssetClick(asset.id)}
-          >
-            <div className="text-gray-600">{asset.symbol}</div>
-            <div className="font-medium text-gray-900">{asset.name}</div>
-            <div className="text-gray-600">{formatCurrency(calculateCurrentPrice(asset))}</div>
+        {filteredAssets.map((asset) => {
+          const averagePrice = calculateAveragePrice(asset);
+          const averageDividend = calculateAverageDividend(asset);
+          const dividendYield = averagePrice > 0 ? (averageDividend / averagePrice) * 100 : 0;
+
+          return (
             <div
-              className={`font-medium ${calculateAverageReturn(asset) >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              key={asset.id}
+              className="grid grid-cols-4 gap-4 p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow cursor-pointer"
+              onClick={() => onAssetClick(asset.id)}
             >
-              {calculateAverageReturn(asset) >= 0 ? '+' : ''}
-              {calculateAverageReturn(asset).toFixed(1)}%
+              <div className="text-gray-600">{asset.symbol}</div>
+              <div className="font-medium text-gray-900">{asset.name}</div>
+              <div
+                className={`font-medium ${calculateAverageReturn(asset) >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
+                {calculateAverageReturn(asset) >= 0 ? '+' : ''}
+                {calculateAverageReturn(asset).toFixed(1)}%
+              </div>
+              <div className="text-green-600">{dividendYield.toFixed(1)}%</div>
             </div>
-            <div className="text-green-600">
-              {((calculateAverageDividend(asset) / calculateCurrentPrice(asset)) * 100).toFixed(1)}%
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {filteredAssets.length === 0 && (
           <div className="text-center py-8 text-gray-500">

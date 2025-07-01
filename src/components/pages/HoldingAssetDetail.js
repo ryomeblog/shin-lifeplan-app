@@ -1,86 +1,181 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HiArrowLeft } from 'react-icons/hi2';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Tabs from '../ui/Tabs';
 import HoldingAssetChart from '../layout/HoldingAssetChart';
+import {
+  getAssetInfo,
+  getLifePlanSettings,
+  getTransactions,
+  getAccounts,
+} from '../../utils/storage';
 
 const HoldingAssetDetail = () => {
   const { holdingId } = useParams();
-  console.log('Holding ID:', holdingId); // TODO: 実際のデータ取得で使用
   const navigate = useNavigate();
 
-  // サンプルデータ（実際はpropsやcontextから取得）
-  const [holdingAsset] = useState({
-    id: 'ha_002',
-    assetId: 'ai_002',
-    quantity: 200,
-    purchaseYear: 2025,
-    sellYear: null,
-    accountId: 'acc_002',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
-
-  const [asset] = useState({
-    id: 'ai_002',
-    name: '米国株式インデックス',
-    symbol: 'US001',
-    description: 'S&P500連動ETF',
-    currency: 'JPY',
-    priceHistory: [
-      { year: 2025, price: 15000 },
-      { year: 2030, price: 16000 },
-      { year: 2035, price: 18000 },
-      { year: 2040, price: 20000 },
-      { year: 2045, price: 22000 },
-      { year: 2050, price: 25000 },
-    ],
-    dividendHistory: [
-      { year: 2025, dividendPerShare: 300 },
-      { year: 2030, dividendPerShare: 350 },
-    ],
-  });
-
-  // 仮の取引データ
-  const [transactions] = useState([
-    {
-      id: 'txn_001',
-      date: '2025/04',
-      type: 'investment',
-      subType: 'buy',
-      quantity: 100,
-      price: 15000,
-      amount: 1500000,
-      account: '楽天証券',
-    },
-    {
-      id: 'txn_002',
-      date: '2025/05',
-      type: 'investment',
-      subType: 'sell',
-      quantity: 50,
-      price: 16000,
-      amount: 800000,
-      account: 'SBI証券',
-    },
-    {
-      id: 'txn_003',
-      date: '2025/06',
-      type: 'investment',
-      subType: 'buy',
-      quantity: 150,
-      price: 15500,
-      amount: 2325000,
-      account: '楽天証券',
-    },
-  ]);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [holdingAsset, setHoldingAsset] = useState(null);
+  const [asset, setAsset] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [transactionFilter, setTransactionFilter] = useState('all');
+  const [investmentSummary, setInvestmentSummary] = useState(null);
+
+  // データ読み込み
+  useEffect(() => {
+    const loadHoldingAssetData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 基本データを取得
+        const settings = getLifePlanSettings();
+        const assets = getAssetInfo();
+        const accountsData = getAccounts();
+
+        // holdingIdから資産IDを抽出 (holding_${assetId} 形式)
+        const assetId = holdingId.replace('holding_', '');
+        const targetAsset = assets.find((a) => a.id === assetId);
+
+        if (!targetAsset) {
+          setError(`資産ID "${assetId}" が見つかりません`);
+          return;
+        }
+
+        setAsset(targetAsset);
+
+        // 全年の投資取引を取得して、該当資産の取引を抽出
+        const allTransactions = [];
+        let currentQuantity = 0;
+        let totalQuantity = 0;
+        let soldQuantity = 0;
+        let totalPurchaseAmount = 0;
+        let totalSellAmount = 0;
+        let firstPurchaseYear = null;
+
+        for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+          try {
+            const yearTransactions = getTransactions(year);
+            const assetTransactions = yearTransactions.filter(
+              (t) => t.type === 'investment' && t.holdingAssetId === assetId
+            );
+
+            assetTransactions.forEach((transaction) => {
+              const quantity = transaction.quantity || 0;
+              const amount = transaction.amount || 0;
+              const isBuy = transaction.transactionSubtype === 'buy';
+
+              // 取引データを整形
+              const formattedTransaction = {
+                id: transaction.id,
+                date: `${transaction.year}/${String(transaction.month).padStart(2, '0')}`,
+                type: 'investment',
+                subType: transaction.transactionSubtype,
+                quantity: quantity,
+                price: getAssetPriceForYear(targetAsset, transaction.year),
+                amount: Math.abs(amount),
+                account: getAccountName(
+                  transaction.toAccountId || transaction.accountId,
+                  accountsData
+                ),
+                year: transaction.year,
+                month: transaction.month,
+              };
+
+              allTransactions.push(formattedTransaction);
+
+              // 投資サマリーデータを計算
+              if (isBuy) {
+                currentQuantity += quantity;
+                totalQuantity += quantity;
+                totalPurchaseAmount += Math.abs(amount);
+                if (!firstPurchaseYear || year < firstPurchaseYear) {
+                  firstPurchaseYear = year;
+                }
+              } else {
+                currentQuantity -= quantity;
+                soldQuantity += quantity;
+                totalSellAmount += Math.abs(amount);
+              }
+            });
+          } catch (error) {
+            console.error(`Failed to load transactions for year ${year}:`, error);
+          }
+        }
+
+        // 投資サマリーを設定
+        const summary = {
+          currentQuantity,
+          totalQuantity,
+          soldQuantity,
+          totalPurchaseAmount,
+          totalSellAmount,
+          // 損益計算: 売却金額の合計 - 買付金額の合計
+          profitLoss: totalSellAmount - totalPurchaseAmount,
+        };
+
+        // 損益率の計算（買付金額ベース）
+        summary.profitLossRate =
+          totalPurchaseAmount > 0 ? (summary.profitLoss / totalPurchaseAmount) * 100 : 0;
+
+        setInvestmentSummary(summary);
+
+        // 保有資産データを作成
+        const holdingData = {
+          id: holdingId,
+          assetId: assetId,
+          quantity: currentQuantity,
+          purchaseYear: firstPurchaseYear || new Date().getFullYear(),
+          sellYear: null,
+          accountId: null, // 複数口座にまたがる可能性があるためnull
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        setHoldingAsset(holdingData);
+        setTransactions(
+          allTransactions.sort((a, b) => {
+            if (a.year !== b.year) return b.year - a.year;
+            return b.month - a.month;
+          })
+        );
+
+        // 買付履歴がない場合のエラー
+        if (totalQuantity <= 0) {
+          setError('この資産の買付履歴がありません');
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load holding asset data:', err);
+        setError('保有資産データの読み込みに失敗しました');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (holdingId) {
+      loadHoldingAssetData();
+    }
+  }, [holdingId]);
+
+  // 指定年の資産価格を取得
+  const getAssetPriceForYear = (asset, year) => {
+    const priceData = asset.priceHistory?.find((p) => p.year === year);
+    return priceData?.price || 0;
+  };
+
+  // 口座名を取得
+  const getAccountName = (accountId, accountsData) => {
+    const account = accountsData.find((acc) => acc.id === accountId);
+    return account ? account.name : '不明な口座';
+  };
 
   // 計算関数
   const getCurrentPrice = () => {
+    if (!asset) return 0;
     const currentYear = new Date().getFullYear();
     const priceData = asset.priceHistory
       .filter((p) => p.year <= currentYear)
@@ -88,26 +183,9 @@ const HoldingAssetDetail = () => {
     return priceData?.price || 0;
   };
 
-  const getPurchasePrice = () => {
-    const priceData = asset.priceHistory.find((p) => p.year === holdingAsset.purchaseYear);
-    return priceData?.price || getCurrentPrice();
-  };
-
   const getCurrentValue = () => {
+    if (!holdingAsset) return 0;
     return getCurrentPrice() * holdingAsset.quantity;
-  };
-
-  const getPurchaseValue = () => {
-    return getPurchasePrice() * holdingAsset.quantity;
-  };
-
-  const getProfitLoss = () => {
-    return getCurrentValue() - getPurchaseValue();
-  };
-
-  const getProfitLossRate = () => {
-    const purchaseValue = getPurchaseValue();
-    return purchaseValue > 0 ? (getProfitLoss() / purchaseValue) * 100 : 0;
   };
 
   // フィルター適用
@@ -128,8 +206,35 @@ const HoldingAssetDetail = () => {
   };
 
   const formatDate = (dateString) => {
-    return dateString; // 今回は簡単な形式のまま
+    return dateString;
   };
+
+  // ローディング状態
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <Card>
+          <div className="text-center py-8">
+            <p>保有資産データを読み込み中...</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // エラー状態
+  if (error || !holdingAsset || !asset || !investmentSummary) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <Card>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-4">{error || '保有資産が見つかりません'}</p>
+            <Button onClick={() => navigate('/assets')}>資産一覧に戻る</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -143,18 +248,84 @@ const HoldingAssetDetail = () => {
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{asset.name}</h1>
+              <p className="text-gray-600">銘柄コード: {asset.symbol}</p>
               <div className="flex items-center space-x-6 text-gray-600 mt-2">
-                <span>保有数: {holdingAsset.quantity}</span>
+                <span>現在の保有数: {holdingAsset.quantity}</span>
+                <span>総保有数: {investmentSummary.totalQuantity}</span>
                 <span>評価額: {formatCurrency(getCurrentValue())}</span>
                 <span
-                  className={`font-medium ${getProfitLoss() >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                  className={`font-medium ${investmentSummary.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
                 >
-                  損益: {getProfitLoss() >= 0 ? '+' : ''}
-                  {formatCurrency(getProfitLoss())}({getProfitLossRate() >= 0 ? '+' : ''}
-                  {getProfitLossRate().toFixed(1)}%)
+                  損益: {investmentSummary.profitLoss >= 0 ? '+' : ''}
+                  {formatCurrency(investmentSummary.profitLoss)}(
+                  {investmentSummary.profitLossRate >= 0 ? '+' : ''}
+                  {investmentSummary.profitLossRate.toFixed(1)}%)
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* 投資サマリー */}
+      <Card title="投資サマリー">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-sm text-blue-600 font-medium">買付総額</div>
+            <div className="text-2xl font-bold text-blue-700">
+              {formatCurrency(investmentSummary.totalPurchaseAmount)}
+            </div>
+            <div className="text-sm text-blue-500 mt-1">
+              総保有数: {investmentSummary.totalQuantity}
+            </div>
+          </div>
+
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-sm text-green-600 font-medium">売却総額</div>
+            <div className="text-2xl font-bold text-green-700">
+              {formatCurrency(investmentSummary.totalSellAmount)}
+            </div>
+            <div className="text-sm text-green-500 mt-1">
+              売却数: {investmentSummary.soldQuantity}
+            </div>
+          </div>
+
+          <div
+            className={`p-4 rounded-lg ${
+              investmentSummary.profitLoss >= 0 ? 'bg-teal-50' : 'bg-red-50'
+            }`}
+          >
+            <div
+              className={`text-sm font-medium ${
+                investmentSummary.profitLoss >= 0 ? 'text-teal-600' : 'text-red-600'
+              }`}
+            >
+              実現損益
+            </div>
+            <div
+              className={`text-2xl font-bold ${
+                investmentSummary.profitLoss >= 0 ? 'text-teal-700' : 'text-red-700'
+              }`}
+            >
+              {investmentSummary.profitLoss >= 0 ? '+' : ''}
+              {formatCurrency(investmentSummary.profitLoss)}
+            </div>
+            <div
+              className={`text-sm mt-1 ${
+                investmentSummary.profitLoss >= 0 ? 'text-teal-500' : 'text-red-500'
+              }`}
+            >
+              {investmentSummary.profitLossRate >= 0 ? '+' : ''}
+              {investmentSummary.profitLossRate.toFixed(1)}%
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="text-sm text-gray-600 font-medium">現在の評価額</div>
+            <div className="text-2xl font-bold text-gray-700">
+              {formatCurrency(getCurrentValue())}
+            </div>
+            <div className="text-sm text-gray-500 mt-1">現在保有数: {holdingAsset.quantity}</div>
           </div>
         </div>
       </Card>

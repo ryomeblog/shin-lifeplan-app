@@ -12,48 +12,36 @@ import {
 } from 'recharts';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { getActiveLifePlan, calculateAccountBalance, getCategories } from '../../utils/storage';
+import { getCategories, getTransactions } from '../../utils/storage';
 
 const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, formatCurrency }) => {
   const [balanceHistory, setBalanceHistory] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [currentBalance, setCurrentBalance] = useState(0);
 
   // 年次データから残高履歴と取引履歴を計算
   useEffect(() => {
     const calculateData = () => {
       try {
-        const plan = getActiveLifePlan();
         const categories = getCategories();
-
-        if (!plan || !plan.yearlyData) {
-          // データがない場合は初期残高を基に履歴を生成
-          const history = [];
-          for (let year = planSettings.planStartYear; year <= planSettings.planEndYear; year++) {
-            history.push({
-              year,
-              balance: account.initialBalance,
-              formattedBalance: formatCurrency(account.initialBalance),
-            });
-          }
-          setBalanceHistory(history);
-          setTransactions([]);
-          setFilteredTransactions([]);
-          return;
-        }
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
 
         // 残高履歴を計算
         const history = [];
         const allTransactions = [];
-        let currentBalance = account.initialBalance;
+        let runningBalance = account.initialBalance;
+        let calculatedCurrentBalance = account.initialBalance;
 
         for (let year = planSettings.planStartYear; year <= planSettings.planEndYear; year++) {
-          const yearData = plan.yearlyData.find((yd) => yd.year === year);
+          // 年次取引データを直接取得
+          const yearTransactions = getTransactions(year);
 
-          if (yearData && yearData.transactions) {
+          if (yearTransactions && yearTransactions.length > 0) {
             // その年の取引を処理
-            yearData.transactions.forEach((transaction) => {
+            yearTransactions.forEach((transaction) => {
               const amount = transaction.amount || 0;
               const frequency = transaction.frequency || 1;
               const totalAmount = amount * frequency;
@@ -83,10 +71,37 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                   isRelevant = true;
                   transactionType = 'transfer_in';
                 }
+              } else if (
+                transaction.type === 'investment' &&
+                transaction.toAccountId === account.id
+              ) {
+                // 投資取引：買付は支出（マイナス）、売却は収入（プラス）として処理
+                if (transaction.transactionSubtype === 'buy') {
+                  // 買付：該当口座から出金（マイナス）
+                  balanceChange = -Math.abs(totalAmount);
+                  isRelevant = true;
+                  transactionType = 'investment_buy';
+                } else if (transaction.transactionSubtype === 'sell') {
+                  // 売却：該当口座に入金（プラス）
+                  balanceChange = Math.abs(totalAmount);
+                  isRelevant = true;
+                  transactionType = 'investment_sell';
+                }
               }
 
               if (isRelevant) {
-                currentBalance += balanceChange;
+                runningBalance += balanceChange;
+
+                // 現在年月以前の取引のみ現在残高に反映
+                const transactionYear = transaction.year;
+                const transactionMonth = transaction.month || 1;
+
+                if (
+                  transactionYear < currentYear ||
+                  (transactionYear === currentYear && transactionMonth <= currentMonth)
+                ) {
+                  calculatedCurrentBalance += balanceChange;
+                }
 
                 // カテゴリ名を取得
                 const category = categories.find((cat) => cat.id === transaction.categoryId);
@@ -97,7 +112,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                   ...transaction,
                   transactionType,
                   balanceChange,
-                  balanceAfter: currentBalance,
+                  balanceAfter: runningBalance,
                   categoryName,
                   year,
                 });
@@ -107,22 +122,26 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
 
           history.push({
             year,
-            balance: currentBalance,
-            formattedBalance: formatCurrency(currentBalance),
+            balance: runningBalance,
+            formattedBalance: formatCurrency(runningBalance),
           });
         }
 
-        // 取引を新しい順にソート
+        // 取引を新しい順にソート（年・月の順番で）
         allTransactions.sort((a, b) => {
           if (a.year !== b.year) {
-            return b.year - a.year;
+            return b.year - a.year; // 年は新しい順
           }
-          return new Date(b.createdAt) - new Date(a.createdAt);
+          // 同じ年の場合は月で比較
+          const aMonth = a.month || 1;
+          const bMonth = b.month || 1;
+          return bMonth - aMonth; // 月も新しい順
         });
 
         setBalanceHistory(history);
         setTransactions(allTransactions);
         setFilteredTransactions(allTransactions);
+        setCurrentBalance(calculatedCurrentBalance);
       } catch (error) {
         console.error('データ計算エラー:', error);
         // エラー時は初期残高で履歴を生成
@@ -137,6 +156,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         setBalanceHistory(history);
         setTransactions([]);
         setFilteredTransactions([]);
+        setCurrentBalance(account.initialBalance);
       }
     };
 
@@ -166,9 +186,6 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
     }
   }, [activeTab, transactions]);
 
-  // 現在残高を取得
-  const currentBalance = calculateAccountBalance(account.id);
-
   // 取引タイプに応じた表示名を取得
   const getTransactionTypeName = (transaction) => {
     switch (transaction.transactionType || transaction.type) {
@@ -184,6 +201,10 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         return '振替';
       case 'investment':
         return '投資';
+      case 'investment_buy':
+        return '投資買付';
+      case 'investment_sell':
+        return '投資売却';
       default:
         return '-';
     }
@@ -196,15 +217,12 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
     return 'text-gray-600';
   };
 
-  // 日付フォーマット
-  const formatDate = (dateString) => {
+  // 日付フォーマット（年月のみ）
+  const formatDate = (transaction) => {
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
+      const year = transaction.year;
+      const month = transaction.month || 1;
+      return `${year}年${month.toString().padStart(2, '0')}月`;
     } catch {
       return '-';
     }
@@ -401,7 +419,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                   filteredTransactions.slice(0, 50).map((transaction, index) => (
                     <tr key={`${transaction.id}-${index}`}>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDate(transaction.createdAt)}
+                        {formatDate(transaction)}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {transaction.title || transaction.description || '-'}

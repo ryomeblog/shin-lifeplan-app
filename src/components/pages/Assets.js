@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import HoldingAssetsList from '../layout/HoldingAssetsList';
 import AssetSearchList from '../layout/AssetSearchList';
 import AssetModal from '../forms/AssetModal';
-import {
-  getAssetInfo,
-  getHoldingAssets,
-  getLifePlanSettings,
-  saveAsset,
-} from '../../utils/storage';
+import Modal from '../ui/Modal';
+import TransactionForm from '../forms/TransactionForm';
+import { getAssetInfo, getLifePlanSettings, saveAsset, getTransactions } from '../../utils/storage';
 
 const Assets = () => {
   const navigate = useNavigate();
@@ -20,6 +17,7 @@ const Assets = () => {
   });
   const [assetInfo, setAssetInfo] = useState([]);
   const [holdingAssets, setHoldingAssets] = useState([]);
+  const [isAddHoldingModalOpen, setIsAddHoldingModalOpen] = useState(false);
 
   // データ読み込み
   useEffect(() => {
@@ -34,8 +32,9 @@ const Assets = () => {
         const assets = getAssetInfo();
         setAssetInfo(assets);
 
-        const holdings = getHoldingAssets();
-        setHoldingAssets(holdings);
+        // 投資取引から保有資産を計算
+        const calculatedHoldings = calculateHoldingAssetsFromTransactions(assets, settings);
+        setHoldingAssets(calculatedHoldings);
       } catch (error) {
         console.error('Failed to load data from storage:', error);
       }
@@ -43,6 +42,72 @@ const Assets = () => {
 
     loadStorageData();
   }, []);
+
+  // 投資取引から保有資産を計算する関数
+  const calculateHoldingAssetsFromTransactions = (assets, settings) => {
+    const holdingsMap = new Map();
+
+    // 全年の投資取引を取得
+    for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+      try {
+        const transactions = getTransactions(year);
+        const investmentTransactions = transactions.filter(
+          (t) => t.type === 'investment' && t.holdingAssetId
+        );
+
+        investmentTransactions.forEach((transaction) => {
+          const assetId = transaction.holdingAssetId;
+
+          // 資産情報が存在するかチェック
+          const assetExists = assets.find((asset) => asset.id === assetId);
+          if (!assetExists) {
+            console.warn(`Asset with ID ${assetId} not found in asset list`);
+            return; // 資産が存在しない取引はスキップ
+          }
+
+          const quantity = transaction.quantity || 0;
+          const amount = transaction.amount || 0;
+          const isBuy = transaction.transactionSubtype === 'buy';
+
+          if (!holdingsMap.has(assetId)) {
+            holdingsMap.set(assetId, {
+              id: `holding_${assetId}`,
+              assetId: assetId,
+              currentQuantity: 0, // 現在の保有数
+              totalQuantity: 0, // 総保有数（買付総数）
+              soldQuantity: 0, // 売却数
+              totalPurchaseAmount: 0, // 買付総額
+              totalSellAmount: 0, // 売却総額
+              purchaseYear: year,
+              transactions: [],
+            });
+          }
+
+          const holding = holdingsMap.get(assetId);
+          holding.transactions.push(transaction);
+
+          if (isBuy) {
+            holding.currentQuantity += quantity;
+            holding.totalQuantity += quantity;
+            holding.totalPurchaseAmount += Math.abs(amount);
+            // 最初の購入年を記録
+            if (!holding.purchaseYear || year < holding.purchaseYear) {
+              holding.purchaseYear = year;
+            }
+          } else {
+            holding.currentQuantity -= quantity;
+            holding.soldQuantity += quantity;
+            holding.totalSellAmount += Math.abs(amount);
+          }
+        });
+      } catch (error) {
+        console.error(`Failed to load transactions for year ${year}:`, error);
+      }
+    }
+
+    // 買付が存在する資産をすべて返す（現在保有数が0でも含む）
+    return Array.from(holdingsMap.values()).filter((holding) => holding.totalQuantity > 0);
+  };
 
   // 検索・フィルター
   const [searchTerm, setSearchTerm] = useState('');
@@ -72,28 +137,41 @@ const Assets = () => {
     return totalDividend / asset.dividendHistory.length;
   };
 
+  // 全年の株価平均を計算する関数
+  const calculateAveragePrice = (asset) => {
+    if (asset.priceHistory.length === 0) return 0;
+    const totalPrice = asset.priceHistory.reduce((sum, p) => sum + p.price, 0);
+    return totalPrice / asset.priceHistory.length;
+  };
+
   // 保有資産の詳細計算
   const getHoldingAssetDetails = (holding) => {
     const asset = assetInfo.find((a) => a.id === holding.assetId);
     if (!asset) return null;
 
-    const currentPrice = calculateCurrentPrice(asset);
-    const purchasePrice =
-      asset.priceHistory.find((p) => p.year === holding.purchaseYear)?.price || currentPrice;
-    const currentValue = currentPrice * holding.quantity;
-    const purchaseValue = purchasePrice * holding.quantity;
-    const profitLoss = currentValue - purchaseValue;
-    const profitLossRate = purchaseValue > 0 ? (profitLoss / purchaseValue) * 100 : 0;
+    // 購入時平均評価額（購入総額 ÷ 総保有数）
+    const purchaseAveragePrice =
+      holding.totalQuantity > 0 ? holding.totalPurchaseAmount / holding.totalQuantity : 0;
+
+    // 売却時平均評価額（売却総額 ÷ 売却数）
+    const sellAveragePrice =
+      holding.soldQuantity > 0 ? holding.totalSellAmount / holding.soldQuantity : 0;
+
+    // 損益計算: 売却金額の合計 - 買付金額の合計
+    const profitLoss = holding.totalSellAmount - holding.totalPurchaseAmount;
+
+    // 損益率の計算（買付金額ベース）
+    const profitLossRate =
+      holding.totalPurchaseAmount > 0 ? (profitLoss / holding.totalPurchaseAmount) * 100 : 0;
 
     return {
       ...holding,
       asset,
-      currentPrice,
-      purchasePrice,
-      currentValue,
-      purchaseValue,
+      purchaseAveragePrice,
+      sellAveragePrice,
       profitLoss,
       profitLossRate,
+      totalPurchaseValue: holding.totalPurchaseAmount, // 購入時平均金額
     };
   };
 
@@ -105,9 +183,13 @@ const Assets = () => {
     }))
     .filter((holding) => holding.details !== null);
 
-  // 総資産計算
+  // 総資産計算（現在保有している分のみ）
   const totalAssetValue = holdingAssetsWithDetails.reduce((total, holding) => {
-    return total + (holding.details?.currentValue || 0);
+    if (holding.details && holding.currentQuantity > 0) {
+      const currentPrice = calculateCurrentPrice(holding.details.asset);
+      return total + currentPrice * holding.currentQuantity;
+    }
+    return total;
   }, 0);
 
   // 検索フィルター
@@ -145,9 +227,35 @@ const Assets = () => {
     }
   };
 
-  // 保有資産追加（未実装）
+  // 保有資産追加（投資フォームを開く）
   const handleAddHoldingAsset = () => {
-    alert('保有資産追加機能は未実装です');
+    setIsAddHoldingModalOpen(true);
+  };
+
+  // 保有資産追加モーダルを閉じる
+  const handleCloseAddHoldingModal = () => {
+    setIsAddHoldingModalOpen(false);
+  };
+
+  // 投資取引保存完了時の処理
+  const handleInvestmentTransactionSaved = () => {
+    // データを再読み込み
+    const loadStorageData = () => {
+      try {
+        const settings = getLifePlanSettings();
+        const assets = getAssetInfo();
+        setAssetInfo(assets);
+
+        // 投資取引から保有資産を再計算
+        const calculatedHoldings = calculateHoldingAssetsFromTransactions(assets, settings);
+        setHoldingAssets(calculatedHoldings);
+      } catch (error) {
+        console.error('Failed to reload data:', error);
+      }
+    };
+
+    loadStorageData();
+    setIsAddHoldingModalOpen(false);
   };
 
   // 保有資産詳細画面へ遷移
@@ -186,10 +294,9 @@ const Assets = () => {
         filteredAssets={filteredAssets}
         onAssetClick={handleAssetDetail}
         onAddAsset={() => handleOpenAssetForm()}
-        calculateCurrentPrice={calculateCurrentPrice}
         calculateAverageReturn={calculateAverageReturn}
         calculateAverageDividend={calculateAverageDividend}
-        formatCurrency={formatCurrency}
+        calculateAveragePrice={calculateAveragePrice}
       />
 
       {/* 資産フォームモーダル */}
@@ -200,6 +307,21 @@ const Assets = () => {
         editingAsset={editingAsset}
         planSettings={planSettings}
       />
+
+      {/* 保有資産追加モーダル（投資フォーム） */}
+      <Modal
+        isOpen={isAddHoldingModalOpen}
+        onClose={handleCloseAddHoldingModal}
+        title="保有資産を追加"
+        size="large"
+      >
+        <TransactionForm
+          initialType="investment"
+          selectedYear={new Date().getFullYear()}
+          onSave={handleInvestmentTransactionSaved}
+          onCancel={handleCloseAddHoldingModal}
+        />
+      </Modal>
     </div>
   );
 };

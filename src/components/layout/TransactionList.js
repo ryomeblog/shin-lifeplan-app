@@ -7,9 +7,10 @@ import {
   updateTransaction,
   deleteTransaction,
   getAccounts,
+  getAssetInfo,
 } from '../../utils/storage';
 
-const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
+const TransactionList = ({ transactions, type, onTransactionUpdate, onTransactionEdit }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -20,14 +21,25 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
   // 口座データを取得
   const accounts = getAccounts();
 
+  // 資産データを取得
+  const assets = getAssetInfo();
+
   // accountId から口座名を取得する関数
   const getAccountName = (accountId) => {
     const account = accounts.find((acc) => acc.id === accountId);
     return account ? account.name : '不明な口座';
   };
 
+  // assetId から資産名を取得する関数
+  const getAssetName = (assetId) => {
+    const asset = assets.find((ast) => ast.id === assetId);
+    console.log('assets', assets);
+    console.log('assetId', assetId);
+    return asset ? asset.name : '不明な銘柄';
+  };
+
   // 取引タイプに応じた金額の色とプレフィックスを取得
-  const getAmountStyle = (amount, transactionType) => {
+  const getAmountStyle = (amount, transactionType, transactionSubtype) => {
     if (transactionType === 'transfer') {
       return {
         color: 'text-gray-600',
@@ -35,6 +47,17 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
       };
     }
     if (transactionType === 'investment') {
+      if (transactionSubtype === 'buy') {
+        return {
+          color: 'text-red-600',
+          prefix: '-',
+        };
+      } else if (transactionSubtype === 'sell') {
+        return {
+          color: 'text-green-600',
+          prefix: '+',
+        };
+      }
       return {
         color: 'text-teal-600',
         prefix: '',
@@ -61,8 +84,14 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
 
   // 取引編集処理
   const handleEditTransaction = (transaction) => {
-    setEditingTransaction(transaction);
-    setIsEditModalOpen(true);
+    // 親コンポーネントから onTransactionEdit が渡されている場合はそれを使用
+    if (onTransactionEdit) {
+      onTransactionEdit(transaction);
+    } else {
+      // フォールバック：独自のモーダルを使用
+      setEditingTransaction(transaction);
+      setIsEditModalOpen(true);
+    }
   };
 
   // 取引削除処理
@@ -213,21 +242,29 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
                   <div className="font-medium text-gray-900">
                     {type === 'transfer'
                       ? `${getAccountName(transaction.fromAccountId)} → ${getAccountName(transaction.toAccountId)}`
-                      : transaction.assetName || transaction.title || '投資銘柄'}
+                      : transaction.title ||
+                        `${transaction.transactionSubtype === 'buy' ? '【買付】' : '【売却】'}${getAssetName(transaction.holdingAssetId)}`}
                   </div>
                   {type === 'investment' && (
                     <div className="text-sm text-gray-600">
-                      保有数: {transaction.quantity || 0}
-                      {transaction.unit || '株'}
+                      {transaction.transactionSubtype === 'buy' ? '買付' : '売却'}数量:{' '}
+                      {transaction.quantity || 0}株
+                      {transaction.transactionSubtype && (
+                        <span
+                          className={`ml-2 px-2 py-1 rounded text-xs ${transaction.transactionSubtype === 'buy' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}
+                        >
+                          {transaction.transactionSubtype === 'buy' ? '買付' : '売却'}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <div
-                  className={`text-lg font-semibold ${getAmountStyle(transaction.amount, type).color}`}
+                  className={`text-lg font-semibold ${getAmountStyle(transaction.amount, type, transaction.transactionSubtype).color}`}
                 >
-                  {getAmountStyle(transaction.amount, type).prefix}
+                  {getAmountStyle(transaction.amount, type, transaction.transactionSubtype).prefix}
                   {formatAmount(Math.abs(transaction.amount || 0))}
                 </div>
                 <div className="flex space-x-1">
@@ -264,6 +301,33 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
             </div>
           </Card>
         ))}
+
+        {groupedTransactions.length === 0 && (
+          <Card className="p-8 text-center">
+            <div className="text-gray-500">
+              {type === 'transfer' && '振替取引がありません'}
+              {type === 'investment' && '投資取引がありません'}
+            </div>
+          </Card>
+        )}
+
+        {/* 独自の編集モーダル（onTransactionEditが渡されていない場合のフォールバック） */}
+        {!onTransactionEdit && editingTransaction && (
+          <Modal
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            title="取引編集"
+            size="large"
+          >
+            <TransactionForm
+              initialType={editingTransaction.type}
+              transaction={editingTransaction}
+              isEditing={true}
+              onSave={handleUpdateTransaction}
+              onCancel={handleCloseEditModal}
+            />
+          </Modal>
+        )}
       </div>
     );
   }
@@ -401,14 +465,12 @@ const TransactionList = ({ transactions, type, onTransactionUpdate }) => {
           <div className="text-gray-500">
             {type === 'expense' && '支出カテゴリがありません'}
             {type === 'income' && '収入カテゴリがありません'}
-            {type === 'transfer' && '振替取引がありません'}
-            {type === 'investment' && '投資取引がありません'}
           </div>
         </Card>
       )}
 
-      {/* 編集モーダル */}
-      {editingTransaction && (
+      {/* 独自の編集モーダル（onTransactionEditが渡されていない場合のフォールバック） */}
+      {!onTransactionEdit && editingTransaction && (
         <Modal
           isOpen={isEditModalOpen}
           onClose={handleCloseEditModal}

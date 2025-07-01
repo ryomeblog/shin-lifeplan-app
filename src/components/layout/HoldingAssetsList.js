@@ -16,15 +16,16 @@ const HoldingAssetsList = ({
         {/* ヘッダー */}
         <div className="grid grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg font-medium text-gray-700">
           <div>資産名</div>
-          <div>保有数</div>
-          <div>購入時評価額</div>
-          <div>現在評価額</div>
-          <div>評価額</div>
+          <div>現在の保有数</div>
+          <div>総保有数</div>
+          <div>購入時平均評価額</div>
+          <div>購入時平均金額</div>
           <div>損益</div>
         </div>
 
         {/* 保有資産リスト */}
         {holdingAssets.map((holding) => {
+          console.log('holding', holding);
           if (!holding.details) return null;
 
           return (
@@ -34,10 +35,19 @@ const HoldingAssetsList = ({
               onClick={() => onHoldingAssetClick(holding.id)}
             >
               <div className="font-medium text-gray-900">{holding.details.asset.name}</div>
-              <div className="text-gray-600">{holding.details.quantity}</div>
-              <div className="text-gray-600">{formatCurrency(holding.details.purchasePrice)}</div>
-              <div className="text-gray-600">{formatCurrency(holding.details.currentPrice)}</div>
-              <div className="text-gray-600">{formatCurrency(holding.details.currentValue)}</div>
+              <div className="text-gray-600">
+                {holding.currentQuantity}
+                {holding.currentQuantity === 0 && (
+                  <span className="text-red-500 text-xs ml-1">(売却済)</span>
+                )}
+              </div>
+              <div className="text-gray-600">{holding.totalQuantity}</div>
+              <div className="text-gray-600">
+                {formatCurrency(holding.details.purchaseAveragePrice)}
+              </div>
+              <div className="text-gray-600">
+                {formatCurrency(holding.details.totalPurchaseValue)}
+              </div>
               <div
                 className={`font-medium ${holding.details.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
               >

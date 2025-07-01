@@ -45,6 +45,34 @@ const TransactionSummary = ({ transactions, year, type }) => {
 
   const config = typeConfig[type] || typeConfig.expense;
 
+  // 投資の場合の買付・売却別集計
+  const investmentSummary = React.useMemo(() => {
+    if (type !== 'investment') return null;
+
+    const buyTransactions = transactions.filter((t) => t.transactionSubtype === 'buy');
+    const sellTransactions = transactions.filter((t) => t.transactionSubtype === 'sell');
+
+    const buyTotal = buyTransactions.reduce((sum, transaction) => {
+      const amount = transaction.amount || 0;
+      const frequency = transaction.frequency || 1;
+      return sum + Math.abs(amount * frequency);
+    }, 0);
+
+    const sellTotal = sellTransactions.reduce((sum, transaction) => {
+      const amount = transaction.amount || 0;
+      const frequency = transaction.frequency || 1;
+      return sum + Math.abs(amount * frequency);
+    }, 0);
+
+    return {
+      buyTotal,
+      sellTotal,
+      buyCount: buyTransactions.length,
+      sellCount: sellTransactions.length,
+      netAmount: sellTotal - buyTotal, // 売却 - 買付 = 純損益
+    };
+  }, [transactions, type]);
+
   // 年間合計金額を計算（amount × frequency）
   const totalAmount = transactions.reduce((sum, transaction) => {
     const amount = transaction.amount || 0;
@@ -125,25 +153,81 @@ const TransactionSummary = ({ transactions, year, type }) => {
             {year}年の{config.title}
           </h2>
 
-          <div className="mb-4">
-            <div className={`text-3xl font-bold ${config.color}`}>
-              {config.prefix}
-              {formatAmount(Math.abs(totalAmount))}
-            </div>
-
-            {type !== 'transfer' && type !== 'investment' && (
-              <div className="text-lg text-gray-600 mt-2">
-                月平均: {config.prefix}
-                {formatAmount(Math.abs(monthlyAverage))}
+          {/* 投資の場合の詳細表示 */}
+          {type === 'investment' && investmentSummary && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* 買付合計 */}
+              <div className="bg-red-50 p-4 rounded-lg">
+                <div className="text-sm text-red-600 font-medium">買付合計</div>
+                <div className="text-2xl font-bold text-red-700">
+                  -{formatAmount(investmentSummary.buyTotal)}
+                </div>
+                <div className="text-sm text-red-500 mt-1">{investmentSummary.buyCount}件</div>
               </div>
-            )}
 
-            {type === 'transfer' && (
-              <div className="text-lg text-gray-600 mt-2">総取引件数: {transactions.length}件</div>
-            )}
+              {/* 売却合計 */}
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="text-sm text-green-600 font-medium">売却合計</div>
+                <div className="text-2xl font-bold text-green-700">
+                  +{formatAmount(investmentSummary.sellTotal)}
+                </div>
+                <div className="text-sm text-green-500 mt-1">{investmentSummary.sellCount}件</div>
+              </div>
 
-            {type === 'investment' && <div className="text-lg text-gray-600 mt-2">評価額合計</div>}
-          </div>
+              {/* 純損益 */}
+              <div
+                className={`p-4 rounded-lg ${
+                  investmentSummary.netAmount >= 0 ? 'bg-blue-50' : 'bg-orange-50'
+                }`}
+              >
+                <div
+                  className={`text-sm font-medium ${
+                    investmentSummary.netAmount >= 0 ? 'text-blue-600' : 'text-orange-600'
+                  }`}
+                >
+                  純損益
+                </div>
+                <div
+                  className={`text-2xl font-bold ${
+                    investmentSummary.netAmount >= 0 ? 'text-blue-700' : 'text-orange-700'
+                  }`}
+                >
+                  {investmentSummary.netAmount >= 0 ? '+' : ''}
+                  {formatAmount(investmentSummary.netAmount)}
+                </div>
+                <div
+                  className={`text-sm mt-1 ${
+                    investmentSummary.netAmount >= 0 ? 'text-blue-500' : 'text-orange-500'
+                  }`}
+                >
+                  {investmentSummary.netAmount >= 0 ? '利益' : '損失'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 通常の合計表示（投資以外） */}
+          {type !== 'investment' && (
+            <div className="mb-4">
+              <div className={`text-3xl font-bold ${config.color}`}>
+                {config.prefix}
+                {formatAmount(Math.abs(totalAmount))}
+              </div>
+
+              {type !== 'transfer' && (
+                <div className="text-lg text-gray-600 mt-2">
+                  月平均: {config.prefix}
+                  {formatAmount(Math.abs(monthlyAverage))}
+                </div>
+              )}
+
+              {type === 'transfer' && (
+                <div className="text-lg text-gray-600 mt-2">
+                  総取引件数: {transactions.length}件
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* カテゴリ別チャート（支出・収入の場合） */}

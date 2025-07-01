@@ -9,12 +9,13 @@ import { getLifePlanSettings } from '../../utils/storage';
 const DividendForm = ({ onSave }) => {
   // 配当金額入力用のref（uncontrolled component）
   const dividendRef = useRef(null);
+  // JSON入力用のref（uncontrolled component）
+  const jsonRef = useRef(null);
 
   const [formData, setFormData] = useState({
     year: new Date().getFullYear(),
     dividendPerShare: 0,
   });
-  const [jsonData, setJsonData] = useState('');
 
   // ライフプラン範囲に基づいた年選択肢を生成
   const generateYearOptions = () => {
@@ -77,6 +78,9 @@ const DividendForm = ({ onSave }) => {
 
   const handleJsonSave = () => {
     try {
+      // refから最新のJSON値を取得
+      const jsonData = jsonRef.current ? jsonRef.current.value : '';
+
       const parsedData = JSON.parse(jsonData);
       if (Array.isArray(parsedData)) {
         // ライフプラン範囲内の年のみを有効とする
@@ -96,7 +100,11 @@ const DividendForm = ({ onSave }) => {
 
         if (validData.length > 0) {
           onSave(validData);
-          setJsonData('');
+
+          // refもリセット
+          if (jsonRef.current) {
+            jsonRef.current.value = '';
+          }
 
           // 範囲外のデータがあった場合の警告
           if (validData.length < parsedData.length) {
@@ -168,8 +176,8 @@ const DividendForm = ({ onSave }) => {
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">JSON配当データ</label>
         <textarea
-          value={jsonData}
-          onChange={(e) => setJsonData(e.target.value)}
+          ref={jsonRef}
+          defaultValue=""
           className="w-full h-32 p-3 border rounded-lg font-mono text-sm"
           placeholder={`[
   {

@@ -12,6 +12,8 @@ const Transactions = () => {
   const [activeTab, setActiveTab] = useState('expense');
   const [transactions, setTransactions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   // ライフプラン範囲に基づいた年選択肢を生成
   const generateYearOptions = () => {
@@ -64,12 +66,26 @@ const Transactions = () => {
 
   // 新規取引追加
   const handleAddTransaction = () => {
+    setEditingTransaction(null);
     setIsModalOpen(true);
   };
 
-  // モーダルを閉じる
+  // 取引編集
+  const handleEditTransaction = (transaction) => {
+    setEditingTransaction(transaction);
+    setIsEditModalOpen(true);
+  };
+
+  // 新規モーダルを閉じる
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  // 編集モーダルを閉じる
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingTransaction(null);
   };
 
   // 取引保存完了時の処理
@@ -79,6 +95,17 @@ const Transactions = () => {
 
     // モーダルを閉じる
     setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
+
+  // 取引編集保存完了時の処理
+  const handleTransactionEditSaved = () => {
+    // 取引データを再読み込み
+    loadTransactions();
+
+    // 編集モーダルを閉じる
+    setIsEditModalOpen(false);
+    setEditingTransaction(null);
   };
 
   // 取引更新時の処理（編集・削除後）
@@ -144,6 +171,7 @@ const Transactions = () => {
           transactions={filteredTransactions}
           type={activeTab}
           onTransactionUpdate={handleTransactionUpdate}
+          onTransactionEdit={handleEditTransaction}
         />
 
         {/* 新規追加ボタン（完全に丸いボタン） */}
@@ -168,12 +196,29 @@ const Transactions = () => {
           </button>
         </div>
 
-        {/* 取引フォームモーダル */}
+        {/* 新規取引フォームモーダル */}
         <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="新規取引" size="large">
           <TransactionForm
             initialType={activeTab}
+            selectedYear={selectedYear}
             onSave={handleTransactionSaved}
             onCancel={handleCloseModal}
+          />
+        </Modal>
+
+        {/* 取引編集フォームモーダル */}
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          title="取引編集"
+          size="large"
+        >
+          <TransactionForm
+            transaction={editingTransaction}
+            isEditing={true}
+            selectedYear={selectedYear}
+            onSave={handleTransactionEditSaved}
+            onCancel={handleCloseEditModal}
           />
         </Modal>
       </div>

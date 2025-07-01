@@ -9,12 +9,14 @@ import {
   saveTransaction,
   updateTransaction,
   getLifePlanSettings,
+  getTransactions,
 } from '../../utils/storage';
 
 const TransactionForm = ({
   initialType = 'expense',
   transaction = null,
   isEditing = false,
+  selectedYear = null,
   onSave,
   onCancel,
 }) => {
@@ -40,7 +42,7 @@ const TransactionForm = ({
     memo: transaction?.memo || '',
     transactionSubtype: transaction?.transactionSubtype || 'buy',
     // 詳細設定
-    year: transaction?.year || new Date().getFullYear(),
+    year: transaction?.year || selectedYear || new Date().getFullYear(),
     month: transaction?.month || new Date().getMonth() + 1,
     tags: transaction?.tags || [],
     detailMemo: transaction?.detailMemo || '',
@@ -49,6 +51,7 @@ const TransactionForm = ({
   const [accounts, setAccounts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [assets, setAssets] = useState([]);
+  const [holdingAssets, setHoldingAssets] = useState([]);
   const [errors, setErrors] = useState({});
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -59,10 +62,75 @@ const TransactionForm = ({
       setAccounts(getAccounts());
       setCategories(getCategories());
       setAssets(getAssetInfo());
+
+      // 保有資産を計算
+      calculateHoldingAssets();
     } catch (error) {
       console.error('データ読み込みエラー:', error);
     }
   }, []);
+
+  // 保有資産を計算する関数
+  const calculateHoldingAssets = () => {
+    try {
+      const settings = getLifePlanSettings();
+      const assets = getAssetInfo();
+      const holdingsMap = new Map();
+
+      // 全年の投資取引を取得
+      for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+        try {
+          const transactions = getTransactions(year);
+          const investmentTransactions = transactions.filter(
+            (t) => t.type === 'investment' && t.holdingAssetId
+          );
+
+          investmentTransactions.forEach((transaction) => {
+            const assetId = transaction.holdingAssetId;
+            const quantity = transaction.quantity || 0;
+            const isBuy = transaction.transactionSubtype === 'buy';
+
+            if (!holdingsMap.has(assetId)) {
+              holdingsMap.set(assetId, {
+                assetId: assetId,
+                quantity: 0,
+                purchaseYear: year,
+              });
+            }
+
+            const holding = holdingsMap.get(assetId);
+
+            if (isBuy) {
+              holding.quantity += quantity;
+              if (!holding.purchaseYear || year < holding.purchaseYear) {
+                holding.purchaseYear = year;
+              }
+            } else {
+              holding.quantity -= quantity;
+            }
+          });
+        } catch (error) {
+          console.error(`Failed to load transactions for year ${year}:`, error);
+        }
+      }
+
+      // 保有数量が0より多い資産のみを保持
+      const holdings = Array.from(holdingsMap.values())
+        .filter((holding) => holding.quantity > 0)
+        .map((holding) => {
+          const asset = assets.find((a) => a.id === holding.assetId);
+          return {
+            ...holding,
+            asset: asset,
+          };
+        })
+        .filter((holding) => holding.asset);
+
+      setHoldingAssets(holdings);
+    } catch (error) {
+      console.error('保有資産計算エラー:', error);
+    }
+  };
 
   // 編集データの初期化
   useEffect(() => {
@@ -82,20 +150,24 @@ const TransactionForm = ({
         memo: transaction.memo || '',
         transactionSubtype: transaction.transactionSubtype || 'buy',
         // 詳細設定
-        year: transaction.year || new Date().getFullYear(),
+        year: transaction.year || selectedYear || new Date().getFullYear(),
         month: transaction.month || new Date().getMonth() + 1,
         tags: transaction.tags || [],
         detailMemo: transaction.detailMemo || '',
       });
     }
-  }, [transaction, initialType]);
+  }, [transaction, initialType, selectedYear]);
 
   // 初期取引タイプが変更された場合にフォームデータを更新
   useEffect(() => {
     if (!transaction) {
-      setFormData((prev) => ({ ...prev, type: initialType }));
+      setFormData((prev) => ({
+        ...prev,
+        type: initialType,
+        year: selectedYear || prev.year,
+      }));
     }
-  }, [initialType, transaction]);
+  }, [initialType, selectedYear, transaction]);
 
   // 取引タイプ設定
   const transactionTypes = [
@@ -235,12 +307,67 @@ const TransactionForm = ({
   // 選択された資産の情報を取得
   const selectedAsset = assets.find((asset) => asset.id === formData.assetId);
 
+  // 選択された保有資産の情報を取得
+  const selectedHoldingAsset = holdingAssets.find(
+    (holding) => holding.assetId === formData.assetId
+  );
+
+  // 使用する年を取得（selectedYearまたはformData.year）
+  const getEffectiveYear = () => {
+    return selectedYear || formData.year;
+  };
+
+  // 選択された年の価格情報を取得
+  const getAssetPriceForYear = () => {
+    if (!selectedAsset) return 0;
+    const effectiveYear = getEffectiveYear();
+    const priceData = selectedAsset.priceHistory?.find((p) => p.year === effectiveYear);
+    return priceData?.price || 0;
+  };
+
+  // 選択された年の配当情報を取得
+  const getAssetDividendForYear = () => {
+    if (!selectedAsset) return 0;
+    const effectiveYear = getEffectiveYear();
+    const dividendData = selectedAsset.dividendHistory?.find((d) => d.year === effectiveYear);
+    return dividendData?.dividendPerShare || 0;
+  };
+
+  // 購入時の価格を取得
+  const getPurchasePrice = () => {
+    if (!selectedAsset || !selectedHoldingAsset) return 0;
+    const priceData = selectedAsset.priceHistory?.find(
+      (p) => p.year === selectedHoldingAsset.purchaseYear
+    );
+    return priceData?.price || 0;
+  };
+
   // 投資金額を計算
   const calculateInvestmentAmount = () => {
     if (!selectedAsset || !formData.quantity) return 0;
-    const currentPrice =
-      selectedAsset.priceHistory?.[selectedAsset.priceHistory.length - 1]?.price || 0;
-    return formData.quantity * currentPrice;
+    const priceForYear = getAssetPriceForYear();
+    return formData.quantity * priceForYear;
+  };
+
+  // 売却時の損益を計算
+  const calculateSellProfitLoss = () => {
+    if (
+      !selectedAsset ||
+      !selectedHoldingAsset ||
+      !formData.quantity ||
+      formData.transactionSubtype !== 'sell'
+    ) {
+      return { profitLoss: 0, profitLossRate: 0 };
+    }
+
+    const currentPrice = getAssetPriceForYear();
+    const purchasePrice = getPurchasePrice();
+    const sellAmount = currentPrice * formData.quantity;
+    const purchaseAmount = purchasePrice * formData.quantity;
+    const profitLoss = sellAmount - purchaseAmount;
+    const profitLossRate = purchaseAmount > 0 ? (profitLoss / purchaseAmount) * 100 : 0;
+
+    return { profitLoss, profitLossRate };
   };
 
   // バリデーション
@@ -287,13 +414,26 @@ const TransactionForm = ({
     // 投資の場合
     if (formData.type === 'investment') {
       if (!formData.assetId) {
-        newErrors.assetId = '投資先を選択してください';
+        newErrors.assetId =
+          formData.transactionSubtype === 'sell'
+            ? '保有資産を選択してください'
+            : '投資先を選択してください';
       }
       if (!formData.accountId) {
-        newErrors.accountId = '投資元口座を選択してください';
+        newErrors.accountId =
+          formData.transactionSubtype === 'sell'
+            ? '入金先口座を選択してください'
+            : '投資元口座を選択してください';
       }
       if (currentQuantity <= 0) {
         newErrors.quantity = '数量を入力してください';
+      }
+
+      // 売却時の数量チェック
+      if (formData.transactionSubtype === 'sell' && selectedHoldingAsset) {
+        if (currentQuantity > selectedHoldingAsset.quantity) {
+          newErrors.quantity = `保有数量（${selectedHoldingAsset.quantity}）を超えて売却することはできません`;
+        }
       }
     }
 
@@ -332,11 +472,17 @@ const TransactionForm = ({
       finalTitle = `${fromAccount?.name || '不明な口座'} → ${toAccount?.name || '不明な口座'}`;
     }
 
+    // 投資の場合はタイトルを自動生成
+    if (formData.type === 'investment' && selectedAsset) {
+      const actionLabel = formData.transactionSubtype === 'buy' ? '【買付】' : '【売却】';
+      finalTitle = `${actionLabel}${selectedAsset.name}`;
+    }
+
     const transactionData = {
       id: isEditing ? transaction.id : `txn_${Date.now()}`,
       title: finalTitle,
       type: formData.type,
-      year: formData.year,
+      year: selectedYear || formData.year,
       month: formData.month,
       amount: formData.type === 'investment' ? calculateInvestmentAmount() : finalAmount,
       description: finalTitle,
@@ -347,8 +493,8 @@ const TransactionForm = ({
       quantity: finalQuantity,
       tags: formData.tags,
       templateId: transaction?.templateId || null,
-      frequency: formData.frequency,
-      eventId: formData.eventId,
+      frequency: formData.type === 'investment' ? 1 : formData.frequency, // 投資の場合は常に1回
+      eventId: formData.type === 'investment' ? '' : formData.eventId, // 投資の場合は空文字
       memo: finalMemo,
       detailMemo: finalDetailMemo,
       transactionSubtype: formData.transactionSubtype,
@@ -386,6 +532,27 @@ const TransactionForm = ({
     if (formData.type === 'income') return category.type === 'income';
     return false;
   });
+
+  // 投資先選択肢を取得（買付時は全資産、売却時は保有資産のみ）
+  const getInvestmentOptions = () => {
+    if (formData.transactionSubtype === 'sell') {
+      return [
+        { value: '', label: '保有資産を選択' },
+        ...holdingAssets.map((holding) => ({
+          value: holding.assetId,
+          label: `${holding.asset.name} (${holding.asset.symbol}) - 保有数: ${holding.quantity}`,
+        })),
+      ];
+    } else {
+      return [
+        { value: '', label: '投資先を選択' },
+        ...assets.map((asset) => ({
+          value: asset.id,
+          label: `${asset.name} (${asset.symbol})`,
+        })),
+      ];
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -455,6 +622,15 @@ const TransactionForm = ({
               売却
             </button>
           </div>
+          {/* 投資のタイトルプレビュー */}
+          {selectedAsset && (
+            <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                取引タイトル: {formData.transactionSubtype === 'buy' ? '【買付】' : '【売却】'}
+                {selectedAsset.name}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -480,33 +656,34 @@ const TransactionForm = ({
       {/* 投資先選択（投資の場合） */}
       {formData.type === 'investment' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">投資先選択</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {formData.transactionSubtype === 'sell' ? '保有資産選択' : '投資先選択'}
+          </label>
           <Select
             value={formData.assetId}
             onChange={(e) => handleInputChange('assetId', e.target.value)}
-            options={[
-              { value: '', label: '投資先を選択' },
-              ...assets.map((asset) => ({
-                value: asset.id,
-                label: `${asset.name} (${asset.symbol})`,
-              })),
-            ]}
+            options={getInvestmentOptions()}
             error={errors.assetId}
           />
           {selectedAsset && (
             <div className="mt-2 p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">
-                現在値: ¥
-                {selectedAsset.priceHistory?.[
-                  selectedAsset.priceHistory.length - 1
-                ]?.price?.toLocaleString() || 0}
+                {getEffectiveYear()}年の価格: ¥{getAssetPriceForYear().toLocaleString()}
+                {getAssetPriceForYear() === 0 && (
+                  <span className="text-red-500 ml-2">（{getEffectiveYear()}年のデータなし）</span>
+                )}
               </p>
               <p className="text-sm text-gray-600">
-                年間配当: ¥
-                {selectedAsset.dividendHistory?.[
-                  selectedAsset.dividendHistory.length - 1
-                ]?.dividendPerShare?.toLocaleString() || 0}
+                {getEffectiveYear()}年の配当: ¥{getAssetDividendForYear().toLocaleString()}
+                {getAssetDividendForYear() === 0 && (
+                  <span className="text-red-500 ml-2">（{getEffectiveYear()}年のデータなし）</span>
+                )}
               </p>
+              {formData.transactionSubtype === 'sell' && selectedHoldingAsset && (
+                <p className="text-sm text-gray-600">
+                  保有数量: {selectedHoldingAsset.quantity}（売却可能）
+                </p>
+              )}
             </div>
           )}
           {errors.assetId && <p className="mt-1 text-sm text-red-600">{errors.assetId}</p>}
@@ -520,7 +697,9 @@ const TransactionForm = ({
             {formData.type === 'income'
               ? '入金口座'
               : formData.type === 'investment'
-                ? '投資元口座'
+                ? formData.transactionSubtype === 'sell'
+                  ? '入金先口座'
+                  : '投資元口座'
                 : '口座'}
           </label>
           <Select
@@ -620,11 +799,23 @@ const TransactionForm = ({
             onBlur={handleQuantityBlur}
             placeholder="0"
             min="0"
+            max={
+              formData.transactionSubtype === 'sell' && selectedHoldingAsset
+                ? selectedHoldingAsset.quantity
+                : undefined
+            }
             step="1"
             className="text-xl py-3"
             error={errors.quantity}
           />
-          <div className="mt-1 text-sm text-gray-600">株 / 口</div>
+          <div className="mt-1 text-sm text-gray-600">
+            株 / 口
+            {formData.transactionSubtype === 'sell' && selectedHoldingAsset && (
+              <span className="ml-2 text-blue-600">
+                （最大 {selectedHoldingAsset.quantity} まで売却可能）
+              </span>
+            )}
+          </div>
           {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
         </div>
       )}
@@ -640,17 +831,53 @@ const TransactionForm = ({
               ¥{calculateInvestmentAmount().toLocaleString()}
             </div>
             <div className="text-sm text-gray-600">
-              {formData.quantity || 0} × ¥
-              {selectedAsset.priceHistory?.[
-                selectedAsset.priceHistory.length - 1
-              ]?.price?.toLocaleString() || 0}
+              {formData.quantity || 0} × ¥{getAssetPriceForYear().toLocaleString()}
+              {getAssetPriceForYear() === 0 && (
+                <span className="text-red-500 ml-2">
+                  （{getEffectiveYear()}年の価格データがありません）
+                </span>
+              )}
             </div>
+
+            {/* 売却時の損益表示 */}
+            {formData.transactionSubtype === 'sell' &&
+              selectedHoldingAsset &&
+              formData.quantity > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-300">
+                  <div className="text-sm font-medium text-gray-700 mb-2">損益情報</div>
+                  {(() => {
+                    const { profitLoss, profitLossRate } = calculateSellProfitLoss();
+                    return (
+                      <>
+                        <div className="text-sm text-gray-600">
+                          購入価格: ¥{getPurchasePrice().toLocaleString()} × {formData.quantity} = ¥
+                          {(getPurchasePrice() * formData.quantity).toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          売却価格: ¥{getAssetPriceForYear().toLocaleString()} × {formData.quantity}{' '}
+                          = ¥{calculateInvestmentAmount().toLocaleString()}
+                        </div>
+                        <div
+                          className={`text-lg font-bold ${profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                        >
+                          {profitLoss >= 0 ? '利益' : '損失'}: {profitLoss >= 0 ? '+' : ''}¥
+                          {profitLoss.toLocaleString()}
+                          <span className="text-sm ml-2">
+                            ({profitLoss >= 0 ? '+' : ''}
+                            {profitLossRate.toFixed(1)}%)
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
           </div>
         </div>
       )}
 
-      {/* 頻度設定（振替以外） */}
-      {formData.type !== 'transfer' && (
+      {/* 頻度設定（振替・投資以外） */}
+      {formData.type !== 'transfer' && formData.type !== 'investment' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">頻度（年に何回）</label>
           <div className="w-48">
@@ -663,8 +890,8 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* イベント選択（任意、振替以外） */}
-      {formData.type !== 'transfer' && (
+      {/* イベント選択（任意、振替・投資以外） */}
+      {formData.type !== 'transfer' && formData.type !== 'investment' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">イベント（任意）</label>
           <Select
@@ -692,8 +919,10 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* 詳細設定ボタン（支出・収入の場合） */}
-      {(formData.type === 'expense' || formData.type === 'income') && (
+      {/* 詳細設定ボタン（支出・収入・投資の場合） */}
+      {(formData.type === 'expense' ||
+        formData.type === 'income' ||
+        formData.type === 'investment') && (
         <div>
           <button
             type="button"
@@ -718,109 +947,116 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* 詳細設定セクション（支出・収入の場合） */}
-      {(formData.type === 'expense' || formData.type === 'income') && showAdvancedSettings && (
-        <div className="border-t pt-6 space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">詳細設定</h3>
+      {/* 詳細設定セクション（支出・収入・投資の場合） */}
+      {(formData.type === 'expense' ||
+        formData.type === 'income' ||
+        formData.type === 'investment') &&
+        showAdvancedSettings && (
+          <div className="border-t pt-6 space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">詳細設定</h3>
 
-          {/* 年・月選択 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">年</label>
-              <Select
-                value={formData.year}
-                onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
-                options={generateYearOptions()}
-              />
+            {/* 年・月選択 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">年</label>
+                <Select
+                  value={formData.year}
+                  onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
+                  options={generateYearOptions()}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">月</label>
+                <Select
+                  value={formData.month}
+                  onChange={(e) => handleInputChange('month', parseInt(e.target.value))}
+                  options={generateMonthOptions()}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">月</label>
-              <Select
-                value={formData.month}
-                onChange={(e) => handleInputChange('month', parseInt(e.target.value))}
-                options={generateMonthOptions()}
-              />
-            </div>
-          </div>
 
-          {/* タグ入力（バッジ形式） */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">タグ（任意）</label>
+            {/* タグ入力（バッジ形式）（支出・収入の場合のみ） */}
+            {(formData.type === 'expense' || formData.type === 'income') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">タグ（任意）</label>
 
-            {/* タグバッジ表示 */}
-            {formData.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {formData.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                  >
-                    <span>{tag}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors"
-                      title="タグを削除"
-                    >
-                      <svg
-                        className="w-3 h-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                {/* タグバッジ表示 */}
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {formData.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
+                        <span>{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors"
+                          title="タグを削除"
+                        >
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* タグ入力フィールド */}
+                <div className="flex gap-2">
+                  <Input
+                    ref={tagInputRef}
+                    type="text"
+                    value={tagInput}
+                    onChange={handleTagInputChange}
+                    onKeyDown={handleTagInputKeyDown}
+                    placeholder="タグを入力してEnterまたはカンマで追加"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addTag}
+                    variant="outline"
+                    className="px-4"
+                    disabled={!tagInput.trim()}
+                  >
+                    追加
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Enterキーまたはカンマで複数のタグを追加できます
+                </p>
               </div>
             )}
 
-            {/* タグ入力フィールド */}
-            <div className="flex gap-2">
-              <Input
-                ref={tagInputRef}
-                type="text"
-                value={tagInput}
-                onChange={handleTagInputChange}
-                onKeyDown={handleTagInputKeyDown}
-                placeholder="タグを入力してEnterまたはカンマで追加"
-                className="flex-1"
+            {/* 詳細メモ */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                詳細メモ（任意）
+              </label>
+              <textarea
+                ref={detailMemoRef}
+                defaultValue={formData.detailMemo}
+                onBlur={handleDetailMemoBlur}
+                placeholder="取引に関する詳細なメモを入力してください..."
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                rows={3}
               />
-              <Button
-                type="button"
-                onClick={addTag}
-                variant="outline"
-                className="px-4"
-                disabled={!tagInput.trim()}
-              >
-                追加
-              </Button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Enterキーまたはカンマで複数のタグを追加できます
-            </p>
           </div>
-
-          {/* 詳細メモ */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">詳細メモ（任意）</label>
-            <textarea
-              ref={detailMemoRef}
-              defaultValue={formData.detailMemo}
-              onBlur={handleDetailMemoBlur}
-              placeholder="取引に関する詳細なメモを入力してください..."
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              rows={3}
-            />
-          </div>
-        </div>
-      )}
+        )}
 
       {/* ボタン */}
       <div className="flex space-x-4">
