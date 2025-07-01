@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { HiArrowLeft } from 'react-icons/hi2';
+import { HiArrowLeft, HiPlus, HiMinus } from 'react-icons/hi2';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Tabs from '../ui/Tabs';
+import Modal from '../ui/Modal';
+import TransactionForm from '../forms/TransactionForm';
 import HoldingAssetChart from '../layout/HoldingAssetChart';
 import {
   getAssetInfo,
@@ -23,6 +25,10 @@ const HoldingAssetDetail = () => {
   const [transactions, setTransactions] = useState([]);
   const [transactionFilter, setTransactionFilter] = useState('all');
   const [investmentSummary, setInvestmentSummary] = useState(null);
+
+  // 取引フォーム関連のstate
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [transactionSubtype, setTransactionSubtype] = useState('buy');
 
   // データ読み込み
   useEffect(() => {
@@ -188,6 +194,43 @@ const HoldingAssetDetail = () => {
     return getCurrentPrice() * holdingAsset.quantity;
   };
 
+  // 買付ボタンクリック処理
+  const handleBuyClick = () => {
+    setTransactionSubtype('buy');
+    setIsTransactionModalOpen(true);
+  };
+
+  // 売却ボタンクリック処理
+  const handleSellClick = () => {
+    setTransactionSubtype('sell');
+    setIsTransactionModalOpen(true);
+  };
+
+  // 取引フォームモーダルを閉じる
+  const handleCloseTransactionModal = () => {
+    setIsTransactionModalOpen(false);
+  };
+
+  // 取引保存完了時の処理
+  const handleTransactionSaved = () => {
+    // データを再読み込み
+    window.location.reload(); // 簡易的にページリロード
+    setIsTransactionModalOpen(false);
+  };
+
+  // 事前設定された取引データを作成
+  const getPresetTransactionData = () => {
+    if (!asset) return null;
+
+    return {
+      type: 'investment',
+      transactionSubtype: transactionSubtype,
+      holdingAssetId: asset.id,
+      year: new Date().getFullYear(),
+      month: new Date().getMonth() + 1,
+    };
+  };
+
   // フィルター適用
   const getFilteredTransactions = () => {
     if (transactionFilter === 'all') return transactions;
@@ -263,6 +306,26 @@ const HoldingAssetDetail = () => {
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* 買付・売却ボタン */}
+          <div className="flex space-x-3">
+            <Button
+              onClick={handleBuyClick}
+              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700"
+            >
+              <HiPlus className="h-4 w-4" />
+              <span>買付</span>
+            </Button>
+            <Button
+              onClick={handleSellClick}
+              variant="outline"
+              className="flex items-center space-x-2 text-red-600 border-red-200 hover:bg-red-50"
+              disabled={holdingAsset.quantity <= 0}
+            >
+              <HiMinus className="h-4 w-4" />
+              <span>売却</span>
+            </Button>
           </div>
         </div>
       </Card>
@@ -401,6 +464,22 @@ const HoldingAssetDetail = () => {
           )}
         </div>
       </Card>
+
+      {/* 投資取引フォームモーダル */}
+      <Modal
+        isOpen={isTransactionModalOpen}
+        onClose={handleCloseTransactionModal}
+        title={`${transactionSubtype === 'buy' ? '買付' : '売却'}取引`}
+        size="large"
+      >
+        <TransactionForm
+          initialType="investment"
+          transaction={getPresetTransactionData()}
+          selectedYear={new Date().getFullYear()}
+          onSave={handleTransactionSaved}
+          onCancel={handleCloseTransactionModal}
+        />
+      </Modal>
     </div>
   );
 };

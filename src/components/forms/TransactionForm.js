@@ -164,10 +164,11 @@ const TransactionForm = ({
       setFormData((prev) => ({
         ...prev,
         type: initialType,
-        year: selectedYear || prev.year,
+        // selectedYearは初期値のみに使用し、詳細設定での変更を優先
+        year: prev.year || selectedYear || new Date().getFullYear(),
       }));
     }
-  }, [initialType, selectedYear, transaction]);
+  }, [initialType, transaction]);
 
   // 取引タイプ設定
   const transactionTypes = [
@@ -312,9 +313,9 @@ const TransactionForm = ({
     (holding) => holding.assetId === formData.assetId
   );
 
-  // 使用する年を取得（selectedYearまたはformData.year）
+  // 使用する年を取得（formData.yearを優先）
   const getEffectiveYear = () => {
-    return selectedYear || formData.year;
+    return formData.year;
   };
 
   // 選択された年の価格情報を取得
@@ -482,8 +483,8 @@ const TransactionForm = ({
       id: isEditing ? transaction.id : `txn_${Date.now()}`,
       title: finalTitle,
       type: formData.type,
-      year: selectedYear || formData.year,
-      month: formData.month,
+      year: formData.year, // 詳細設定の年を使用
+      month: formData.month, // 詳細設定の月を使用
       amount: formData.type === 'investment' ? calculateInvestmentAmount() : finalAmount,
       description: finalTitle,
       categoryId: formData.categoryId,
