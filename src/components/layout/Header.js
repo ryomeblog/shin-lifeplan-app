@@ -58,7 +58,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-15">
           {/* ロゴ */}
           <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
+            <Link to="/dashboard" className="text-2xl font-bold text-blue-600">
               LifePlan
             </Link>
           </div>
