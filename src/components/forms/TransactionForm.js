@@ -89,6 +89,7 @@ const TransactionForm = ({
             const assetId = transaction.holdingAssetId;
             const quantity = transaction.quantity || 0;
             const isBuy = transaction.transactionSubtype === 'buy';
+            const isSell = transaction.transactionSubtype === 'sell';
 
             if (!holdingsMap.has(assetId)) {
               holdingsMap.set(assetId, {
@@ -105,9 +106,10 @@ const TransactionForm = ({
               if (!holding.purchaseYear || year < holding.purchaseYear) {
                 holding.purchaseYear = year;
               }
-            } else {
+            } else if (isSell) {
               holding.quantity -= quantity;
             }
+            // 配当の場合は数量に影響しない
           });
         } catch (error) {
           console.error(`Failed to load transactions for year ${year}:`, error);
@@ -346,8 +348,15 @@ const TransactionForm = ({
   // 投資金額を計算
   const calculateInvestmentAmount = () => {
     if (!selectedAsset || !formData.quantity) return 0;
-    const priceForYear = getAssetPriceForYear();
-    return formData.quantity * priceForYear;
+    if (formData.transactionSubtype === 'dividend') {
+      // 配当の場合は配当単価 × 数量
+      const dividendPerShare = getAssetDividendForYear();
+      return formData.quantity * dividendPerShare;
+    } else {
+      // 買付・売却の場合は価格 × 数量
+      const priceForYear = getAssetPriceForYear();
+      return formData.quantity * priceForYear;
+    }
   };
 
   // 売却時の損益を計算
@@ -416,24 +425,28 @@ const TransactionForm = ({
     if (formData.type === 'investment') {
       if (!formData.assetId) {
         newErrors.assetId =
-          formData.transactionSubtype === 'sell'
+          formData.transactionSubtype === 'sell' || formData.transactionSubtype === 'dividend'
             ? '保有資産を選択してください'
             : '投資先を選択してください';
       }
       if (!formData.accountId) {
         newErrors.accountId =
-          formData.transactionSubtype === 'sell'
-            ? '入金先口座を選択してください'
-            : '投資元口座を選択してください';
+          formData.transactionSubtype === 'buy'
+            ? '投資元口座を選択してください'
+            : '入金先口座を選択してください';
       }
       if (currentQuantity <= 0) {
         newErrors.quantity = '数量を入力してください';
       }
 
-      // 売却時の数量チェック
-      if (formData.transactionSubtype === 'sell' && selectedHoldingAsset) {
+      // 売却・配当時の数量チェック
+      if (
+        (formData.transactionSubtype === 'sell' || formData.transactionSubtype === 'dividend') &&
+        selectedHoldingAsset
+      ) {
         if (currentQuantity > selectedHoldingAsset.quantity) {
-          newErrors.quantity = `保有数量（${selectedHoldingAsset.quantity}）を超えて売却することはできません`;
+          const actionLabel = formData.transactionSubtype === 'sell' ? '売却' : '配当受取';
+          newErrors.quantity = `保有数量（${selectedHoldingAsset.quantity}）を超えて${actionLabel}することはできません`;
         }
       }
     }
@@ -475,7 +488,12 @@ const TransactionForm = ({
 
     // 投資の場合はタイトルを自動生成
     if (formData.type === 'investment' && selectedAsset) {
-      const actionLabel = formData.transactionSubtype === 'buy' ? '【買付】' : '【売却】';
+      const actionLabel =
+        formData.transactionSubtype === 'buy'
+          ? '【買付】'
+          : formData.transactionSubtype === 'sell'
+            ? '【売却】'
+            : '【配当】';
       finalTitle = `${actionLabel}${selectedAsset.name}`;
     }
 
@@ -534,9 +552,9 @@ const TransactionForm = ({
     return false;
   });
 
-  // 投資先選択肢を取得（買付時は全資産、売却時は保有資産のみ）
+  // 投資先選択肢を取得（買付時は全資産、売却・配当時は保有資産のみ）
   const getInvestmentOptions = () => {
-    if (formData.transactionSubtype === 'sell') {
+    if (formData.transactionSubtype === 'sell' || formData.transactionSubtype === 'dividend') {
       return [
         { value: '', label: '保有資産を選択' },
         ...holdingAssets.map((holding) => ({
@@ -601,11 +619,11 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* 投資の場合：買付/売却選択 */}
+      {/* 投資の場合：買付/売却/配当選択 */}
       {formData.type === 'investment' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">取引種別</label>
-          <div className="flex bg-gray-100 rounded-full p-1 max-w-xs">
+          <div className="flex bg-gray-100 rounded-full p-1 max-w-md">
             <button
               onClick={() => handleInputChange('transactionSubtype', 'buy')}
               className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
@@ -622,12 +640,27 @@ const TransactionForm = ({
             >
               売却
             </button>
+            <button
+              onClick={() => handleInputChange('transactionSubtype', 'dividend')}
+              className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+                formData.transactionSubtype === 'dividend'
+                  ? 'bg-yellow-500 text-white'
+                  : 'text-gray-600'
+              }`}
+            >
+              配当
+            </button>
           </div>
           {/* 投資のタイトルプレビュー */}
           {selectedAsset && (
             <div className="mt-2 p-2 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                取引タイトル: {formData.transactionSubtype === 'buy' ? '【買付】' : '【売却】'}
+                取引タイトル:{' '}
+                {formData.transactionSubtype === 'buy'
+                  ? '【買付】'
+                  : formData.transactionSubtype === 'sell'
+                    ? '【売却】'
+                    : '【配当】'}
                 {selectedAsset.name}
               </p>
             </div>
@@ -658,7 +691,9 @@ const TransactionForm = ({
       {formData.type === 'investment' && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            {formData.transactionSubtype === 'sell' ? '保有資産選択' : '投資先選択'}
+            {formData.transactionSubtype === 'sell' || formData.transactionSubtype === 'dividend'
+              ? '保有資産選択'
+              : '投資先選択'}
           </label>
           <Select
             value={formData.assetId}
@@ -680,11 +715,14 @@ const TransactionForm = ({
                   <span className="text-red-500 ml-2">（{getEffectiveYear()}年のデータなし）</span>
                 )}
               </p>
-              {formData.transactionSubtype === 'sell' && selectedHoldingAsset && (
-                <p className="text-sm text-gray-600">
-                  保有数量: {selectedHoldingAsset.quantity}（売却可能）
-                </p>
-              )}
+              {(formData.transactionSubtype === 'sell' ||
+                formData.transactionSubtype === 'dividend') &&
+                selectedHoldingAsset && (
+                  <p className="text-sm text-gray-600">
+                    保有数量: {selectedHoldingAsset.quantity}（
+                    {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
+                  </p>
+                )}
             </div>
           )}
           {errors.assetId && <p className="mt-1 text-sm text-red-600">{errors.assetId}</p>}
@@ -698,9 +736,9 @@ const TransactionForm = ({
             {formData.type === 'income'
               ? '入金口座'
               : formData.type === 'investment'
-                ? formData.transactionSubtype === 'sell'
-                  ? '入金先口座'
-                  : '投資元口座'
+                ? formData.transactionSubtype === 'buy'
+                  ? '投資元口座'
+                  : '入金先口座'
                 : '口座'}
           </label>
           <Select
@@ -801,7 +839,9 @@ const TransactionForm = ({
             placeholder="0"
             min="0"
             max={
-              formData.transactionSubtype === 'sell' && selectedHoldingAsset
+              (formData.transactionSubtype === 'sell' ||
+                formData.transactionSubtype === 'dividend') &&
+              selectedHoldingAsset
                 ? selectedHoldingAsset.quantity
                 : undefined
             }
@@ -811,11 +851,14 @@ const TransactionForm = ({
           />
           <div className="mt-1 text-sm text-gray-600">
             株 / 口
-            {formData.transactionSubtype === 'sell' && selectedHoldingAsset && (
-              <span className="ml-2 text-blue-600">
-                （最大 {selectedHoldingAsset.quantity} まで売却可能）
-              </span>
-            )}
+            {(formData.transactionSubtype === 'sell' ||
+              formData.transactionSubtype === 'dividend') &&
+              selectedHoldingAsset && (
+                <span className="ml-2 text-blue-600">
+                  （最大 {selectedHoldingAsset.quantity} まで
+                  {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
+                </span>
+              )}
           </div>
           {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
         </div>
@@ -825,17 +868,26 @@ const TransactionForm = ({
       {formData.type === 'investment' && selectedAsset && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            {formData.transactionSubtype === 'buy' ? '投資金額' : '売却金額'}
+            {formData.transactionSubtype === 'buy'
+              ? '投資金額'
+              : formData.transactionSubtype === 'sell'
+                ? '売却金額'
+                : '配当金額'}
           </label>
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="text-2xl font-bold text-teal-600">
               ¥{calculateInvestmentAmount().toLocaleString()}
             </div>
             <div className="text-sm text-gray-600">
-              {formData.quantity || 0} × ¥{getAssetPriceForYear().toLocaleString()}
-              {getAssetPriceForYear() === 0 && (
+              {formData.quantity || 0} × ¥
+              {formData.transactionSubtype === 'dividend'
+                ? getAssetDividendForYear().toLocaleString()
+                : getAssetPriceForYear().toLocaleString()}
+              {((formData.transactionSubtype === 'dividend' && getAssetDividendForYear() === 0) ||
+                (formData.transactionSubtype !== 'dividend' && getAssetPriceForYear() === 0)) && (
                 <span className="text-red-500 ml-2">
-                  （{getEffectiveYear()}年の価格データがありません）
+                  （{getEffectiveYear()}年の
+                  {formData.transactionSubtype === 'dividend' ? '配当' : '価格'}データがありません）
                 </span>
               )}
             </div>

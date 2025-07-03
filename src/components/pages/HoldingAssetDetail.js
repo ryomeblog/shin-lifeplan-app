@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HiArrowLeft, HiPlus, HiMinus } from 'react-icons/hi2';
+import { HiArrowLeft, HiPlus, HiMinus, HiBanknotes } from 'react-icons/hi2';
 import { useParams, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
@@ -60,6 +60,7 @@ const HoldingAssetDetail = () => {
         let soldQuantity = 0;
         let totalPurchaseAmount = 0;
         let totalSellAmount = 0;
+        let totalDividendAmount = 0;
         let firstPurchaseYear = null;
 
         for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
@@ -73,6 +74,8 @@ const HoldingAssetDetail = () => {
               const quantity = transaction.quantity || 0;
               const amount = transaction.amount || 0;
               const isBuy = transaction.transactionSubtype === 'buy';
+              const isSell = transaction.transactionSubtype === 'sell';
+              const isDividend = transaction.transactionSubtype === 'dividend';
 
               // 取引データを整形
               const formattedTransaction = {
@@ -101,10 +104,12 @@ const HoldingAssetDetail = () => {
                 if (!firstPurchaseYear || year < firstPurchaseYear) {
                   firstPurchaseYear = year;
                 }
-              } else {
+              } else if (isSell) {
                 currentQuantity -= quantity;
                 soldQuantity += quantity;
                 totalSellAmount += Math.abs(amount);
+              } else if (isDividend) {
+                totalDividendAmount += Math.abs(amount);
               }
             });
           } catch (error) {
@@ -119,8 +124,9 @@ const HoldingAssetDetail = () => {
           soldQuantity,
           totalPurchaseAmount,
           totalSellAmount,
-          // 損益計算: 売却金額の合計 - 買付金額の合計
-          profitLoss: totalSellAmount - totalPurchaseAmount,
+          totalDividendAmount,
+          // 損益計算: 売却金額 + 配当金額 - 買付金額 (配当を収入として含める)
+          profitLoss: totalSellAmount + totalDividendAmount - totalPurchaseAmount,
         };
 
         // 損益率の計算（買付金額ベース）
@@ -206,6 +212,12 @@ const HoldingAssetDetail = () => {
     setIsTransactionModalOpen(true);
   };
 
+  // 配当ボタンクリック処理
+  const handleDividendClick = () => {
+    setTransactionSubtype('dividend');
+    setIsTransactionModalOpen(true);
+  };
+
   // 取引フォームモーダルを閉じる
   const handleCloseTransactionModal = () => {
     setIsTransactionModalOpen(false);
@@ -236,8 +248,23 @@ const HoldingAssetDetail = () => {
     if (transactionFilter === 'all') return transactions;
     if (transactionFilter === 'buy') return transactions.filter((t) => t.subType === 'buy');
     if (transactionFilter === 'sell') return transactions.filter((t) => t.subType === 'sell');
-    if (transactionFilter === 'dividend') return []; // 配当取引は今回未実装
+    if (transactionFilter === 'dividend')
+      return transactions.filter((t) => t.subType === 'dividend');
     return transactions;
+  };
+
+  // モーダルタイトルを取得
+  const getModalTitle = () => {
+    switch (transactionSubtype) {
+      case 'buy':
+        return '買付取引';
+      case 'sell':
+        return '売却取引';
+      case 'dividend':
+        return '配当取引';
+      default:
+        return '取引';
+    }
   };
 
   const formatCurrency = (amount) => {
@@ -308,7 +335,7 @@ const HoldingAssetDetail = () => {
             </div>
           </div>
 
-          {/* 買付・売却ボタン */}
+          {/* 買付・売却・配当ボタン */}
           <div className="flex space-x-3">
             <Button
               onClick={handleBuyClick}
@@ -325,6 +352,14 @@ const HoldingAssetDetail = () => {
             >
               <HiMinus className="h-4 w-4" />
               <span>売却</span>
+            </Button>
+            <Button
+              onClick={handleDividendClick}
+              variant="outline"
+              className="flex items-center space-x-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+            >
+              <HiBanknotes className="h-4 w-4" />
+              <span>配当</span>
             </Button>
           </div>
         </div>
@@ -351,6 +386,14 @@ const HoldingAssetDetail = () => {
             <div className="text-sm text-green-500 mt-1">
               売却数: {investmentSummary.soldQuantity}
             </div>
+          </div>
+
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="text-sm text-yellow-600 font-medium">配当総額</div>
+            <div className="text-2xl font-bold text-yellow-700">
+              {formatCurrency(investmentSummary.totalDividendAmount)}
+            </div>
+            <div className="text-sm text-yellow-500 mt-1">配当収入</div>
           </div>
 
           <div
@@ -381,14 +424,6 @@ const HoldingAssetDetail = () => {
               {investmentSummary.profitLossRate >= 0 ? '+' : ''}
               {investmentSummary.profitLossRate.toFixed(1)}%
             </div>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="text-sm text-gray-600 font-medium">現在の評価額</div>
-            <div className="text-2xl font-bold text-gray-700">
-              {formatCurrency(getCurrentValue())}
-            </div>
-            <div className="text-sm text-gray-500 mt-1">現在保有数: {holdingAsset.quantity}</div>
           </div>
         </div>
       </Card>
@@ -440,14 +475,26 @@ const HoldingAssetDetail = () => {
                 <div className="text-gray-600">{asset.symbol}</div>
                 <div className="font-medium text-gray-900">{asset.name}</div>
                 <div
-                  className={`font-medium ${transaction.subType === 'buy' ? 'text-green-600' : 'text-red-600'}`}
+                  className={`font-medium ${
+                    transaction.subType === 'buy'
+                      ? 'text-green-600'
+                      : transaction.subType === 'sell'
+                        ? 'text-red-600'
+                        : 'text-yellow-600'
+                  }`}
                 >
-                  {transaction.subType === 'buy' ? '買付' : '売却'}
+                  {transaction.subType === 'buy'
+                    ? '買付'
+                    : transaction.subType === 'sell'
+                      ? '売却'
+                      : '配当'}
                 </div>
                 <div className="text-gray-600">{transaction.quantity}</div>
                 <div className="text-gray-600">{formatCurrency(transaction.price)}</div>
                 <div
-                  className={`font-medium ${transaction.subType === 'buy' ? 'text-red-600' : 'text-green-600'}`}
+                  className={`font-medium ${
+                    transaction.subType === 'buy' ? 'text-red-600' : 'text-green-600'
+                  }`}
                 >
                   {transaction.subType === 'buy' ? '-' : '+'}
                   {formatCurrency(transaction.amount)}
@@ -469,7 +516,7 @@ const HoldingAssetDetail = () => {
       <Modal
         isOpen={isTransactionModalOpen}
         onClose={handleCloseTransactionModal}
-        title={`${transactionSubtype === 'buy' ? '買付' : '売却'}取引`}
+        title={getModalTitle()}
         size="large"
       >
         <TransactionForm

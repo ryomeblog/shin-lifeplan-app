@@ -5,12 +5,9 @@ import Card from '../ui/Card';
 import { getTransactions, getLifePlanSettings } from '../../utils/storage';
 
 const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }) => {
-  // 各口座の現在残高を計算（現在年月まで）
+  // 各口座の残高を計算（全年の取引を含む）
   const getAccountBalance = (account) => {
     try {
-      const currentYear = new Date().getFullYear();
-      const currentMonth = new Date().getMonth() + 1;
-
       let balance = account.initialBalance;
 
       // ライフプラン設定から年数範囲を取得
@@ -26,16 +23,6 @@ const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }
             const amount = transaction.amount || 0;
             const frequency = transaction.frequency || 1;
             const totalAmount = amount * frequency;
-            const transactionYear = transaction.year;
-            const transactionMonth = transaction.month || 1;
-
-            // 現在年月以前の取引のみ処理
-            if (
-              transactionYear > currentYear ||
-              (transactionYear === currentYear && transactionMonth > currentMonth)
-            ) {
-              return; // 将来の取引はスキップ
-            }
 
             // 該当口座に関連する取引のみ処理
             if (transaction.type === 'expense' && transaction.toAccountId === account.id) {
@@ -56,13 +43,23 @@ const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }
               transaction.type === 'investment' &&
               transaction.toAccountId === account.id
             ) {
-              // 投資取引：買付は支出、売却は収入として処理
+              // 投資取引：買付は支出、売却・配当は収入として処理
               if (transaction.transactionSubtype === 'buy') {
                 // 買付：該当口座から出金
                 balance -= Math.abs(totalAmount);
               } else if (transaction.transactionSubtype === 'sell') {
                 // 売却：該当口座に入金
                 balance += Math.abs(totalAmount);
+              } else if (transaction.transactionSubtype === 'dividend') {
+                // 配当：該当口座に入金（収入として処理）
+                balance += Math.abs(totalAmount);
+
+                // デバッグ：配当取引の処理を確認
+                if (process.env.NODE_ENV === 'development') {
+                  console.log(
+                    `配当取引処理 - 口座: ${account.name}, 金額: ${totalAmount}, 残高: ${balance}`
+                  );
+                }
               }
             }
           });
@@ -76,7 +73,7 @@ const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }
     }
   };
 
-  // 総資産を計算（全口座の現在残高の合計）
+  // 総資産を計算（全口座の残高の合計）
   const getTotalAssets = () => {
     return accounts.reduce((total, account) => {
       return total + getAccountBalance(account);
@@ -112,7 +109,7 @@ const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-1">現在残高</p>
+                    <p className="text-xs text-gray-500 mb-1">残高</p>
                     <p
                       className={`text-xl font-bold ${
                         currentBalance >= 0 ? 'text-gray-900' : 'text-red-600'

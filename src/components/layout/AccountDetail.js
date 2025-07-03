@@ -19,21 +19,18 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
-  const [currentBalance, setCurrentBalance] = useState(0);
+  const [finalBalance, setFinalBalance] = useState(0);
 
   // 年次データから残高履歴と取引履歴を計算
   useEffect(() => {
     const calculateData = () => {
       try {
         const categories = getCategories();
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
 
         // 残高履歴を計算
         const history = [];
         const allTransactions = [];
         let runningBalance = account.initialBalance;
-        let calculatedCurrentBalance = account.initialBalance;
 
         for (let year = planSettings.planStartYear; year <= planSettings.planEndYear; year++) {
           // 年次取引データを直接取得
@@ -75,7 +72,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                 transaction.type === 'investment' &&
                 transaction.toAccountId === account.id
               ) {
-                // 投資取引：買付は支出（マイナス）、売却は収入（プラス）として処理
+                // 投資取引：買付は支出（マイナス）、売却・配当は収入（プラス）として処理
                 if (transaction.transactionSubtype === 'buy') {
                   // 買付：該当口座から出金（マイナス）
                   balanceChange = -Math.abs(totalAmount);
@@ -86,22 +83,16 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                   balanceChange = Math.abs(totalAmount);
                   isRelevant = true;
                   transactionType = 'investment_sell';
+                } else if (transaction.transactionSubtype === 'dividend') {
+                  // 配当：該当口座に入金（プラス）
+                  balanceChange = Math.abs(totalAmount);
+                  isRelevant = true;
+                  transactionType = 'investment_dividend';
                 }
               }
 
               if (isRelevant) {
                 runningBalance += balanceChange;
-
-                // 現在年月以前の取引のみ現在残高に反映
-                const transactionYear = transaction.year;
-                const transactionMonth = transaction.month || 1;
-
-                if (
-                  transactionYear < currentYear ||
-                  (transactionYear === currentYear && transactionMonth <= currentMonth)
-                ) {
-                  calculatedCurrentBalance += balanceChange;
-                }
 
                 // カテゴリ名を取得
                 const category = categories.find((cat) => cat.id === transaction.categoryId);
@@ -141,7 +132,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         setBalanceHistory(history);
         setTransactions(allTransactions);
         setFilteredTransactions(allTransactions);
-        setCurrentBalance(calculatedCurrentBalance);
+        setFinalBalance(runningBalance);
       } catch (error) {
         console.error('データ計算エラー:', error);
         // エラー時は初期残高で履歴を生成
@@ -156,7 +147,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         setBalanceHistory(history);
         setTransactions([]);
         setFilteredTransactions([]);
-        setCurrentBalance(account.initialBalance);
+        setFinalBalance(account.initialBalance);
       }
     };
 
@@ -178,6 +169,10 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
             return transaction.type === 'transfer';
           case 'investment':
             return transaction.type === 'investment';
+          case 'dividend':
+            return (
+              transaction.type === 'investment' && transaction.transactionSubtype === 'dividend'
+            );
           default:
             return true;
         }
@@ -205,6 +200,8 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         return '投資買付';
       case 'investment_sell':
         return '投資売却';
+      case 'investment_dividend':
+        return '配当収入';
       default:
         return '-';
     }
@@ -272,13 +269,13 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
         <Card>
           <div className="flex justify-between items-center p-4">
             <div>
-              <p className="text-sm text-gray-600">現在残高</p>
+              <p className="text-sm text-gray-600">最終残高</p>
               <p
                 className={`text-2xl font-bold ${
-                  currentBalance >= 0 ? 'text-gray-900' : 'text-red-600'
+                  finalBalance >= 0 ? 'text-gray-900' : 'text-red-600'
                 }`}
               >
-                {formatCurrency(currentBalance)}
+                {formatCurrency(finalBalance)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 初期残高: {formatCurrency(account.initialBalance)}
@@ -376,6 +373,7 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
               { id: 'income', label: '収入' },
               { id: 'transfer', label: '振替' },
               { id: 'investment', label: '投資' },
+              { id: 'dividend', label: '配当' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -446,7 +444,19 @@ const AccountDetail = ({ account, onBack, onEdit, onDelete, planSettings, format
                     <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
                       {activeTab === 'all'
                         ? 'この口座に関連する取引はありません'
-                        : `この口座に関連する${activeTab === 'expense' ? '支出' : activeTab === 'income' ? '収入' : activeTab === 'transfer' ? '振替' : '投資'}取引はありません`}
+                        : `この口座に関連する${
+                            activeTab === 'expense'
+                              ? '支出'
+                              : activeTab === 'income'
+                                ? '収入'
+                                : activeTab === 'transfer'
+                                  ? '振替'
+                                  : activeTab === 'investment'
+                                    ? '投資'
+                                    : activeTab === 'dividend'
+                                      ? '配当'
+                                      : ''
+                          }取引はありません`}
                     </td>
                   </tr>
                 )}

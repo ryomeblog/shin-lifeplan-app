@@ -45,12 +45,13 @@ const TransactionSummary = ({ transactions, year, type }) => {
 
   const config = typeConfig[type] || typeConfig.expense;
 
-  // 投資の場合の買付・売却別集計
+  // 投資の場合の買付・売却・配当別集計
   const investmentSummary = React.useMemo(() => {
     if (type !== 'investment') return null;
 
     const buyTransactions = transactions.filter((t) => t.transactionSubtype === 'buy');
     const sellTransactions = transactions.filter((t) => t.transactionSubtype === 'sell');
+    const dividendTransactions = transactions.filter((t) => t.transactionSubtype === 'dividend');
 
     const buyTotal = buyTransactions.reduce((sum, transaction) => {
       const amount = transaction.amount || 0;
@@ -64,12 +65,20 @@ const TransactionSummary = ({ transactions, year, type }) => {
       return sum + Math.abs(amount * frequency);
     }, 0);
 
+    const dividendTotal = dividendTransactions.reduce((sum, transaction) => {
+      const amount = transaction.amount || 0;
+      const frequency = transaction.frequency || 1;
+      return sum + Math.abs(amount * frequency);
+    }, 0);
+
     return {
       buyTotal,
       sellTotal,
+      dividendTotal,
       buyCount: buyTransactions.length,
       sellCount: sellTransactions.length,
-      netAmount: sellTotal - buyTotal, // 売却 - 買付 = 純損益
+      dividendCount: dividendTransactions.length,
+      netAmount: sellTotal + dividendTotal - buyTotal, // 売却 + 配当 - 買付 = 純損益
     };
   }, [transactions, type]);
 
@@ -155,7 +164,7 @@ const TransactionSummary = ({ transactions, year, type }) => {
 
           {/* 投資の場合の詳細表示 */}
           {type === 'investment' && investmentSummary && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               {/* 買付合計 */}
               <div className="bg-red-50 p-4 rounded-lg">
                 <div className="text-sm text-red-600 font-medium">買付合計</div>
@@ -172,6 +181,17 @@ const TransactionSummary = ({ transactions, year, type }) => {
                   +{formatAmount(investmentSummary.sellTotal)}
                 </div>
                 <div className="text-sm text-green-500 mt-1">{investmentSummary.sellCount}件</div>
+              </div>
+
+              {/* 配当合計 */}
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="text-sm text-yellow-600 font-medium">配当合計</div>
+                <div className="text-2xl font-bold text-yellow-700">
+                  +{formatAmount(investmentSummary.dividendTotal)}
+                </div>
+                <div className="text-sm text-yellow-500 mt-1">
+                  {investmentSummary.dividendCount}件
+                </div>
               </div>
 
               {/* 純損益 */}

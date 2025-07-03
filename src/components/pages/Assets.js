@@ -68,16 +68,18 @@ const Assets = () => {
           const quantity = transaction.quantity || 0;
           const amount = transaction.amount || 0;
           const isBuy = transaction.transactionSubtype === 'buy';
+          const isSell = transaction.transactionSubtype === 'sell';
+          const isDividend = transaction.transactionSubtype === 'dividend';
 
           if (!holdingsMap.has(assetId)) {
             holdingsMap.set(assetId, {
               id: `holding_${assetId}`,
               assetId: assetId,
-              currentQuantity: 0, // 現在の保有数
               totalQuantity: 0, // 総保有数（買付総数）
               soldQuantity: 0, // 売却数
               totalPurchaseAmount: 0, // 買付総額
               totalSellAmount: 0, // 売却総額
+              totalDividendAmount: 0, // 配当総額
               purchaseYear: year,
               transactions: [],
             });
@@ -87,17 +89,18 @@ const Assets = () => {
           holding.transactions.push(transaction);
 
           if (isBuy) {
-            holding.currentQuantity += quantity;
             holding.totalQuantity += quantity;
             holding.totalPurchaseAmount += Math.abs(amount);
             // 最初の購入年を記録
             if (!holding.purchaseYear || year < holding.purchaseYear) {
               holding.purchaseYear = year;
             }
-          } else {
-            holding.currentQuantity -= quantity;
+          } else if (isSell) {
             holding.soldQuantity += quantity;
             holding.totalSellAmount += Math.abs(amount);
+          } else if (isDividend) {
+            // 配当は数量に影響しないが、配当総額に加算
+            holding.totalDividendAmount += Math.abs(amount);
           }
         });
       } catch (error) {
@@ -106,7 +109,13 @@ const Assets = () => {
     }
 
     // 買付が存在する資産をすべて返す（現在保有数が0でも含む）
-    return Array.from(holdingsMap.values()).filter((holding) => holding.totalQuantity > 0);
+    return Array.from(holdingsMap.values())
+      .filter((holding) => holding.totalQuantity > 0)
+      .map((holding) => ({
+        ...holding,
+        // 現在の保有数 = 総保有数 - 売却数
+        currentQuantity: holding.totalQuantity - holding.soldQuantity,
+      }));
   };
 
   // 検索・フィルター
@@ -157,8 +166,9 @@ const Assets = () => {
     const sellAveragePrice =
       holding.soldQuantity > 0 ? holding.totalSellAmount / holding.soldQuantity : 0;
 
-    // 損益計算: 売却金額の合計 - 買付金額の合計
-    const profitLoss = holding.totalSellAmount - holding.totalPurchaseAmount;
+    // 損益計算: 売却金額 + 配当金額 - 買付金額 (配当を収入として含める)
+    const profitLoss =
+      holding.totalSellAmount + holding.totalDividendAmount - holding.totalPurchaseAmount;
 
     // 損益率の計算（買付金額ベース）
     const profitLossRate =

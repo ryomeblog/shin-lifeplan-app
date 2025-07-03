@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { HiPlus, HiMagnifyingGlass } from 'react-icons/hi2';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
@@ -14,6 +14,24 @@ const AssetSearchList = ({
   calculateAverageDividend,
   calculateAveragePrice,
 }) => {
+  const inputRef = useRef(null);
+
+  const handleSearchBlur = () => {
+    if (inputRef.current) {
+      const value = inputRef.current.value;
+      onSearchChange(value);
+    }
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      if (inputRef.current) {
+        const value = inputRef.current.value;
+        onSearchChange(value);
+      }
+    }
+  };
+
   return (
     <Card
       title="資産検索"
@@ -29,10 +47,12 @@ const AssetSearchList = ({
         <div className="relative">
           <HiMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
+            ref={inputRef}
             type="text"
             placeholder="資産IDまたは資産名で検索..."
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            defaultValue={searchTerm}
+            onBlur={handleSearchBlur}
+            onKeyDown={handleSearchKeyDown}
             className="pl-10"
           />
         </div>

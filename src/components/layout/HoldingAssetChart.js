@@ -66,8 +66,20 @@ const HoldingAssetChart = ({ priceHistory, transactions, title = '資産推移' 
               <p className="text-sm font-medium text-gray-700">取引:</p>
               {transactionAtYear.map((transaction, index) => (
                 <div key={index} className="text-sm">
-                  <span className={transaction.type === 'buy' ? 'text-green-600' : 'text-red-600'}>
-                    {transaction.type === 'buy' ? '買付' : '売却'}
+                  <span
+                    className={
+                      transaction.type === 'buy'
+                        ? 'text-green-600'
+                        : transaction.type === 'sell'
+                          ? 'text-red-600'
+                          : 'text-yellow-600'
+                    }
+                  >
+                    {transaction.type === 'buy'
+                      ? '買付'
+                      : transaction.type === 'sell'
+                        ? '売却'
+                        : '配当'}
                   </span>{' '}
                   数量: {transaction.quantity} 金額: {transaction.formattedAmount}
                 </div>
@@ -102,17 +114,35 @@ const HoldingAssetChart = ({ priceHistory, transactions, title = '資産推移' 
     return (
       <g>
         <circle cx={cx} cy={cy} r={4} fill="#3b82f6" strokeWidth={2} stroke="#3b82f6" />
-        {transactionAtYear.map((transaction, index) => (
-          <circle
-            key={index}
-            cx={cx}
-            cy={cy - 8 - index * 16}
-            r={6}
-            fill={transaction.type === 'buy' ? '#10b981' : '#ef4444'}
-            strokeWidth={2}
-            stroke="#ffffff"
-          />
-        ))}
+        {transactionAtYear.map((transaction, index) => {
+          // 取引タイプに応じて色を設定
+          let fillColor;
+          switch (transaction.type) {
+            case 'buy':
+              fillColor = '#10b981'; // 緑
+              break;
+            case 'sell':
+              fillColor = '#ef4444'; // 赤
+              break;
+            case 'dividend':
+              fillColor = '#f59e0b'; // 黄
+              break;
+            default:
+              fillColor = '#6b7280'; // グレー
+          }
+
+          return (
+            <circle
+              key={index}
+              cx={cx}
+              cy={cy - 8 - index * 16}
+              r={6}
+              fill={fillColor}
+              strokeWidth={2}
+              stroke="#ffffff"
+            />
+          );
+        })}
       </g>
     );
   };
@@ -131,6 +161,10 @@ const HoldingAssetChart = ({ priceHistory, transactions, title = '資産推移' 
           <div className="flex items-center space-x-1">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
             <span className="text-sm text-gray-600">売却</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <span className="text-sm text-gray-600">配当</span>
           </div>
         </div>
       </div>
