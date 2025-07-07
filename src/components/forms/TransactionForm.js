@@ -10,6 +10,9 @@ import {
   updateTransaction,
   getLifePlanSettings,
   getTransactions,
+  getEvents,
+  addTransactionToEvent,
+  removeTransactionFromEvent,
 } from '../../utils/storage';
 
 const TransactionForm = ({
@@ -52,6 +55,7 @@ const TransactionForm = ({
   const [categories, setCategories] = useState([]);
   const [assets, setAssets] = useState([]);
   const [holdingAssets, setHoldingAssets] = useState([]);
+  const [events, setEvents] = useState([]);
   const [errors, setErrors] = useState({});
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [tagInput, setTagInput] = useState('');
@@ -69,6 +73,17 @@ const TransactionForm = ({
       console.error('データ読み込みエラー:', error);
     }
   }, []);
+
+  // 年が変更されたときにイベントデータを読み込み
+  useEffect(() => {
+    try {
+      const yearEvents = getEvents(formData.year);
+      setEvents(yearEvents);
+    } catch (error) {
+      console.error('イベントデータ読み込みエラー:', error);
+      setEvents([]);
+    }
+  }, [formData.year]);
 
   // 保有資産を計算する関数
   const calculateHoldingAssets = () => {
@@ -524,9 +539,24 @@ const TransactionForm = ({
     try {
       let success;
       if (isEditing) {
+        // 編集時：既存のイベント関連付けを削除してから新しい関連付けを追加
+        const oldEventId = transaction?.eventId;
+        if (oldEventId && oldEventId !== formData.eventId) {
+          removeTransactionFromEvent(oldEventId, transactionData.id, transactionData.year);
+        }
         success = updateTransaction(transactionData);
       } else {
         success = saveTransaction(transactionData);
+      }
+
+      // イベントに取引を関連付け
+      if (
+        success &&
+        formData.eventId &&
+        formData.type !== 'transfer' &&
+        formData.type !== 'investment'
+      ) {
+        addTransactionToEvent(formData.eventId, transactionData.id, transactionData.year);
       }
 
       if (success) {
@@ -952,9 +982,15 @@ const TransactionForm = ({
             onChange={(e) => handleInputChange('eventId', e.target.value)}
             options={[
               { value: '', label: 'イベントを選択' },
-              // TODO: イベントデータを取得して表示
+              ...events.map((event) => ({
+                value: event.id,
+                label: event.title,
+              })),
             ]}
           />
+          {events.length === 0 && (
+            <p className="mt-1 text-sm text-gray-500">{formData.year}年のイベントがありません</p>
+          )}
         </div>
       )}
 

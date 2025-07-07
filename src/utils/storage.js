@@ -664,6 +664,155 @@ export const deleteTransaction = (transactionId, year) => {
   }
 };
 
+// イベント一覧を取得（年単位）
+export const getEvents = (year = null) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    const yearlyData = activeLifePlan?.yearlyData || [];
+
+    if (year) {
+      // 指定年のイベントのみを取得
+      const yearData = yearlyData.find((yd) => yd.year === year);
+      return yearData?.events || [];
+    }
+
+    // 全年のイベントを結合
+    return yearlyData.reduce((allEvents, yearData) => {
+      return allEvents.concat(yearData.events || []);
+    }, []);
+  } catch (error) {
+    console.error('Failed to get events:', error);
+    return [];
+  }
+};
+
+// イベントを保存（yearlyDataに）
+export const saveEvent = (event) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const yearlyData = activeLifePlan.yearlyData || [];
+
+    // 該当年のデータを取得または作成
+    let yearData = yearlyData.find((yd) => yd.year === event.year);
+    if (!yearData) {
+      yearData = {
+        year: event.year,
+        transactions: [],
+        events: [],
+      };
+      yearlyData.push(yearData);
+    }
+
+    // イベントを追加
+    yearData.events = yearData.events || [];
+
+    // 新規作成か更新かを判定
+    const existingIndex = yearData.events.findIndex((e) => e.id === event.id);
+    if (existingIndex >= 0) {
+      yearData.events[existingIndex] = event;
+    } else {
+      yearData.events.push(event);
+    }
+
+    const updatedPlan = {
+      ...activeLifePlan,
+      yearlyData: yearlyData,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return saveLifePlan(updatedPlan);
+  } catch (error) {
+    console.error('Failed to save event:', error);
+    return false;
+  }
+};
+
+// イベントを削除
+export const deleteEvent = (eventId, year) => {
+  try {
+    const yearlyData = getYearlyData();
+    const yearData = yearlyData.find((yd) => yd.year === year);
+
+    if (!yearData || !yearData.events) {
+      throw new Error('Year data or events not found');
+    }
+
+    yearData.events = yearData.events.filter((e) => e.id !== eventId);
+    return saveYearlyData(yearlyData);
+  } catch (error) {
+    console.error('Failed to delete event:', error);
+    return false;
+  }
+};
+
+// イベントを更新
+export const updateEvent = (event) => {
+  try {
+    const yearlyData = getYearlyData();
+    const yearData = yearlyData.find((yd) => yd.year === event.year);
+
+    if (!yearData || !yearData.events) {
+      throw new Error('Year data or events not found');
+    }
+
+    const eventIndex = yearData.events.findIndex((e) => e.id === event.id);
+    if (eventIndex >= 0) {
+      yearData.events[eventIndex] = event;
+      return saveYearlyData(yearlyData);
+    } else {
+      throw new Error('Event not found');
+    }
+  } catch (error) {
+    console.error('Failed to update event:', error);
+    return false;
+  }
+};
+
+// イベントに取引を追加
+export const addTransactionToEvent = (eventId, transactionId, year) => {
+  try {
+    const events = getEvents(year);
+    const event = events.find((e) => e.id === eventId);
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    // 既に追加されていない場合のみ追加
+    if (!event.transactionIds.includes(transactionId)) {
+      event.transactionIds.push(transactionId);
+      return updateEvent(event);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to add transaction to event:', error);
+    return false;
+  }
+};
+
+// イベントから取引を削除
+export const removeTransactionFromEvent = (eventId, transactionId, year) => {
+  try {
+    const events = getEvents(year);
+    const event = events.find((e) => e.id === eventId);
+
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    event.transactionIds = event.transactionIds.filter((id) => id !== transactionId);
+    return updateEvent(event);
+  } catch (error) {
+    console.error('Failed to remove transaction from event:', error);
+    return false;
+  }
+};
+
 // データエクスポート
 export const exportData = () => {
   try {
