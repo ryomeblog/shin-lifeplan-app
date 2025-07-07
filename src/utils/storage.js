@@ -813,6 +813,192 @@ export const removeTransactionFromEvent = (eventId, transactionId, year) => {
   }
 };
 
+// テンプレート一覧を取得
+export const getTemplates = (type = null) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    const templates = activeLifePlan?.templates || [];
+
+    if (type) {
+      return templates.filter((template) => template.type === type);
+    }
+
+    return templates;
+  } catch (error) {
+    console.error('Failed to get templates:', error);
+    return [];
+  }
+};
+
+// テンプレートを保存
+export const saveTemplate = (template) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const updatedTemplates = [...templates, template];
+
+    const updatedPlan = {
+      ...activeLifePlan,
+      templates: updatedTemplates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return saveLifePlan(updatedPlan);
+  } catch (error) {
+    console.error('Failed to save template:', error);
+    return false;
+  }
+};
+
+// テンプレートを更新
+export const updateTemplate = (template) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const templateIndex = templates.findIndex((t) => t.id === template.id);
+
+    if (templateIndex >= 0) {
+      templates[templateIndex] = template;
+    } else {
+      throw new Error('Template not found');
+    }
+
+    const updatedPlan = {
+      ...activeLifePlan,
+      templates: templates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return saveLifePlan(updatedPlan);
+  } catch (error) {
+    console.error('Failed to update template:', error);
+    return false;
+  }
+};
+
+// テンプレートを削除
+export const deleteTemplate = (templateId) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const updatedTemplates = templates.filter((t) => t.id !== templateId);
+
+    const updatedPlan = {
+      ...activeLifePlan,
+      templates: updatedTemplates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return saveLifePlan(updatedPlan);
+  } catch (error) {
+    console.error('Failed to delete template:', error);
+    return false;
+  }
+};
+
+// テンプレート内取引を保存
+export const saveTemplateTransaction = (templateId, transaction) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const template = templates.find((t) => t.id === templateId);
+
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    if (!template.transactions) {
+      template.transactions = [];
+    }
+
+    template.transactions.push(transaction);
+    template.updatedAt = new Date().toISOString();
+
+    return updateTemplate(template);
+  } catch (error) {
+    console.error('Failed to save template transaction:', error);
+    return false;
+  }
+};
+
+// テンプレート内取引を更新
+export const updateTemplateTransaction = (templateId, transaction) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const template = templates.find((t) => t.id === templateId);
+
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    if (!template.transactions) {
+      template.transactions = [];
+    }
+
+    const transactionIndex = template.transactions.findIndex((t) => t.id === transaction.id);
+    if (transactionIndex >= 0) {
+      template.transactions[transactionIndex] = transaction;
+      template.updatedAt = new Date().toISOString();
+      return updateTemplate(template);
+    } else {
+      throw new Error('Template transaction not found');
+    }
+  } catch (error) {
+    console.error('Failed to update template transaction:', error);
+    return false;
+  }
+};
+
+// テンプレート内取引を削除
+export const deleteTemplateTransaction = (templateId, transactionId) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+
+    const templates = activeLifePlan.templates || [];
+    const template = templates.find((t) => t.id === templateId);
+
+    if (!template) {
+      throw new Error('Template not found');
+    }
+
+    if (!template.transactions) {
+      template.transactions = [];
+    }
+
+    template.transactions = template.transactions.filter((t) => t.id !== transactionId);
+    template.updatedAt = new Date().toISOString();
+
+    return updateTemplate(template);
+  } catch (error) {
+    console.error('Failed to delete template transaction:', error);
+    return false;
+  }
+};
+
 // データエクスポート
 export const exportData = () => {
   try {

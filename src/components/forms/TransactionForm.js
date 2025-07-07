@@ -13,6 +13,7 @@ import {
   getEvents,
   addTransactionToEvent,
   removeTransactionFromEvent,
+  getTemplates,
 } from '../../utils/storage';
 
 const TransactionForm = ({
@@ -59,6 +60,7 @@ const TransactionForm = ({
   const [errors, setErrors] = useState({});
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [templates, setTemplates] = useState([]);
 
   // データ読み込み
   useEffect(() => {
@@ -66,6 +68,7 @@ const TransactionForm = ({
       setAccounts(getAccounts());
       setCategories(getCategories());
       setAssets(getAssetInfo());
+      setTemplates(getTemplates());
 
       // 保有資産を計算
       calculateHoldingAssets();
@@ -193,6 +196,7 @@ const TransactionForm = ({
     { id: 'income', label: '収入', color: 'bg-green-500' },
     { id: 'transfer', label: '振替', color: 'bg-gray-500' },
     { id: 'investment', label: '投資', color: 'bg-teal-500' },
+    { id: 'template', label: 'テンプレート', color: 'bg-purple-500' },
   ];
 
   // 頻度オプション
@@ -603,6 +607,89 @@ const TransactionForm = ({
     }
   };
 
+  // インフレ率・昇給率の複利計算
+  const calculateAdjustedAmount = (baseAmount, rate, years) => {
+    if (!rate || years <= 0) return baseAmount;
+    return baseAmount * Math.pow(1 + rate / 100, years);
+  };
+
+  // テンプレートから全取引を一括作成
+  const createAllTransactionsFromTemplate = (template) => {
+    try {
+      const settings = getLifePlanSettings();
+      const yearsDiff = selectedYear - settings.planStartYear;
+      let successCount = 0;
+      let totalCount = template.transactions?.length || 0;
+
+      if (totalCount === 0) {
+        alert('このテンプレートには取引が登録されていません');
+        return false;
+      }
+
+      for (const templateTransaction of template.transactions) {
+        let adjustedAmount = templateTransaction.amount;
+
+        // インフレ率・昇給率で金額を調整
+        if (template.type === 'expense' && templateTransaction.inflationRate) {
+          adjustedAmount = calculateAdjustedAmount(
+            templateTransaction.amount,
+            templateTransaction.inflationRate,
+            yearsDiff
+          );
+        } else if (template.type === 'income' && templateTransaction.salaryIncreaseRate) {
+          adjustedAmount = calculateAdjustedAmount(
+            templateTransaction.amount,
+            templateTransaction.salaryIncreaseRate,
+            yearsDiff
+          );
+        }
+
+        const transactionData = {
+          id: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          title: templateTransaction.title,
+          type: template.type,
+          year: selectedYear,
+          month: formData.month,
+          amount: Math.round(adjustedAmount),
+          description: templateTransaction.title,
+          categoryId: templateTransaction.categoryId,
+          fromAccountId: templateTransaction.fromAccountId,
+          toAccountId: templateTransaction.toAccountId,
+          holdingAssetId: templateTransaction.holdingAssetId,
+          quantity: templateTransaction.quantity || 0,
+          tags: templateTransaction.tags || [],
+          templateId: template.id,
+          frequency: templateTransaction.frequency || 1,
+          eventId: '',
+          memo: templateTransaction.memo || '',
+          detailMemo: `テンプレート「${template.name}」から作成`,
+          transactionSubtype: templateTransaction.transactionSubtype,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        if (saveTransaction(transactionData)) {
+          successCount++;
+        }
+      }
+
+      if (successCount === totalCount) {
+        alert(`${successCount}件の取引を作成しました`);
+        return true;
+      } else if (successCount > 0) {
+        alert(`${totalCount}件中${successCount}件の取引を作成しました`);
+        return true;
+      } else {
+        alert('取引の作成に失敗しました');
+        return false;
+      }
+    } catch (error) {
+      console.error('テンプレートからの取引一括作成エラー:', error);
+      alert('取引の作成中にエラーが発生しました');
+      return false;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 取引タイプ切り替え（編集時は無効化） */}
@@ -630,522 +717,661 @@ const TransactionForm = ({
         )}
       </div>
 
-      {/* タイトル入力（支出・収入の場合） */}
-      {(formData.type === 'expense' || formData.type === 'income') && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            取引タイトル <span className="text-red-500">*</span>
-          </label>
-          <Input
-            ref={titleRef}
-            type="text"
-            defaultValue={formData.title}
-            onBlur={handleTitleBlur}
-            placeholder="例：家賃支払い、給与振込"
-            className="text-lg py-3"
-            error={errors.title}
-          />
-          {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
-        </div>
-      )}
+      {/* テンプレートセクション */}
+      {formData.type === 'template' && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900">テンプレートから取引を作成</h3>
+          <p className="text-sm text-gray-600">
+            テンプレートを選択して、{selectedYear}年の取引を作成します。
+            支出・収入はインフレ率・昇給率を考慮した金額で作成されます。
+          </p>
 
-      {/* 投資の場合：買付/売却/配当選択 */}
-      {formData.type === 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">取引種別</label>
-          <div className="flex bg-gray-100 rounded-full p-1 max-w-md">
-            <button
-              onClick={() => handleInputChange('transactionSubtype', 'buy')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
-                formData.transactionSubtype === 'buy' ? 'bg-teal-500 text-white' : 'text-gray-600'
-              }`}
-            >
-              買付
-            </button>
-            <button
-              onClick={() => handleInputChange('transactionSubtype', 'sell')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
-                formData.transactionSubtype === 'sell' ? 'bg-red-500 text-white' : 'text-gray-600'
-              }`}
-            >
-              売却
-            </button>
-            <button
-              onClick={() => handleInputChange('transactionSubtype', 'dividend')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
-                formData.transactionSubtype === 'dividend'
-                  ? 'bg-yellow-500 text-white'
-                  : 'text-gray-600'
-              }`}
-            >
-              配当
-            </button>
-          </div>
-          {/* 投資のタイトルプレビュー */}
-          {selectedAsset && (
-            <div className="mt-2 p-2 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                取引タイトル:{' '}
-                {formData.transactionSubtype === 'buy'
-                  ? '【買付】'
-                  : formData.transactionSubtype === 'sell'
-                    ? '【売却】'
-                    : '【配当】'}
-                {selectedAsset.name}
-              </p>
+          {templates.length > 0 ? (
+            <div className="space-y-4">
+              {['expense', 'income', 'investment'].map((type) => {
+                const typeTemplates = templates.filter((t) => t.type === type);
+                if (typeTemplates.length === 0) return null;
+
+                const typeLabel = type === 'expense' ? '支出' : type === 'income' ? '収入' : '投資';
+                const typeColor = type === 'expense' ? 'red' : type === 'income' ? 'green' : 'blue';
+
+                return (
+                  <div key={type} className="border rounded-lg p-4">
+                    <h4 className={`text-md font-medium text-${typeColor}-600 mb-3`}>
+                      {typeLabel}テンプレート
+                    </h4>
+                    <div className="space-y-2">
+                      {typeTemplates.map((template) => (
+                        <div key={template.id} className="border rounded-lg p-3 bg-gray-50">
+                          <div className="flex justify-between items-center mb-2">
+                            <h5 className="font-medium text-gray-900">{template.name}</h5>
+                            <span className="text-sm text-gray-500">
+                              {template.transactions?.length || 0}件の取引
+                            </span>
+                          </div>
+
+                          {template.transactions && template.transactions.length > 0 && (
+                            <div className="space-y-2">
+                              <div className="text-sm text-gray-600 mb-2">含まれる取引:</div>
+                              {template.transactions.map((transaction) => {
+                                const settings = getLifePlanSettings();
+                                const yearsDiff = selectedYear - settings.planStartYear;
+                                let adjustedAmount = transaction.amount;
+
+                                if (type === 'expense' && transaction.inflationRate) {
+                                  adjustedAmount = calculateAdjustedAmount(
+                                    transaction.amount,
+                                    transaction.inflationRate,
+                                    yearsDiff
+                                  );
+                                } else if (type === 'income' && transaction.salaryIncreaseRate) {
+                                  adjustedAmount = calculateAdjustedAmount(
+                                    transaction.amount,
+                                    transaction.salaryIncreaseRate,
+                                    yearsDiff
+                                  );
+                                }
+
+                                return (
+                                  <div
+                                    key={transaction.id}
+                                    className="py-2 px-3 bg-white rounded border"
+                                  >
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {transaction.title}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      元金額: ¥{transaction.amount.toLocaleString()}
+                                      {yearsDiff > 0 && (
+                                        <span>
+                                          {' '}
+                                          → 調整後: ¥{Math.round(adjustedAmount).toLocaleString()}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+
+                              <div className="pt-2 border-t">
+                                <Button
+                                  onClick={() => {
+                                    if (createAllTransactionsFromTemplate(template)) {
+                                      onSave && onSave();
+                                    }
+                                  }}
+                                  className={`w-full ${
+                                    type === 'expense'
+                                      ? 'bg-red-500 hover:bg-red-600'
+                                      : type === 'income'
+                                        ? 'bg-green-500 hover:bg-green-600'
+                                        : 'bg-blue-500 hover:bg-blue-600'
+                                  }`}
+                                >
+                                  全ての取引を作成 ({template.transactions.length}件)
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 border rounded-lg">
+              <p>テンプレートがありません</p>
+              <p className="text-sm mt-1">テンプレート管理画面から作成してください</p>
             </div>
           )}
         </div>
       )}
 
-      {/* 金額入力（投資以外） */}
-      {formData.type !== 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">金額</label>
-          <Input
-            ref={amountRef}
-            type="number"
-            defaultValue={formData.amount}
-            onBlur={handleAmountBlur}
-            placeholder="0"
-            min="0"
-            step="1"
-            className="text-xl py-3"
-            error={errors.amount}
-          />
-          {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
-        </div>
-      )}
+      {/* 通常の取引フォーム（テンプレート以外） */}
+      {formData.type !== 'template' && (
+        <div className="space-y-6">
+          {/* タイトル入力（支出・収入の場合） */}
+          {(formData.type === 'expense' || formData.type === 'income') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                取引タイトル <span className="text-red-500">*</span>
+              </label>
+              <Input
+                ref={titleRef}
+                type="text"
+                defaultValue={formData.title}
+                onBlur={handleTitleBlur}
+                placeholder="例：家賃支払い、給与振込"
+                className="text-lg py-3"
+                error={errors.title}
+              />
+              {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
+            </div>
+          )}
 
-      {/* 投資先選択（投資の場合） */}
-      {formData.type === 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {formData.transactionSubtype === 'sell' || formData.transactionSubtype === 'dividend'
-              ? '保有資産選択'
-              : '投資先選択'}
-          </label>
-          <Select
-            value={formData.assetId}
-            onChange={(e) => handleInputChange('assetId', e.target.value)}
-            options={getInvestmentOptions()}
-            error={errors.assetId}
-          />
-          {selectedAsset && (
-            <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">
-                {getEffectiveYear()}年の価格: ¥{getAssetPriceForYear().toLocaleString()}
-                {getAssetPriceForYear() === 0 && (
-                  <span className="text-red-500 ml-2">（{getEffectiveYear()}年のデータなし）</span>
-                )}
-              </p>
-              <p className="text-sm text-gray-600">
-                {getEffectiveYear()}年の配当: ¥{getAssetDividendForYear().toLocaleString()}
-                {getAssetDividendForYear() === 0 && (
-                  <span className="text-red-500 ml-2">（{getEffectiveYear()}年のデータなし）</span>
-                )}
-              </p>
-              {(formData.transactionSubtype === 'sell' ||
-                formData.transactionSubtype === 'dividend') &&
-                selectedHoldingAsset && (
-                  <p className="text-sm text-gray-600">
-                    保有数量: {selectedHoldingAsset.quantity}（
-                    {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
+          {/* 投資の場合：買付/売却/配当選択 */}
+          {formData.type === 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">取引種別</label>
+              <div className="flex bg-gray-100 rounded-full p-1 max-w-md">
+                <button
+                  onClick={() => handleInputChange('transactionSubtype', 'buy')}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+                    formData.transactionSubtype === 'buy'
+                      ? 'bg-teal-500 text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  買付
+                </button>
+                <button
+                  onClick={() => handleInputChange('transactionSubtype', 'sell')}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+                    formData.transactionSubtype === 'sell'
+                      ? 'bg-red-500 text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  売却
+                </button>
+                <button
+                  onClick={() => handleInputChange('transactionSubtype', 'dividend')}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+                    formData.transactionSubtype === 'dividend'
+                      ? 'bg-yellow-500 text-white'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  配当
+                </button>
+              </div>
+              {/* 投資のタイトルプレビュー */}
+              {selectedAsset && (
+                <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    取引タイトル:{' '}
+                    {formData.transactionSubtype === 'buy'
+                      ? '【買付】'
+                      : formData.transactionSubtype === 'sell'
+                        ? '【売却】'
+                        : '【配当】'}
+                    {selectedAsset.name}
                   </p>
-                )}
-            </div>
-          )}
-          {errors.assetId && <p className="mt-1 text-sm text-red-600">{errors.assetId}</p>}
-        </div>
-      )}
-
-      {/* 口座選択（振替以外） */}
-      {formData.type !== 'transfer' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {formData.type === 'income'
-              ? '入金口座'
-              : formData.type === 'investment'
-                ? formData.transactionSubtype === 'buy'
-                  ? '投資元口座'
-                  : '入金先口座'
-                : '口座'}
-          </label>
-          <Select
-            value={formData.accountId}
-            onChange={(e) => handleInputChange('accountId', e.target.value)}
-            options={[
-              { value: '', label: '口座を選択' },
-              ...accounts.map((account) => ({
-                value: account.id,
-                label: account.name,
-              })),
-            ]}
-            error={errors.accountId}
-          />
-          {errors.accountId && <p className="mt-1 text-sm text-red-600">{errors.accountId}</p>}
-        </div>
-      )}
-
-      {/* 振替の場合：送金元・送金先口座 */}
-      {formData.type === 'transfer' && (
-        <>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">送金元口座</label>
-            <Select
-              value={formData.fromAccountId}
-              onChange={(e) => handleInputChange('fromAccountId', e.target.value)}
-              options={[
-                { value: '', label: '口座を選択' },
-                ...accounts.map((account) => ({
-                  value: account.id,
-                  label: account.name,
-                })),
-              ]}
-              error={errors.fromAccountId}
-            />
-            {errors.fromAccountId && (
-              <p className="mt-1 text-sm text-red-600">{errors.fromAccountId}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">送金先口座</label>
-            <Select
-              value={formData.toAccountId}
-              onChange={(e) => handleInputChange('toAccountId', e.target.value)}
-              options={[
-                { value: '', label: '口座を選択' },
-                ...accounts.map((account) => ({
-                  value: account.id,
-                  label: account.name,
-                })),
-              ]}
-              error={errors.toAccountId}
-            />
-            {errors.toAccountId && (
-              <p className="mt-1 text-sm text-red-600">{errors.toAccountId}</p>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* カテゴリ選択（支出・収入の場合） */}
-      {(formData.type === 'expense' || formData.type === 'income') && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ</label>
-          <div className="grid grid-cols-3 gap-3">
-            {filteredCategories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleInputChange('categoryId', category.id)}
-                className={`p-4 rounded-lg border-2 transition-colors ${
-                  formData.categoryId === category.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div
-                  className="w-8 h-8 rounded-full mx-auto mb-2"
-                  style={{ backgroundColor: category.color }}
-                />
-                <div className="text-sm font-medium text-gray-900">{category.name}</div>
-              </button>
-            ))}
-          </div>
-          {errors.categoryId && <p className="mt-1 text-sm text-red-600">{errors.categoryId}</p>}
-        </div>
-      )}
-
-      {/* 数量入力（投資の場合） */}
-      {formData.type === 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">数量</label>
-          <Input
-            ref={quantityRef}
-            type="number"
-            defaultValue={formData.quantity}
-            onBlur={handleQuantityBlur}
-            placeholder="0"
-            min="0"
-            max={
-              (formData.transactionSubtype === 'sell' ||
-                formData.transactionSubtype === 'dividend') &&
-              selectedHoldingAsset
-                ? selectedHoldingAsset.quantity
-                : undefined
-            }
-            step="1"
-            className="text-xl py-3"
-            error={errors.quantity}
-          />
-          <div className="mt-1 text-sm text-gray-600">
-            株 / 口
-            {(formData.transactionSubtype === 'sell' ||
-              formData.transactionSubtype === 'dividend') &&
-              selectedHoldingAsset && (
-                <span className="ml-2 text-blue-600">
-                  （最大 {selectedHoldingAsset.quantity} まで
-                  {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
-                </span>
-              )}
-          </div>
-          {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
-        </div>
-      )}
-
-      {/* 投資金額計算結果（投資の場合） */}
-      {formData.type === 'investment' && selectedAsset && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {formData.transactionSubtype === 'buy'
-              ? '投資金額'
-              : formData.transactionSubtype === 'sell'
-                ? '売却金額'
-                : '配当金額'}
-          </label>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-teal-600">
-              ¥{calculateInvestmentAmount().toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">
-              {formData.quantity || 0} × ¥
-              {formData.transactionSubtype === 'dividend'
-                ? getAssetDividendForYear().toLocaleString()
-                : getAssetPriceForYear().toLocaleString()}
-              {((formData.transactionSubtype === 'dividend' && getAssetDividendForYear() === 0) ||
-                (formData.transactionSubtype !== 'dividend' && getAssetPriceForYear() === 0)) && (
-                <span className="text-red-500 ml-2">
-                  （{getEffectiveYear()}年の
-                  {formData.transactionSubtype === 'dividend' ? '配当' : '価格'}データがありません）
-                </span>
-              )}
-            </div>
-
-            {/* 売却時の損益表示 */}
-            {formData.transactionSubtype === 'sell' &&
-              selectedHoldingAsset &&
-              formData.quantity > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-300">
-                  <div className="text-sm font-medium text-gray-700 mb-2">損益情報</div>
-                  {(() => {
-                    const { profitLoss, profitLossRate } = calculateSellProfitLoss();
-                    return (
-                      <>
-                        <div className="text-sm text-gray-600">
-                          購入価格: ¥{getPurchasePrice().toLocaleString()} × {formData.quantity} = ¥
-                          {(getPurchasePrice() * formData.quantity).toLocaleString()}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          売却価格: ¥{getAssetPriceForYear().toLocaleString()} × {formData.quantity}{' '}
-                          = ¥{calculateInvestmentAmount().toLocaleString()}
-                        </div>
-                        <div
-                          className={`text-lg font-bold ${profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                        >
-                          {profitLoss >= 0 ? '利益' : '損失'}: {profitLoss >= 0 ? '+' : ''}¥
-                          {profitLoss.toLocaleString()}
-                          <span className="text-sm ml-2">
-                            ({profitLoss >= 0 ? '+' : ''}
-                            {profitLossRate.toFixed(1)}%)
-                          </span>
-                        </div>
-                      </>
-                    );
-                  })()}
                 </div>
               )}
-          </div>
-        </div>
-      )}
-
-      {/* 頻度設定（振替・投資以外） */}
-      {formData.type !== 'transfer' && formData.type !== 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">頻度（年に何回）</label>
-          <div className="w-48">
-            <Select
-              value={formData.frequency}
-              onChange={(e) => handleInputChange('frequency', parseInt(e.target.value))}
-              options={frequencyOptions}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* イベント選択（任意、振替・投資以外） */}
-      {formData.type !== 'transfer' && formData.type !== 'investment' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">イベント（任意）</label>
-          <Select
-            value={formData.eventId}
-            onChange={(e) => handleInputChange('eventId', e.target.value)}
-            options={[
-              { value: '', label: 'イベントを選択' },
-              ...events.map((event) => ({
-                value: event.id,
-                label: event.title,
-              })),
-            ]}
-          />
-          {events.length === 0 && (
-            <p className="mt-1 text-sm text-gray-500">{formData.year}年のイベントがありません</p>
+            </div>
           )}
-        </div>
-      )}
 
-      {/* メモ入力（振替・投資の場合） */}
-      {(formData.type === 'transfer' || formData.type === 'investment') && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">メモ（任意）</label>
-          <Input
-            ref={memoRef}
-            type="text"
-            defaultValue={formData.memo}
-            onBlur={handleMemoBlur}
-            placeholder={formData.type === 'transfer' ? '振替の目的など' : '投資メモ'}
-          />
-        </div>
-      )}
-
-      {/* 詳細設定ボタン（支出・収入・投資の場合） */}
-      {(formData.type === 'expense' ||
-        formData.type === 'income' ||
-        formData.type === 'investment') && (
-        <div>
-          <button
-            type="button"
-            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-            className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
-          >
-            <svg
-              className={`w-4 h-4 transition-transform ${showAdvancedSettings ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
+          {/* 金額入力（投資以外） */}
+          {formData.type !== 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">金額</label>
+              <Input
+                ref={amountRef}
+                type="number"
+                defaultValue={formData.amount}
+                onBlur={handleAmountBlur}
+                placeholder="0"
+                min="0"
+                step="1"
+                className="text-xl py-3"
+                error={errors.amount}
               />
-            </svg>
-            <span>詳細設定</span>
-          </button>
-        </div>
-      )}
+              {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
+            </div>
+          )}
 
-      {/* 詳細設定セクション（支出・収入・投資の場合） */}
-      {(formData.type === 'expense' ||
-        formData.type === 'income' ||
-        formData.type === 'investment') &&
-        showAdvancedSettings && (
-          <div className="border-t pt-6 space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">詳細設定</h3>
+          {/* 投資先選択（投資の場合） */}
+          {formData.type === 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {formData.transactionSubtype === 'sell' ||
+                formData.transactionSubtype === 'dividend'
+                  ? '保有資産選択'
+                  : '投資先選択'}
+              </label>
+              <Select
+                value={formData.assetId}
+                onChange={(e) => handleInputChange('assetId', e.target.value)}
+                options={getInvestmentOptions()}
+                error={errors.assetId}
+              />
+              {selectedAsset && (
+                <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    {getEffectiveYear()}年の価格: ¥{getAssetPriceForYear().toLocaleString()}
+                    {getAssetPriceForYear() === 0 && (
+                      <span className="text-red-500 ml-2">
+                        （{getEffectiveYear()}年のデータなし）
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {getEffectiveYear()}年の配当: ¥{getAssetDividendForYear().toLocaleString()}
+                    {getAssetDividendForYear() === 0 && (
+                      <span className="text-red-500 ml-2">
+                        （{getEffectiveYear()}年のデータなし）
+                      </span>
+                    )}
+                  </p>
+                  {(formData.transactionSubtype === 'sell' ||
+                    formData.transactionSubtype === 'dividend') &&
+                    selectedHoldingAsset && (
+                      <p className="text-sm text-gray-600">
+                        保有数量: {selectedHoldingAsset.quantity}（
+                        {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
+                      </p>
+                    )}
+                </div>
+              )}
+              {errors.assetId && <p className="mt-1 text-sm text-red-600">{errors.assetId}</p>}
+            </div>
+          )}
 
-            {/* 年・月選択 */}
-            <div className="grid grid-cols-2 gap-4">
+          {/* 口座選択（振替以外） */}
+          {formData.type !== 'transfer' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {formData.type === 'income'
+                  ? '入金口座'
+                  : formData.type === 'investment'
+                    ? formData.transactionSubtype === 'buy'
+                      ? '投資元口座'
+                      : '入金先口座'
+                    : '口座'}
+              </label>
+              <Select
+                value={formData.accountId}
+                onChange={(e) => handleInputChange('accountId', e.target.value)}
+                options={[
+                  { value: '', label: '口座を選択' },
+                  ...accounts.map((account) => ({
+                    value: account.id,
+                    label: account.name,
+                  })),
+                ]}
+                error={errors.accountId}
+              />
+              {errors.accountId && <p className="mt-1 text-sm text-red-600">{errors.accountId}</p>}
+            </div>
+          )}
+
+          {/* 振替の場合：送金元・送金先口座 */}
+          {formData.type === 'transfer' && (
+            <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">年</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">送金元口座</label>
                 <Select
-                  value={formData.year}
-                  onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
-                  options={generateYearOptions()}
+                  value={formData.fromAccountId}
+                  onChange={(e) => handleInputChange('fromAccountId', e.target.value)}
+                  options={[
+                    { value: '', label: '口座を選択' },
+                    ...accounts.map((account) => ({
+                      value: account.id,
+                      label: account.name,
+                    })),
+                  ]}
+                  error={errors.fromAccountId}
                 />
+                {errors.fromAccountId && (
+                  <p className="mt-1 text-sm text-red-600">{errors.fromAccountId}</p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">月</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">送金先口座</label>
                 <Select
-                  value={formData.month}
-                  onChange={(e) => handleInputChange('month', parseInt(e.target.value))}
-                  options={generateMonthOptions()}
+                  value={formData.toAccountId}
+                  onChange={(e) => handleInputChange('toAccountId', e.target.value)}
+                  options={[
+                    { value: '', label: '口座を選択' },
+                    ...accounts.map((account) => ({
+                      value: account.id,
+                      label: account.name,
+                    })),
+                  ]}
+                  error={errors.toAccountId}
+                />
+                {errors.toAccountId && (
+                  <p className="mt-1 text-sm text-red-600">{errors.toAccountId}</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* カテゴリ選択（支出・収入の場合） */}
+          {(formData.type === 'expense' || formData.type === 'income') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ</label>
+              <div className="grid grid-cols-3 gap-3">
+                {filteredCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => handleInputChange('categoryId', category.id)}
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      formData.categoryId === category.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full mx-auto mb-2"
+                      style={{ backgroundColor: category.color }}
+                    />
+                    <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                  </button>
+                ))}
+              </div>
+              {errors.categoryId && (
+                <p className="mt-1 text-sm text-red-600">{errors.categoryId}</p>
+              )}
+            </div>
+          )}
+
+          {/* 数量入力（投資の場合） */}
+          {formData.type === 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">数量</label>
+              <Input
+                ref={quantityRef}
+                type="number"
+                defaultValue={formData.quantity}
+                onBlur={handleQuantityBlur}
+                placeholder="0"
+                min="0"
+                max={
+                  (formData.transactionSubtype === 'sell' ||
+                    formData.transactionSubtype === 'dividend') &&
+                  selectedHoldingAsset
+                    ? selectedHoldingAsset.quantity
+                    : undefined
+                }
+                step="1"
+                className="text-xl py-3"
+                error={errors.quantity}
+              />
+              <div className="mt-1 text-sm text-gray-600">
+                株 / 口
+                {(formData.transactionSubtype === 'sell' ||
+                  formData.transactionSubtype === 'dividend') &&
+                  selectedHoldingAsset && (
+                    <span className="ml-2 text-blue-600">
+                      （最大 {selectedHoldingAsset.quantity} まで
+                      {formData.transactionSubtype === 'sell' ? '売却' : '配当'}可能）
+                    </span>
+                  )}
+              </div>
+              {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
+            </div>
+          )}
+
+          {/* 投資金額計算結果（投資の場合） */}
+          {formData.type === 'investment' && selectedAsset && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {formData.transactionSubtype === 'buy'
+                  ? '投資金額'
+                  : formData.transactionSubtype === 'sell'
+                    ? '売却金額'
+                    : '配当金額'}
+              </label>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-teal-600">
+                  ¥{calculateInvestmentAmount().toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {formData.quantity || 0} × ¥
+                  {formData.transactionSubtype === 'dividend'
+                    ? getAssetDividendForYear().toLocaleString()
+                    : getAssetPriceForYear().toLocaleString()}
+                  {((formData.transactionSubtype === 'dividend' &&
+                    getAssetDividendForYear() === 0) ||
+                    (formData.transactionSubtype !== 'dividend' &&
+                      getAssetPriceForYear() === 0)) && (
+                    <span className="text-red-500 ml-2">
+                      （{getEffectiveYear()}年の
+                      {formData.transactionSubtype === 'dividend' ? '配当' : '価格'}
+                      データがありません）
+                    </span>
+                  )}
+                </div>
+
+                {/* 売却時の損益表示 */}
+                {formData.transactionSubtype === 'sell' &&
+                  selectedHoldingAsset &&
+                  formData.quantity > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-300">
+                      <div className="text-sm font-medium text-gray-700 mb-2">損益情報</div>
+                      {(() => {
+                        const { profitLoss, profitLossRate } = calculateSellProfitLoss();
+                        return (
+                          <>
+                            <div className="text-sm text-gray-600">
+                              購入価格: ¥{getPurchasePrice().toLocaleString()} × {formData.quantity}{' '}
+                              = ¥{(getPurchasePrice() * formData.quantity).toLocaleString()}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              売却価格: ¥{getAssetPriceForYear().toLocaleString()} ×{' '}
+                              {formData.quantity} = ¥{calculateInvestmentAmount().toLocaleString()}
+                            </div>
+                            <div
+                              className={`text-lg font-bold ${profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                            >
+                              {profitLoss >= 0 ? '利益' : '損失'}: {profitLoss >= 0 ? '+' : ''}¥
+                              {profitLoss.toLocaleString()}
+                              <span className="text-sm ml-2">
+                                ({profitLoss >= 0 ? '+' : ''}
+                                {profitLossRate.toFixed(1)}%)
+                              </span>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
+              </div>
+            </div>
+          )}
+
+          {/* 頻度設定（振替・投資以外） */}
+          {formData.type !== 'transfer' && formData.type !== 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                頻度（年に何回）
+              </label>
+              <div className="w-48">
+                <Select
+                  value={formData.frequency}
+                  onChange={(e) => handleInputChange('frequency', parseInt(e.target.value))}
+                  options={frequencyOptions}
                 />
               </div>
             </div>
+          )}
 
-            {/* タグ入力（バッジ形式）（支出・収入の場合のみ） */}
-            {(formData.type === 'expense' || formData.type === 'income') && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">タグ（任意）</label>
+          {/* イベント選択（任意、振替・投資以外） */}
+          {formData.type !== 'transfer' && formData.type !== 'investment' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                イベント（任意）
+              </label>
+              <Select
+                value={formData.eventId}
+                onChange={(e) => handleInputChange('eventId', e.target.value)}
+                options={[
+                  { value: '', label: 'イベントを選択' },
+                  ...events.map((event) => ({
+                    value: event.id,
+                    label: event.title,
+                  })),
+                ]}
+              />
+              {events.length === 0 && (
+                <p className="mt-1 text-sm text-gray-500">
+                  {formData.year}年のイベントがありません
+                </p>
+              )}
+            </div>
+          )}
 
-                {/* タグバッジ表示 */}
-                {formData.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {formData.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                      >
-                        <span>{tag}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeTag(tag)}
-                          className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors"
-                          title="タグを削除"
-                        >
-                          <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+          {/* メモ入力（振替・投資の場合） */}
+          {(formData.type === 'transfer' || formData.type === 'investment') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">メモ（任意）</label>
+              <Input
+                ref={memoRef}
+                type="text"
+                defaultValue={formData.memo}
+                onBlur={handleMemoBlur}
+                placeholder={formData.type === 'transfer' ? '振替の目的など' : '投資メモ'}
+              />
+            </div>
+          )}
+
+          {/* 詳細設定ボタン（支出・収入・投資の場合） */}
+          {(formData.type === 'expense' ||
+            formData.type === 'income' ||
+            formData.type === 'investment') && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${showAdvancedSettings ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+                <span>詳細設定</span>
+              </button>
+            </div>
+          )}
+
+          {/* 詳細設定セクション（支出・収入・投資の場合） */}
+          {(formData.type === 'expense' ||
+            formData.type === 'income' ||
+            formData.type === 'investment') &&
+            showAdvancedSettings && (
+              <div className="border-t pt-6 space-y-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">詳細設定</h3>
+
+                {/* 年・月選択 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">年</label>
+                    <Select
+                      value={formData.year}
+                      onChange={(e) => handleInputChange('year', parseInt(e.target.value))}
+                      options={generateYearOptions()}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">月</label>
+                    <Select
+                      value={formData.month}
+                      onChange={(e) => handleInputChange('month', parseInt(e.target.value))}
+                      options={generateMonthOptions()}
+                    />
+                  </div>
+                </div>
+
+                {/* タグ入力（バッジ形式）（支出・収入の場合のみ） */}
+                {(formData.type === 'expense' || formData.type === 'income') && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      タグ（任意）
+                    </label>
+
+                    {/* タグバッジ表示 */}
+                    {formData.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {formData.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                      </span>
-                    ))}
+                            <span>{tag}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeTag(tag)}
+                              className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors"
+                              title="タグを削除"
+                            >
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* タグ入力フィールド */}
+                    <div className="flex gap-2">
+                      <Input
+                        ref={tagInputRef}
+                        type="text"
+                        value={tagInput}
+                        onChange={handleTagInputChange}
+                        onKeyDown={handleTagInputKeyDown}
+                        placeholder="タグを入力してEnterまたはカンマで追加"
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={addTag}
+                        variant="outline"
+                        className="px-4"
+                        disabled={!tagInput.trim()}
+                      >
+                        追加
+                      </Button>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enterキーまたはカンマで複数のタグを追加できます
+                    </p>
                   </div>
                 )}
 
-                {/* タグ入力フィールド */}
-                <div className="flex gap-2">
-                  <Input
-                    ref={tagInputRef}
-                    type="text"
-                    value={tagInput}
-                    onChange={handleTagInputChange}
-                    onKeyDown={handleTagInputKeyDown}
-                    placeholder="タグを入力してEnterまたはカンマで追加"
-                    className="flex-1"
+                {/* 詳細メモ */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    詳細メモ（任意）
+                  </label>
+                  <textarea
+                    ref={detailMemoRef}
+                    defaultValue={formData.detailMemo}
+                    onBlur={handleDetailMemoBlur}
+                    placeholder="取引に関する詳細なメモを入力してください..."
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
                   />
-                  <Button
-                    type="button"
-                    onClick={addTag}
-                    variant="outline"
-                    className="px-4"
-                    disabled={!tagInput.trim()}
-                  >
-                    追加
-                  </Button>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Enterキーまたはカンマで複数のタグを追加できます
-                </p>
               </div>
             )}
-
-            {/* 詳細メモ */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                詳細メモ（任意）
-              </label>
-              <textarea
-                ref={detailMemoRef}
-                defaultValue={formData.detailMemo}
-                onBlur={handleDetailMemoBlur}
-                placeholder="取引に関する詳細なメモを入力してください..."
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                rows={3}
-              />
-            </div>
-          </div>
-        )}
+        </div>
+      )}
 
       {/* ボタン */}
       <div className="flex space-x-4">
