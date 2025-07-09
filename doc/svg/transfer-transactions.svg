@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- ヘッダーセクション -->
+    <rect x="20" y="20" width="1160" height="80" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+    
+    <!-- タブとフィルター -->
+    <g transform="translate(40, 40)">
+        <!-- 年別選択 -->
+        <rect width="120" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+        
+        <!-- タブ切り替え -->
+        <g transform="translate(140, 0)">
+            <rect width="200" height="40" rx="20" fill="#f8f9fa"/>
+            <rect x="200" width="200" height="40" rx="0" fill="#f8f9fa"/>
+            <rect x="400" width="200" height="40" rx="20" fill="#007bff"/>
+            <rect x="600" width="200" height="40" rx="20" fill="#f8f9fa"/>
+            <text x="90" y="25" font-family="Arial" font-size="14" fill="#495057">支出</text>
+            <text x="290" y="25" font-family="Arial" font-size="14" fill="#495057">収入</text>
+            <text x="490" y="25" font-family="Arial" font-size="14" fill="#ffffff">振替</text>
+            <text x="690" y="25" font-family="Arial" font-size="14" fill="#495057">投資</text>
+        </g>
+    </g>
+    
+    <!-- 年間サマリー -->
+    <g transform="translate(20, 120)">
+        <rect width="1160" height="120" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- 総額表示 -->
+        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">2025年の振替取引</text>
+        <text x="40" y="80" font-family="Arial" font-size="24" fill="#6c757d">総取引件数: 24件</text>
+    </g>
+    
+    <!-- 振替取引リスト -->
+    <g transform="translate(20, 260)">
+        <!-- 振替1 -->
+        <rect width="1160" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <circle cx="50" cy="30" r="15" fill="#6c757d"/>
+        <text x="80" y="35" font-family="Arial" font-size="14" fill="#495057">普通預金（みずほ銀行）</text>
+        <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">→</text>
+        <text x="350" y="35" font-family="Arial" font-size="14" fill="#495057">貯蓄預金（みずほ銀行）</text>
+        <text x="1000" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥100,000</text>
+
+        <!-- 振替2 -->
+        <g transform="translate(0, 70)">
+            <rect width="1160" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="50" cy="30" r="15" fill="#6c757d"/>
+            <text x="80" y="35" font-family="Arial" font-size="14" fill="#495057">貯蓄預金（みずほ銀行）</text>
+            <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">→</text>
+            <text x="350" y="35" font-family="Arial" font-size="14" fill="#495057">投資用口座（SBI証券）</text>
+            <text x="1000" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥500,000</text>
+        </g>
+
+        <!-- 振替3 -->
+        <g transform="translate(0, 140)">
+            <rect width="1160" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="50" cy="30" r="15" fill="#6c757d"/>
+            <text x="80" y="35" font-family="Arial" font-size="14" fill="#495057">普通預金（三菱UFJ銀行）</text>
+            <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">→</text>
+            <text x="350" y="35" font-family="Arial" font-size="14" fill="#495057">普通預金（みずほ銀行）</text>
+            <text x="1000" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥300,000</text>
+        </g>
+
+        <!-- 振替4 -->
+        <g transform="translate(0, 210)">
+            <rect width="1160" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="50" cy="30" r="15" fill="#6c757d"/>
+            <text x="80" y="35" font-family="Arial" font-size="14" fill="#495057">投資用口座（SBI証券）</text>
+            <text x="300" y="35" font-family="Arial" font-size="14" fill="#495057">→</text>
+            <text x="350" y="35" font-family="Arial" font-size="14" fill="#495057">貯蓄預金（みずほ銀行）</text>
+            <text x="1000" y="35" font-family="Arial" font-size="14" fill="#6c757d">¥1,000,000</text>
+        </g>
+    </g>
+
+    <!-- 新規追加ボタン -->
+    <circle cx="1140" cy="740" r="40" fill="#007bff"/>
+    <text x="1127" y="748" font-family="Arial" font-size="24" fill="#ffffff">＋</text>
+</svg>

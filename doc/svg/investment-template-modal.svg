@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- オーバーレイ背景 -->
+    <rect width="400" height="300" fill="rgba(0,0,0,0.5)"/>
+    
+    <!-- モーダル本体 -->
+    <g transform="translate(50, 50)">
+        <!-- モーダルの白背景 -->
+        <rect width="300" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="20" y="35" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">投資テンプレート名</text>
+        
+        <!-- 入力フィールド -->
+        <g transform="translate(20, 60)">
+            <rect x="0" y="0" width="260" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="10" y="25" font-family="Arial" font-size="14" fill="#6c757d">テンプレート名を入力</text>
+        </g>
+        
+        <!-- ボタン -->
+        <g transform="translate(20, 130)">
+            <!-- キャンセル -->
+            <rect width="120" height="40" rx="5" fill="#6c757d"/>
+            <text x="35" y="25" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+            
+            <!-- 保存 -->
+            <rect x="140" width="120" height="40" rx="5" fill="#007bff"/>
+            <text x="185" y="25" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+        </g>
+    </g>
+</svg>

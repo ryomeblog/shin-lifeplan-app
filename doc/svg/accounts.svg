@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- 左側：口座一覧 -->
+    <g transform="translate(20, 20)">
+        <rect width="780" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">口座一覧</text>
+        <text x="40" y="80" font-family="Arial" font-size="16" fill="#28a745">総資産: ¥5,430,000</text>
+        
+        <!-- 口座リスト -->
+        <g transform="translate(40, 120)">
+            <!-- 三菱UFJ銀行 -->
+            <a href="#account-detail">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三菱UFJ銀行</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥1,250,000</text>
+            </a>
+            
+            <!-- SBI証券 -->
+            <a href="#account-detail" transform="translate(0, 120)">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">SBI証券</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#212529">¥3,180,000</text>
+            </a>
+            
+            <!-- 三井住友銀行 -->
+            <a href="#account-detail" transform="translate(0, 240)">
+                <rect width="700" height="100" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="35" font-family="Arial" font-size="18" fill="#212529">三井住友銀行</text>
+                <text x="500" y="50" font-family="Arial" font-size="20" fill="#dc3545">-¥150,000</text>
+            </a>
+        </g>
+        
+        <!-- 口座追加ボタン -->
+        <g transform="translate(40, 680)">
+            <rect width="700" height="50" rx="5" fill="#007bff"/>
+            <text x="320" y="32" font-family="Arial" font-size="14" fill="#ffffff">＋ 口座を追加</text>
+        </g>
+    </g>
+    
+    <!-- 右側：振替登録 -->
+    <g transform="translate(820, 20)">
+        <rect width="360" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー -->
+        <text x="40" y="50" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">振替登録</text>
+        
+        <!-- 振替フォーム -->
+        <g transform="translate(40, 80)">
+            <!-- 振替元 -->
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">振替元</text>
+            <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">三菱UFJ銀行▼</text>
+            
+            <!-- 振替先 -->
+            <g transform="translate(0, 100)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">振替先</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">SBI証券▼</text>
+            </g>
+            
+            <!-- 金額 -->
+            <g transform="translate(0, 200)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">金額</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">¥</text>
+                <text x="40" y="60" font-family="Arial" font-size="14" fill="#6c757d">金額を入力</text>
+            </g>
+            
+            <!-- 年月選択 -->
+            <g transform="translate(0, 300)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">年月</text>
+                
+                <!-- 年選択 -->
+                <rect x="0" y="30" width="130" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+                
+                <!-- 月選択 -->
+                <rect x="150" y="30" width="130" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="170" y="60" font-family="Arial" font-size="14" fill="#495057">4月▼</text>
+            </g>
+            
+            <!-- メモ -->
+            <g transform="translate(0, 400)">
+                <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">メモ（任意）</text>
+                <rect x="0" y="30" width="280" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">メモを入力...</text>
+            </g>
+            
+            <!-- 振替ボタン -->
+            <rect x="0" y="500" width="280" height="50" rx="5" fill="#007bff"/>
+            <text x="120" y="532" font-family="Arial" font-size="14" fill="#ffffff">振替を実行</text>
+        </g>
+    </g>
+</svg>

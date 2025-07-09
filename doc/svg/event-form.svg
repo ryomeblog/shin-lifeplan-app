@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="800" fill="#ffffff"/>
+    
+    <!-- ヘッダー -->
+    <rect x="0" y="0" width="800" height="60" fill="#f8f9fa"/>
+    <text x="20" y="38" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">イベント登録</text>
+    
+    <!-- フォーム -->
+    <g transform="translate(40, 70)">
+        <!-- イベント名 -->
+        <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">イベント名</text>
+        <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">イベント名を入力</text>
+        
+        <!-- 年 -->
+        <g transform="translate(0, 120)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">年</text>
+            <rect x="0" y="30" width="200" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">2025年▼</text>
+        </g>
+        
+        <!-- 支出リスト -->
+        <g transform="translate(0, 220)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">支出リスト</text>
+            
+            <!-- リストヘッダー -->
+            <rect x="0" y="40" width="720" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">内容</text>
+            <text x="420" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+            <text x="600" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+            
+            <!-- 支出項目1 -->
+            <g transform="translate(0, 90)">
+                <rect width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">家具購入</text>
+                <text x="420" y="30" font-family="Arial" font-size="14" fill="#495057">生活用品</text>
+                <text x="600" y="30" font-family="Arial" font-size="14" fill="#dc3545">-¥200,000</text>
+                
+                <!-- 削除ボタン -->
+                <circle cx="690" cy="25" r="10" fill="#dc3545"/>
+                <text x="686" y="29" font-family="Arial" font-size="14" fill="#ffffff">×</text>
+            </g>
+            
+            <!-- 支出追加ボタン -->
+            <rect x="0" y="160" width="720" height="40" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-dasharray="4"/>
+            <text x="330" y="185" font-family="Arial" font-size="14" fill="#007bff">＋ 支出を追加</text>
+        </g>
+        
+        <!-- 収入リスト -->
+        <g transform="translate(0, 440)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">収入リスト</text>
+            
+            <!-- リストヘッダー -->
+            <rect x="0" y="40" width="720" height="40" rx="5" fill="#f8f9fa"/>
+            <text x="20" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">内容</text>
+            <text x="420" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+            <text x="600" y="65" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">金額</text>
+            
+            <!-- 収入項目1 -->
+            <g transform="translate(0, 90)">
+                <rect width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">引越し祝い金</text>
+                <text x="420" y="30" font-family="Arial" font-size="14" fill="#495057">臨時収入</text>
+                <text x="600" y="30" font-family="Arial" font-size="14" fill="#28a745">+¥100,000</text>
+                
+                <!-- 削除ボタン -->
+                <circle cx="690" cy="25" r="10" fill="#dc3545"/>
+                <text x="686" y="29" font-family="Arial" font-size="14" fill="#ffffff">×</text>
+            </g>
+            
+            <!-- 収入追加ボタン -->
+            <rect x="0" y="160" width="720" height="40" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-dasharray="4"/>
+            <text x="330" y="185" font-family="Arial" font-size="14" fill="#007bff">＋ 収入を追加</text>
+        </g>
+    </g>
+    
+    <!-- ボタン -->
+    <g transform="translate(40, 720)">
+        <rect width="350" height="50" rx="5" fill="#6c757d"/>
+        <text x="150" y="32" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+        
+        <rect x="370" width="350" height="50" rx="5" fill="#007bff"/>
+        <text x="520" y="32" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+    </g>
+</svg>

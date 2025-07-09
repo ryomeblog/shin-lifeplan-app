@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- ヘッダー -->
+    <g transform="translate(20, 20)">
+        <!-- タブ切り替え -->
+        <rect width="1160" height="60" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <rect x="20" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
+        <rect x="220" y="10" width="200" height="40" rx="20" fill="#007bff"/>
+        <rect x="420" y="10" width="200" height="40" rx="20" fill="#f8f9fa"/>
+        <text x="85" y="35" font-family="Arial" font-size="14" fill="#495057">支出テンプレート</text>
+        <text x="285" y="35" font-family="Arial" font-size="14" fill="#ffffff">収入テンプレート</text>
+        <text x="485" y="35" font-family="Arial" font-size="14" fill="#495057">投資テンプレート</text>
+        
+        <!-- 新規登録ボタン -->
+        <a href="#new">
+            <circle cx="1100" cy="30" r="15" fill="#007bff"/>
+            <text x="1093" y="37" font-family="Arial" font-size="20" fill="#ffffff">+</text>
+        </a>
+    </g>
+    
+    <!-- テンプレートリスト -->
+    <g transform="translate(20, 100)">
+        <!-- 給与収入テンプレート -->
+        <rect width="1160" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">給与収入</text>
+        <text x="120" y="40" font-family="Arial" font-size="14" fill="#6c757d">年12回</text>
+        <a href="#add">
+            <circle cx="1120" cy="30" r="12" fill="#007bff"/>
+            <text x="1114" y="36" font-family="Arial" font-size="16" fill="#ffffff">+</text>
+        </a>
+        
+        <!-- テンプレート内容 -->
+        <g transform="translate(40, 60)">
+            <rect width="1080" height="80" fill="#f8f9fa" rx="5"/>
+            
+            <!-- ヘッダー -->
+            <rect width="1080" height="40" fill="#f8f9fa"/>
+            <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">口座</text>
+            <text x="180" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+            <text x="340" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
+            <text x="500" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">昇給率</text>
+            <text x="800" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">収入金額</text>
+            <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
+            
+            <!-- 取引1 -->
+            <g transform="translate(0, 40)">
+                <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">普通預金</text>
+                <text x="180" y="25" font-family="Arial" font-size="14" fill="#495057">給与収入</text>
+                <text x="340" y="25" font-family="Arial" font-size="14" fill="#495057">月給</text>
+                <text x="500" y="25" font-family="Arial" font-size="14" fill="#495057">3%</text>
+                <text x="800" y="25" font-family="Arial" font-size="14" fill="#28a745">¥300,000</text>
+                <a href="#edit">
+                    <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                </a>
+            </g>
+        </g>
+        
+        <!-- 賞与テンプレート -->
+        <g transform="translate(0, 220)">
+            <rect width="1160" height="200" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="40" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">賞与</text>
+            <text x="120" y="40" font-family="Arial" font-size="14" fill="#6c757d">年2回</text>
+            <a href="#add">
+                <circle cx="1120" cy="30" r="12" fill="#007bff"/>
+                <text x="1114" y="36" font-family="Arial" font-size="16" fill="#ffffff">+</text>
+            </a>
+            
+            <!-- テンプレート内容 -->
+            <g transform="translate(40, 60)">
+                <rect width="1080" height="80" fill="#f8f9fa" rx="5"/>
+                
+                <!-- ヘッダー -->
+                <rect width="1080" height="40" fill="#f8f9fa"/>
+                <text x="20" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">口座</text>
+                <text x="180" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">カテゴリ</text>
+                <text x="340" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">メモ</text>
+                <text x="500" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">昇給率</text>
+                <text x="800" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">収入金額</text>
+                <text x="1020" y="25" font-family="Arial" font-size="12" font-weight="bold" fill="#495057">編集</text>
+                
+                <!-- 取引1 -->
+                <g transform="translate(0, 40)">
+                    <rect width="1080" height="40" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="25" font-family="Arial" font-size="14" fill="#495057">普通預金</text>
+                    <text x="180" y="25" font-family="Arial" font-size="14" fill="#495057">賞与</text>
+                    <text x="340" y="25" font-family="Arial" font-size="14" fill="#495057">年2回</text>
+                    <text x="500" y="25" font-family="Arial" font-size="14" fill="#495057">5%</text>
+                    <text x="800" y="25" font-family="Arial" font-size="14" fill="#28a745">¥600,000</text>
+                    <a href="#edit">
+                        <text x="1020" y="25" font-family="Arial" font-size="14" fill="#007bff">✎</text>
+                    </a>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

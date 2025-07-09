@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- サイドバー -->
+    <g transform="translate(20, 20)">
+        <rect width="280" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- メニュー項目 -->
+        <g transform="translate(20, 20)">
+            <!-- 基本設定 -->
+            <rect width="240" height="50" rx="5" fill="#ffffff"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">基本設定</text>
+            
+            <!-- 詳細設定 -->
+            <g transform="translate(0, 60)">
+                <rect width="240" height="50" rx="5" fill="#007bff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">詳細設定</text>
+            </g>
+            
+            <!-- FIRE計画 -->
+            <g transform="translate(0, 120)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">FIRE計画</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(320, 20)">
+        <rect width="860" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- 家族管理 -->
+        <g transform="translate(40, 40)">
+            <text x="0" y="0" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">家族管理</text>
+            <text x="0" y="30" font-family="Arial" font-size="14" fill="#6c757d">家族メンバーを登録・管理します</text>
+            
+            <!-- 家族リスト -->
+            <g transform="translate(0, 50)">
+                <!-- ヘッダー -->
+                <rect width="780" height="40" fill="#f8f9fa"/>
+                <text x="20" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">名前</text>
+                <text x="200" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">生年月日</text>
+                <text x="400" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">年齢</text>
+                <text x="500" y="25" font-family="Arial" font-size="14" font-weight="bold" fill="#495057">寿命設定</text>
+                
+                <!-- 家族1 -->
+                <g transform="translate(0, 50)">
+                    <rect width="780" height="60" fill="#ffffff" stroke="#dee2e6"/>
+                    <text x="20" y="35" font-family="Arial" font-size="14" fill="#495057">山田太郎</text>
+                    <text x="200" y="35" font-family="Arial" font-size="14" fill="#495057">1990年4月1日</text>
+                    <text x="400" y="35" font-family="Arial" font-size="14" fill="#495057">35歳</text>
+                    <text x="500" y="35" font-family="Arial" font-size="14" fill="#495057">85歳</text>
+                    
+                    <!-- 編集・削除ボタン -->
+                    <rect x="650" y="15" width="50" height="30" rx="5" fill="#007bff"/>
+                    <text x="665" y="35" font-family="Arial" font-size="14" fill="#ffffff">編集</text>
+                    
+                    <rect x="710" y="15" width="50" height="30" rx="5" fill="#dc3545"/>
+                    <text x="725" y="35" font-family="Arial" font-size="14" fill="#ffffff">削除</text>
+                </g>
+            </g>
+            
+            <!-- 家族追加ボタン -->
+            <rect x="0" y="150" width="780" height="50" rx="5" fill="#f8f9fa" stroke="#dee2e6" stroke-dasharray="4"/>
+            <text x="360" y="180" font-family="Arial" font-size="14" fill="#007bff">＋ 家族を追加</text>
+        </g>
+        
+        <!-- データインポート/エクスポート -->
+        <g transform="translate(40, 280)">
+            <text x="0" y="0" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">データ管理</text>
+            <text x="0" y="30" font-family="Arial" font-size="14" fill="#6c757d">データのバックアップと復元を行います</text>
+            
+            <!-- エクスポート -->
+            <g transform="translate(0, 50)">
+                <rect width="780" height="100" rx="10" fill="#f8f9fa"/>
+                <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">データのエクスポート</text>
+                <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">すべてのデータをJSONファイルとしてエクスポートします</text>
+                <rect x="580" y="30" width="180" height="40" rx="5" fill="#007bff"/>
+                <text x="620" y="55" font-family="Arial" font-size="14" fill="#ffffff">エクスポート</text>
+            </g>
+            
+            <!-- インポート -->
+            <g transform="translate(0, 170)">
+                <rect width="780" height="100" rx="10" fill="#f8f9fa"/>
+                <text x="20" y="40" font-family="Arial" font-size="16" font-weight="bold" fill="#212529">データのインポート</text>
+                <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">エクスポートしたJSONファイルからデータを復元します</text>
+                <rect x="580" y="30" width="180" height="40" rx="5" fill="#28a745"/>
+                <text x="635" y="55" font-family="Arial" font-size="14" fill="#ffffff">インポート</text>
+            </g>
+        </g>
+    </g>
+</svg>

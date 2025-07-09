@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="1200" height="800" fill="#f8f9fa"/>
+    
+    <!-- サイドバー -->
+    <g transform="translate(20, 20)">
+        <rect width="280" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- メニュー項目 -->
+        <g transform="translate(20, 20)">
+            <!-- 基本設定 -->
+            <rect width="240" height="50" rx="5" fill="#ffffff"/>
+            <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">基本設定</text>
+            
+            <!-- 詳細設定 -->
+            <g transform="translate(0, 60)">
+                <rect width="240" height="50" rx="5" fill="#ffffff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#495057">詳細設定</text>
+            </g>
+            
+            <!-- FIRE計画 -->
+            <g transform="translate(0, 120)">
+                <rect width="240" height="50" rx="5" fill="#007bff"/>
+                <text x="20" y="30" font-family="Arial" font-size="14" fill="#ffffff">FIRE計画</text>
+            </g>
+        </g>
+    </g>
+    
+    <!-- メインコンテンツ -->
+    <g transform="translate(320, 20)">
+        <rect width="860" height="760" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+        
+        <!-- ヘッダー部分 -->
+        <g transform="translate(40, 40)">
+            <text x="0" y="0" font-family="Arial" font-size="24" font-weight="bold" fill="#212529">FIRE計画</text>
+            <text x="0" y="30" font-family="Arial" font-size="14" fill="#6c757d">経済的自立を達成するための計画を管理します</text>
+            
+            <!-- 編集ボタン -->
+            <rect x="680" y="-10" width="100" height="40" rx="5" fill="#007bff"/>
+            <text x="710" y="18" font-family="Arial" font-size="14" fill="#ffffff">編集</text>
+        </g>
+        
+        <!-- FIRE目標 -->
+        <g transform="translate(40, 100)">
+            <rect width="780" height="120" rx="10" fill="#f8f9fa"/>
+            
+            <!-- 目標達成時期 -->
+            <g transform="translate(40, 30)">
+                <text x="0" y="0" font-family="Arial" font-size="16" fill="#212529">目標達成時期</text>
+                <text x="0" y="30" font-family="Arial" font-size="24" fill="#007bff">2045年（55歳）</text>
+            </g>
+            
+            <!-- 必要資産額 -->
+            <g transform="translate(400, 30)">
+                <text x="0" y="0" font-family="Arial" font-size="16" fill="#212529">必要資産額</text>
+                <!-- 入力フィールド背景 -->
+                <rect x="0" y="10" width="240" height="40" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+                <!-- 金額記号 -->
+                <text x="10" y="35" font-family="Arial" font-size="24" fill="#007bff">¥</text>
+                <!-- 入力フィールドプレースホルダー -->
+                <text x="35" y="35" font-family="Arial" font-size="24" fill="#007bff">100,000,000</text>
+                <!-- フォーカス時の青枠表現用 -->
+                <rect x="0" y="10" width="240" height="40" rx="5" fill="transparent" stroke="#007bff" stroke-width="2" opacity="0"/>
+            </g>
+        </g>
+        
+        <!-- シミュレーション結果 -->
+        <g transform="translate(40, 260)">
+            <text x="0" y="0" font-family="Arial" font-size="18" font-weight="bold" fill="#212529">シミュレーション結果</text>
+            
+            <!-- シミュレーショングラフ -->
+            <g transform="translate(0, 40)">
+                <!-- Y軸 -->
+                <line x1="40" y1="0" x2="40" y2="240" stroke="#dee2e6"/>
+                <text x="0" y="20" font-family="Arial" font-size="12" fill="#6c757d">1億</text>
+                <text x="0" y="120" font-family="Arial" font-size="12" fill="#6c757d">5千万</text>
+                <text x="0" y="220" font-family="Arial" font-size="12" fill="#6c757d">0</text>
+                
+                <!-- X軸 -->
+                <line x1="40" y1="240" x2="780" y2="240" stroke="#dee2e6"/>
+                
+                <!-- グラフライン -->
+                <path d="M40,220 C200,180 400,100 780,20" 
+                      fill="none" stroke="#007bff" stroke-width="2"/>
+                
+                <!-- 目標ライン -->
+                <line x1="40" y1="40" x2="780" y2="40" 
+                      stroke="#dc3545" stroke-width="2" stroke-dasharray="4"/>
+                <text x="50" y="35" font-family="Arial" font-size="12" fill="#dc3545">目標金額</text>
+                
+                <!-- 年齢ラベル -->
+                <text x="40" y="260" font-family="Arial" font-size="12" fill="#6c757d">35歳</text>
+                <text x="200" y="260" font-family="Arial" font-size="12" fill="#6c757d">40歳</text>
+                <text x="400" y="260" font-family="Arial" font-size="12" fill="#6c757d">45歳</text>
+                <text x="600" y="260" font-family="Arial" font-size="12" fill="#6c757d">50歳</text>
+                <text x="780" y="260" font-family="Arial" font-size="12" fill="#6c757d">55歳</text>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#ffffff"/>
+    
+    <!-- ヘッダー -->
+    <rect x="0" y="0" width="800" height="60" fill="#f8f9fa"/>
+    <text x="20" y="38" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">口座登録</text>
+    
+    <!-- フォーム -->
+    <g transform="translate(40, 100)">
+        <!-- 口座名 -->
+        <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">口座名</text>
+        <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">口座名を入力</text>
+        
+        <!-- 初期残高 -->
+        <g transform="translate(0, 120)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">初期残高</text>
+            <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#495057">¥</text>
+            <text x="40" y="60" font-family="Arial" font-size="14" fill="#6c757d">初期残高を入力</text>
+        </g>
+        
+        <!-- メモ -->
+        <g transform="translate(0, 220)">
+            <text x="0" y="20" font-family="Arial" font-size="14" fill="#495057">メモ（任意）</text>
+            <rect x="0" y="30" width="720" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <text x="20" y="60" font-family="Arial" font-size="14" fill="#6c757d">メモを入力...</text>
+        </g>
+    </g>
+    
+    <!-- ボタン -->
+    <g transform="translate(40, 420)">
+        <rect width="350" height="50" rx="5" fill="#6c757d"/>
+        <text x="150" y="32" font-family="Arial" font-size="14" fill="#ffffff">キャンセル</text>
+        
+        <rect x="370" width="350" height="50" rx="5" fill="#007bff"/>
+        <text x="520" y="32" font-family="Arial" font-size="14" fill="#ffffff">保存</text>
+    </g>
+</svg>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="800" fill="#ffffff"/>
+    
+    <!-- ヘッダー -->
+    <rect x="0" y="0" width="800" height="60" fill="#f8f9fa"/>
+    <text x="20" y="38" font-family="Arial" font-size="20" font-weight="bold" fill="#212529">新規取引</text>
+    
+    <!-- 取引タイプ切り替え -->
+    <g transform="translate(20, 80)">
+        <rect width="760" height="60" rx="30" fill="#f8f9fa"/>
+        <rect width="190" height="60" rx="30" fill="#f8f9fa"/>
+        <rect x="190" width="190" height="60" rx="30" fill="#007bff"/>
+        <rect x="380" width="190" height="60" rx="0" fill="#f8f9fa"/>
+        <rect x="570" width="190" height="60" rx="30" fill="#f8f9fa"/>
+        <text x="80" y="38" font-family="Arial" font-size="16" fill="#6c757d">支出</text>
+        <text x="270" y="38" font-family="Arial" font-size="16" fill="#ffffff">収入</text>
+        <text x="460" y="38" font-family="Arial" font-size="16" fill="#6c757d">振替</text>
+        <text x="650" y="38" font-family="Arial" font-size="16" fill="#6c757d">投資</text>
+    </g>
+    
+    <!-- 金額入力 -->
+    <g transform="translate(20, 160)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">金額</text>
+        <rect x="0" y="40" width="760" height="60" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="80" font-family="Arial" font-size="24" fill="#28a745">¥</text>
+        <text x="45" y="80" font-family="Arial" font-size="24" fill="#28a745">0</text>
+    </g>
+
+    <!-- 口座選択 -->
+    <g transform="translate(20, 260)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">入金口座</text>
+        <rect x="0" y="40" width="760" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">口座を選択</text>
+        <text x="720" y="70" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+    </g>
+    
+    <!-- カテゴリ選択 -->
+    <g transform="translate(20, 350)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">カテゴリ</text>
+        <g transform="translate(0, 40)">
+            <!-- カテゴリグリッド -->
+            <rect width="180" height="80" rx="5" fill="#28a745" fill-opacity="0.1" stroke="#28a745"/>
+            <circle cx="40" cy="40" r="20" fill="#28a745"/>
+            <text x="70" y="45" font-family="Arial" font-size="14" fill="#28a745">給与収入</text>
+            
+            <rect x="190" width="180" height="80" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="230" cy="40" r="20" fill="#007bff"/>
+            <text x="260" y="45" font-family="Arial" font-size="14" fill="#495057">副業収入</text>
+            
+            <rect x="380" width="180" height="80" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+            <circle cx="420" cy="40" r="20" fill="#ffc107"/>
+            <text x="450" y="45" font-family="Arial" font-size="14" fill="#495057">その他</text>
+        </g>
+    </g>
+    
+    <!-- 頻度設定 -->
+    <g transform="translate(20, 510)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">頻度（年に何回）</text>
+        <rect x="0" y="40" width="200" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="70" font-family="Arial" font-size="14" fill="#212529">12</text>
+        <text x="160" y="70" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+    </g>
+    
+    <!-- イベント選択 -->
+    <g transform="translate(20, 600)">
+        <text x="0" y="30" font-family="Arial" font-size="16" fill="#495057">イベント（任意）</text>
+        <rect x="0" y="40" width="760" height="50" rx="5" fill="#ffffff" stroke="#dee2e6"/>
+        <text x="20" y="70" font-family="Arial" font-size="14" fill="#6c757d">イベントを選択</text>
+        <text x="720" y="70" font-family="Arial" font-size="14" fill="#6c757d">▼</text>
+    </g>
+    
+    <!-- ボタン -->
+    <g transform="translate(20, 720)">
+        <rect width="370" height="60" rx="5" fill="#6c757d"/>
+        <text x="160" y="38" font-family="Arial" font-size="16" fill="#ffffff">キャンセル</text>
+        
+        <rect x="390" width="370" height="60" rx="5" fill="#28a745"/>
+        <text x="550" y="38" font-family="Arial" font-size="16" fill="#ffffff">保存</text>
+    </g>
+</svg>

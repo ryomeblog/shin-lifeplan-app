@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 半透明オーバーレイ背景 -->
+  <rect width="400" height="400" fill="rgba(0,0,0,0.5)"/>
+  
+  <!-- モーダル本体 -->
+  <rect x="50" y="50" width="300" height="300" rx="10" fill="white"/>
+  
+  <!-- タイトル -->
+  <text x="70" y="85" font-size="18" font-weight="bold" fill="#333">家族メンバー情報</text>
+  
+  <!-- 名前フィールド -->
+  <text x="70" y="125" font-size="14" fill="#666">名前</text>
+  <rect x="70" y="135" width="260" height="30" rx="5" fill="#f5f5f5" stroke="#ddd"/>
+  <text x="80" y="155" font-size="14" fill="#999">名前を入力してください</text>
+  
+  <!-- 生年月日フィールド -->
+  <text x="70" y="185" font-size="14" fill="#666">生年月日</text>
+  <rect x="70" y="195" width="260" height="30" rx="5" fill="#f5f5f5" stroke="#ddd"/>
+  <text x="80" y="215" font-size="14" fill="#999">YYYY-MM-DD</text>
+  
+  <!-- 寿命設定フィールド -->
+  <text x="70" y="245" font-size="14" fill="#666">寿命設定 (年齢)</text>
+  <rect x="70" y="255" width="260" height="30" rx="5" fill="#f5f5f5" stroke="#ddd"/>
+  <text x="80" y="275" font-size="14" fill="#999">80</text>
+  
+  <!-- ボタングループ -->
+  <g transform="translate(70,300)">
+    <!-- キャンセルボタン -->
+    <rect x="0" y="0" width="100" height="35" rx="5" fill="#e0e0e0"/>
+    <text x="50" y="22" font-size="14" fill="#666" text-anchor="middle">キャンセル</text>
+    
+    <!-- 保存ボタン -->
+    <rect x="160" y="0" width="100" height="35" rx="5" fill="#2196F3"/>
+    <text x="210" y="22" font-size="14" fill="white" text-anchor="middle">保存</text>
+  </g>
+</svg>
