@@ -426,38 +426,6 @@ export const deleteAsset = (assetId) => {
   }
 };
 
-// 保有資産一覧を取得
-export const getHoldingAssets = () => {
-  try {
-    const activeLifePlan = getActiveLifePlan();
-    return activeLifePlan?.holdingAssets || [];
-  } catch (error) {
-    console.error('Failed to get holding assets:', error);
-    return [];
-  }
-};
-
-// 保有資産を保存
-export const saveHoldingAssets = (holdingAssets) => {
-  try {
-    const activeLifePlan = getActiveLifePlan();
-    if (!activeLifePlan) {
-      throw new Error('No active life plan found');
-    }
-
-    const updatedPlan = {
-      ...activeLifePlan,
-      holdingAssets: holdingAssets,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return saveLifePlan(updatedPlan);
-  } catch (error) {
-    console.error('Failed to save holding assets:', error);
-    return false;
-  }
-};
-
 // 家族メンバー一覧を取得
 export const getFamilyMembers = () => {
   try {

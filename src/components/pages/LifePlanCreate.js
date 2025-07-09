@@ -366,7 +366,6 @@ const LifePlanCreate = ({ initialData = null }) => {
       accounts: initialData?.accounts || [],
       categories: initialData?.categories || defaultCategories,
       assetInfo: initialData?.assetInfo || [],
-      holdingAssets: initialData?.holdingAssets || [],
       templates: initialData?.templates || [],
       yearlyData: initialData?.yearlyData || [],
       createdAt: initialData?.createdAt || new Date().toISOString(),

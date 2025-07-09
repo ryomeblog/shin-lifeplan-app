@@ -14,12 +14,14 @@ import {
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Input from '../ui/Input';
+import Select from '../ui/Select';
 import {
   getLifePlanSettings,
   getTransactions,
   getAssetInfo,
   saveLifePlan,
   getActiveLifePlan,
+  getFamilyMembers,
 } from '../../utils/storage';
 
 const FireSettingsForm = ({ onSave }) => {
@@ -27,9 +29,12 @@ const FireSettingsForm = ({ onSave }) => {
   const [fireSettings, setFireSettings] = useState({
     targetAmount: 50000000,
     isEnabled: true,
+    selectedMemberId: '', // 選択された家族メンバー
   });
   const [simulationData, setSimulationData] = useState([]);
+  const [achievementYear, setAchievementYear] = useState(null);
   const [achievementAge, setAchievementAge] = useState(null);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   // Uncontrolled Input用のref
   const targetAmountInputRef = useRef(null);
@@ -41,16 +46,44 @@ const FireSettingsForm = ({ onSave }) => {
   useEffect(() => {
     // FIRE設定が変更された時にシミュレーションを再計算
     calculateSimulation();
-  }, [fireSettings.targetAmount]);
+  }, [fireSettings.targetAmount, fireSettings.selectedMemberId]);
 
   const loadData = () => {
     try {
       const settings = getLifePlanSettings();
-      const fireData = settings.fireSettings || { targetAmount: 50000000, isEnabled: true };
+      const fireData = settings.fireSettings || {
+        targetAmount: 50000000,
+        isEnabled: true,
+        selectedMemberId: '',
+      };
+
+      const members = getFamilyMembers();
+      setFamilyMembers(members);
+
+      // 選択されたメンバーがいない場合は、最初のメンバーを選択
+      if (!fireData.selectedMemberId && members.length > 0) {
+        fireData.selectedMemberId = members[0].id;
+      }
+
       setFireSettings(fireData);
     } catch (error) {
       console.error('FIRE設定読み込みエラー:', error);
     }
+  };
+
+  // 選択されたメンバーの現在年齢を計算
+  const getSelectedMemberCurrentAge = () => {
+    if (!fireSettings.selectedMemberId || familyMembers.length === 0) {
+      return 35; // デフォルト
+    }
+
+    const selectedMember = familyMembers.find((m) => m.id === fireSettings.selectedMemberId);
+    if (!selectedMember || !selectedMember.birthYear) {
+      return 35; // デフォルト
+    }
+
+    const currentYear = new Date().getFullYear();
+    return currentYear - selectedMember.birthYear;
   };
 
   // レポートと同じロジックで資産推移を計算
@@ -60,11 +93,14 @@ const FireSettingsForm = ({ onSave }) => {
       const assets = getAssetInfo();
       const yearlyAssetData = [];
 
+      const selectedMemberCurrentAge = getSelectedMemberCurrentAge();
+
       // 年別データを初期化
       for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+        const ageInYear = selectedMemberCurrentAge + (year - new Date().getFullYear());
         yearlyAssetData.push({
           year,
-          age: year - settings.planStartYear + 35, // 仮定：35歳スタート
+          age: ageInYear,
           totalAssetValue: 0,
           dividendAmount: 0,
         });
@@ -128,14 +164,16 @@ const FireSettingsForm = ({ onSave }) => {
         }
       }
 
-      // 目標金額達成年齢を計算
-      const achievementYear = yearlyAssetData.find(
+      // 目標金額達成年と年齢を計算
+      const achievementData = yearlyAssetData.find(
         (data) => data.totalAssetValue >= fireSettings.targetAmount
       );
 
-      if (achievementYear) {
-        setAchievementAge(achievementYear.age);
+      if (achievementData) {
+        setAchievementYear(achievementData.year);
+        setAchievementAge(achievementData.age);
       } else {
+        setAchievementYear(null);
         setAchievementAge(null);
       }
 
@@ -236,6 +274,21 @@ const FireSettingsForm = ({ onSave }) => {
     }
   };
 
+  // メンバー選択変更ハンドラー
+  const handleMemberChange = (e) => {
+    const selectedMemberId = e.target.value;
+    setFireSettings((prev) => ({ ...prev, selectedMemberId }));
+  };
+
+  // 家族メンバー選択肢を準備（年齢表示なし）
+  const memberOptions = familyMembers.map((member) => ({
+    value: member.id,
+    label: member.name,
+  }));
+
+  // 選択されたメンバーの情報を取得
+  const selectedMember = familyMembers.find((m) => m.id === fireSettings.selectedMemberId);
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -247,15 +300,31 @@ const FireSettingsForm = ({ onSave }) => {
       </div>
 
       <Card>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-3 gap-8">
+          <div>
+            <h3 className="text-base font-medium text-gray-900 mb-2">対象メンバー</h3>
+            {isEditMode ? (
+              <Select
+                value={fireSettings.selectedMemberId}
+                onChange={handleMemberChange}
+                options={[{ value: '', label: 'メンバーを選択' }, ...memberOptions]}
+                className="text-lg font-medium"
+              />
+            ) : (
+              <p className="text-xl font-bold text-blue-600">
+                {selectedMember ? selectedMember.name : '未選択'}
+              </p>
+            )}
+          </div>
+
           <div>
             <h3 className="text-base font-medium text-gray-900 mb-2">目標達成時期</h3>
             <p className="text-2xl font-bold text-blue-600">
-              {achievementAge ? `${achievementAge}歳` : '未達成'}
+              {achievementYear ? `${achievementYear}年` : '期間内未達成'}
             </p>
-            {achievementAge && (
+            {achievementYear && achievementAge && (
               <p className="text-sm text-gray-600 mt-1">
-                {new Date().getFullYear() + (achievementAge - 35)}年
+                {selectedMember ? selectedMember.name : '対象者'}が{achievementAge}歳の時
               </p>
             )}
           </div>
