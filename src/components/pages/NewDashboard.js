@@ -1,75 +1,237 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../ui/Card';
-import { getActiveLifePlan } from '../../utils/storage';
+import {
+  getActiveLifePlan,
+  getCategories,
+  getAccounts,
+  getAssetInfo,
+  getTemplates,
+  getTransactions,
+  getEvents,
+  getLifePlanSettings,
+} from '../../utils/storage';
 
 const NewDashboard = () => {
-  const [activeLifePlan, setActiveLifePlan] = useState(null);
   const [categoryTab, setCategoryTab] = useState('expenses'); // expenses or income
   const [templateTab, setTemplateTab] = useState('expenses'); // expenses, income, investment
+  const [dashboardData, setDashboardData] = useState({
+    categories: { expenses: [], income: [] },
+    accounts: [],
+    assets: [],
+    templates: [],
+    events: [],
+    familyMembers: [],
+  });
 
   useEffect(() => {
-    // アクティブなライフプランを取得
-    try {
-      const plan = getActiveLifePlan();
-      setActiveLifePlan(plan);
-    } catch (error) {
-      console.error('ライフプラン読み込みエラー:', error);
-    }
+    loadDashboardData();
   }, []);
 
-  // サンプルデータ
-  const expenseCategories = [
-    { name: '食費', amount: -50000 },
-    { name: '交通費', amount: -30000 },
-    { name: '住居費', amount: -100000 },
-  ];
+  const loadDashboardData = () => {
+    try {
+      const plan = getActiveLifePlan();
+      const settings = getLifePlanSettings();
 
-  const incomeCategories = [
-    { name: '給与', amount: 300000 },
-    { name: '副業', amount: 50000 },
-    { name: 'ボーナス', amount: 500000 },
-  ];
+      if (!plan) {
+        // プランがない場合は初期値のまま
+        return;
+      }
 
-  const accounts = [
-    { name: '普通預金', amount: 1000000 },
-    { name: '貯蓄預金', amount: 2000000 },
-    { name: '現金', amount: 50000 },
-  ];
+      // カテゴリ一覧の計算（全期間の支出・収入合計でトップ3）
+      const categories = getCategories();
+      const categoryTotals = calculateCategoryTotals(categories, settings);
 
-  const assets = [
-    { name: '米国株式', amount: 3000000 },
-    { name: '日本株式', amount: 2000000 },
-    { name: '投資信託', amount: 1000000 },
-  ];
+      // 口座一覧の計算（全期間で残高が高いトップ3）
+      const accounts = getAccounts();
+      const accountBalances = calculateAccountBalances(accounts, settings);
 
-  const expenseTemplates = [
-    { name: '月末家賃支払い', amount: -100000 },
-    { name: '水道光熱費', amount: -20000 },
-    { name: '食費', amount: -50000 },
-  ];
+      // 保有資産の計算（実現損益が高いトップ3）
+      const assets = getAssetInfo();
+      const assetPerformance = calculateAssetPerformance(assets, settings);
 
-  const incomeTemplates = [
-    { name: '月末給与', amount: 300000 },
-    { name: '副業収入', amount: 50000 },
-  ];
+      // テンプレート一覧
+      const templates = getTemplates();
 
-  const investmentTemplates = [
-    { name: '積立NISA', amount: -33333 },
-    { name: 'iDeCo', amount: -23000 },
-  ];
+      // イベント一覧（費用が高いトップ3）
+      const events = calculateEventCosts(settings);
 
-  const yearData = [
-    { year: 2023, income: 8000000, expenses: -5000000 },
-    { year: 2024, income: 8500000, expenses: -5200000 },
-    { year: 2025, income: 9000000, expenses: -5500000 },
-  ];
+      // 家族メンバー
+      const familyMembers = plan.familyMembers || [];
 
-  const familyMembers = activeLifePlan?.familyMembers || [
-    { name: '山田太郎', age: 35, lifeExpectancy: 85 },
-    { name: '山田花子', age: 32, lifeExpectancy: 88 },
-    { name: '山田一郎', age: 5, lifeExpectancy: 85 },
-  ];
+      setDashboardData({
+        categories: categoryTotals,
+        accounts: accountBalances,
+        assets: assetPerformance,
+        templates: templates,
+        events: events,
+        familyMembers: familyMembers,
+      });
+    } catch (error) {
+      console.error('ダッシュボードデータ読み込みエラー:', error);
+      // エラー時も初期値を設定
+      setDashboardData({
+        categories: { expenses: [], income: [] },
+        accounts: [],
+        assets: [],
+        templates: [],
+        events: [],
+        familyMembers: [],
+      });
+    }
+  };
+
+  // カテゴリ合計を計算
+  const calculateCategoryTotals = (categories, settings) => {
+    const categoryTotals = new Map();
+
+    // 全期間の取引を集計
+    for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+      const transactions = getTransactions(year);
+
+      transactions.forEach((transaction) => {
+        const categoryId = transaction.categoryId;
+        const category = categories.find((c) => c.id === categoryId);
+
+        if (category) {
+          const amount = Math.abs(transaction.amount || 0) * (transaction.frequency || 1);
+          const current = categoryTotals.get(categoryId) || {
+            name: category.name,
+            type: category.type,
+            total: 0,
+          };
+          current.total += amount;
+          categoryTotals.set(categoryId, current);
+        }
+      });
+    }
+
+    // タイプ別にソートしてトップ3を取得
+    const expenseCategories = Array.from(categoryTotals.values())
+      .filter((cat) => cat.type === 'expense')
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 3)
+      .map((cat) => ({ name: cat.name, amount: -cat.total }));
+
+    const incomeCategories = Array.from(categoryTotals.values())
+      .filter((cat) => cat.type === 'income')
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 3)
+      .map((cat) => ({ name: cat.name, amount: cat.total }));
+
+    return { expenses: expenseCategories, income: incomeCategories };
+  };
+
+  // 口座残高を計算
+  const calculateAccountBalances = (accounts, settings) => {
+    if (!accounts || accounts.length === 0) {
+      return [];
+    }
+
+    const accountBalances = accounts.map((account) => {
+      let balance = account.initialBalance || 0;
+
+      // 全期間の取引を適用
+      for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+        const transactions = getTransactions(year);
+
+        transactions.forEach((transaction) => {
+          const amount = Math.abs(transaction.amount || 0) * (transaction.frequency || 1);
+
+          if (transaction.type === 'expense' && transaction.toAccountId === account.id) {
+            balance -= amount;
+          } else if (transaction.type === 'income' && transaction.toAccountId === account.id) {
+            balance += amount;
+          } else if (transaction.type === 'investment') {
+            if (
+              transaction.fromAccountId === account.id &&
+              transaction.transactionSubtype === 'buy'
+            ) {
+              balance -= amount; // 投資買付は支出
+            } else if (
+              transaction.toAccountId === account.id &&
+              (transaction.transactionSubtype === 'dividend' ||
+                transaction.transactionSubtype === 'sell')
+            ) {
+              balance += amount; // 配当と売却は収入
+            }
+          } else if (transaction.type === 'transfer') {
+            if (transaction.fromAccountId === account.id) {
+              balance -= amount;
+            } else if (transaction.toAccountId === account.id) {
+              balance += amount;
+            }
+          }
+        });
+      }
+
+      return { name: account.name, amount: balance };
+    });
+
+    return accountBalances.sort((a, b) => b.amount - a.amount).slice(0, 3);
+  };
+
+  // 資産パフォーマンスを計算
+  const calculateAssetPerformance = (assets, settings) => {
+    if (!assets || assets.length === 0) {
+      return [];
+    }
+
+    const assetPerformance = assets.map((asset) => {
+      let totalRealized = 0;
+
+      // 全期間の投資取引から実現損益を計算
+      for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+        const transactions = getTransactions(year);
+
+        transactions.forEach((transaction) => {
+          if (
+            transaction.type === 'investment' &&
+            transaction.holdingAssetId === asset.id &&
+            transaction.transactionSubtype === 'sell'
+          ) {
+            const amount = Math.abs(transaction.amount || 0) * (transaction.frequency || 1);
+            totalRealized += amount;
+          }
+        });
+      }
+
+      return { name: asset.name, amount: totalRealized };
+    });
+
+    return assetPerformance.sort((a, b) => b.amount - a.amount).slice(0, 3);
+  };
+
+  // イベント費用を計算
+  const calculateEventCosts = (settings) => {
+    const eventCosts = new Map();
+
+    // 全期間のイベントを集計
+    for (let year = settings.planStartYear; year <= settings.planEndYear; year++) {
+      const events = getEvents(year);
+
+      events.forEach((event) => {
+        const transactions = getTransactions(year).filter(
+          (t) => event.transactionIds && event.transactionIds.includes(t.id)
+        );
+
+        const totalCost = transactions.reduce((sum, transaction) => {
+          if (transaction.type === 'expense') {
+            return sum + Math.abs(transaction.amount || 0) * (transaction.frequency || 1);
+          }
+          return sum;
+        }, 0);
+
+        if (totalCost > 0) {
+          eventCosts.set(event.id, { name: event.name, amount: totalCost });
+        }
+      });
+    }
+
+    return Array.from(eventCosts.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 3);
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
@@ -79,18 +241,29 @@ const NewDashboard = () => {
   };
 
   const getCurrentCategories = () => {
-    return categoryTab === 'expenses' ? expenseCategories : incomeCategories;
+    if (!dashboardData.categories) {
+      return [];
+    }
+    return categoryTab === 'expenses'
+      ? dashboardData.categories.expenses || []
+      : dashboardData.categories.income || [];
   };
 
   const getCurrentTemplates = () => {
+    const templates = dashboardData.templates || [];
     switch (templateTab) {
       case 'income':
-        return incomeTemplates;
+        return templates.filter((t) => t.type === 'income').slice(0, 3);
       case 'investment':
-        return investmentTemplates;
+        return templates.filter((t) => t.type === 'investment').slice(0, 3);
       default:
-        return expenseTemplates;
+        return templates.filter((t) => t.type === 'expense').slice(0, 3);
     }
+  };
+
+  // 寿命を計算
+  const calculateLifeExpectancy = (member) => {
+    return member.lifeExpectancy || (member.gender === 'female' ? 87 : 81);
   };
 
   return (
@@ -131,19 +304,23 @@ const NewDashboard = () => {
             }
           >
             <div className="space-y-2">
-              {getCurrentCategories().map((category, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                >
-                  <span className="text-gray-900">{category.name}</span>
-                  <span
-                    className={`font-semibold ${category.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
+              {getCurrentCategories().length > 0 ? (
+                getCurrentCategories().map((category, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                   >
-                    {formatCurrency(category.amount)}
-                  </span>
-                </div>
-              ))}
+                    <span className="text-gray-900">{category.name}</span>
+                    <span
+                      className={`font-semibold ${category.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
+                    >
+                      {formatCurrency(category.amount)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
 
@@ -156,17 +333,21 @@ const NewDashboard = () => {
             }
           >
             <div className="space-y-2">
-              {accounts.map((account, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                >
-                  <span className="text-gray-900">{account.name}</span>
-                  <span className="font-semibold text-gray-900">
-                    {formatCurrency(account.amount)}
-                  </span>
-                </div>
-              ))}
+              {dashboardData.accounts && dashboardData.accounts.length > 0 ? (
+                dashboardData.accounts.map((account, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span className="text-gray-900">{account.name}</span>
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrency(account.amount)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
         </div>
@@ -182,17 +363,21 @@ const NewDashboard = () => {
             }
           >
             <div className="space-y-2">
-              {assets.map((asset, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                >
-                  <span className="text-gray-900">{asset.name}</span>
-                  <span className="font-semibold text-gray-900">
-                    {formatCurrency(asset.amount)}
-                  </span>
-                </div>
-              ))}
+              {dashboardData.assets && dashboardData.assets.length > 0 ? (
+                dashboardData.assets.map((asset, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span className="text-gray-900">{asset.name}</span>
+                    <span className="font-semibold text-green-600">
+                      {formatCurrency(asset.amount)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
 
@@ -239,55 +424,49 @@ const NewDashboard = () => {
             }
           >
             <div className="space-y-2">
-              {getCurrentTemplates().map((template, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                >
-                  <span className="text-gray-900">{template.name}</span>
-                  <span
-                    className={`font-semibold ${template.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
+              {getCurrentTemplates().length > 0 ? (
+                getCurrentTemplates().map((template, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                   >
-                    {formatCurrency(template.amount)}
-                  </span>
-                </div>
-              ))}
+                    <span className="text-gray-900">{template.name}</span>
+                    <span className="font-semibold text-blue-600">テンプレート</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
         </div>
 
-        {/* 年選択と家族管理 */}
+        {/* イベント一覧と家族管理 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 年選択 */}
+          {/* イベント一覧 */}
           <Card
             title={
               <Link to="/events" className="text-blue-600 hover:text-blue-800">
-                年選択
+                イベント一覧
               </Link>
             }
           >
             <div className="space-y-2">
-              {yearData.map((data, index) => (
-                <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-900 font-medium">{data.year}年</span>
+              {dashboardData.events && dashboardData.events.length > 0 ? (
+                dashboardData.events.map((event, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <span className="text-gray-900">{event.name}</span>
+                    <span className="font-semibold text-red-600">
+                      {formatCurrency(event.amount)}
+                    </span>
                   </div>
-                  <div className="mt-1 text-sm space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-green-600">収入:</span>
-                      <span className="text-green-600 font-semibold">
-                        {formatCurrency(data.income)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-red-600">支出:</span>
-                      <span className="text-red-600 font-semibold">
-                        {formatCurrency(data.expenses)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
 
@@ -300,17 +479,22 @@ const NewDashboard = () => {
             }
           >
             <div className="space-y-2">
-              {familyMembers.map((member, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                >
-                  <span className="text-gray-900">{member.name}</span>
-                  <span className="text-sm text-gray-600">
-                    {member.age}歳 / 寿命 {member.lifeExpectancy}歳
-                  </span>
-                </div>
-              ))}
+              {dashboardData.familyMembers && dashboardData.familyMembers.length > 0 ? (
+                dashboardData.familyMembers.map((member, index) => {
+                  const lifeExpectancy = calculateLifeExpectancy(member);
+                  return (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-gray-900">{member.name}</span>
+                      <span className="text-sm text-gray-600">寿命 {lifeExpectancy}歳</span>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center text-gray-500 py-4">データがありません</div>
+              )}
             </div>
           </Card>
         </div>

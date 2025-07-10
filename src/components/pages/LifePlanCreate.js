@@ -1,13 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Card from '../ui/Card';
+import Modal from '../ui/Modal';
 import PlanRangeSettings from '../layout/PlanRangeSettings';
 import FamilySettings from '../layout/FamilySettings';
 import FireSettings from '../layout/FireSettings';
 import FamilyMemberModal from '../forms/FamilyMemberModal';
-import { saveLifePlan, setActiveLifePlanId } from '../../utils/storage';
+import { saveLifePlan, setActiveLifePlanId, getLifePlans } from '../../utils/storage';
 
 const LifePlanCreate = ({ initialData = null }) => {
   const navigate = useNavigate();
@@ -34,8 +35,25 @@ const LifePlanCreate = ({ initialData = null }) => {
     isEditing: false,
   });
 
+  // データ確認モーダルの状態管理
+  const [dataConfirmModal, setDataConfirmModal] = useState({
+    isOpen: false,
+    existingPlans: [],
+  });
+
   // バリデーションエラーの状態管理
   const [errors, setErrors] = useState({});
+
+  // 初期化時にローカルデータの存在をチェック
+  useEffect(() => {
+    const existingPlans = getLifePlans();
+    if (existingPlans.length > 0) {
+      setDataConfirmModal({
+        isOpen: true,
+        existingPlans: existingPlans,
+      });
+    }
+  }, []);
 
   // フォーム入力処理（年や金額など、即座に反映したいもの用）
   const handleInputChange = (field, value) => {
@@ -126,6 +144,29 @@ const LifePlanCreate = ({ initialData = null }) => {
       editingMember: null,
       isEditing: false,
     });
+  };
+
+  // 過去データを使用する
+  const handleUsePastData = () => {
+    setDataConfirmModal({ isOpen: false, existingPlans: [] });
+    navigate('/dashboard');
+  };
+
+  // 過去データを使用しない（新規作成を続行）
+  const handleNotUsePastData = () => {
+    setDataConfirmModal({ isOpen: false, existingPlans: [] });
+  };
+
+  // 過去データを破棄する
+  const handleDiscardPastData = () => {
+    if (window.confirm('すべての過去データを完全に削除しますか？\nこの操作は元に戻せません。')) {
+      // ローカルストレージを完全にクリア
+      localStorage.removeItem('lifePlanData');
+      localStorage.removeItem('activeLifePlan');
+
+      setDataConfirmModal({ isOpen: false, existingPlans: [] });
+      alert('過去データを削除しました');
+    }
   };
 
   // バリデーション
@@ -468,6 +509,51 @@ const LifePlanCreate = ({ initialData = null }) => {
           member={modalState.editingMember}
           isEditing={modalState.isEditing}
         />
+
+        {/* データ確認モーダル */}
+        <Modal
+          isOpen={dataConfirmModal.isOpen}
+          onClose={() => {}}
+          title="過去データが見つかりました"
+          size="lg"
+        >
+          <div className="space-y-4">
+            <p className="text-gray-700">
+              既存のライフプランデータが見つかりました。どうしますか？
+            </p>
+
+            {dataConfirmModal.existingPlans.length > 0 && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-900 mb-2">既存のプラン:</h4>
+                <ul className="space-y-2">
+                  {dataConfirmModal.existingPlans.map((plan) => (
+                    <li key={plan.id} className="text-sm text-gray-600">
+                      • {plan.name} (作成日: {new Date(plan.createdAt).toLocaleDateString('ja-JP')})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 pt-4">
+              <Button onClick={handleUsePastData} className="w-full bg-blue-600 hover:bg-blue-700">
+                過去データを使用する（ダッシュボードへ移動）
+              </Button>
+
+              <Button onClick={handleNotUsePastData} variant="outline" className="w-full">
+                過去データを使用しない（新規作成を続行）
+              </Button>
+
+              <Button
+                onClick={handleDiscardPastData}
+                variant="outline"
+                className="w-full border-red-300 text-red-600 hover:bg-red-50"
+              >
+                過去データを破棄する（完全削除）
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </div>
   );
