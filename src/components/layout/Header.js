@@ -58,7 +58,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-15">
           {/* ロゴ */}
           <div className="flex items-center">
-            <Link to="/dashboard" className="text-2xl font-bold text-blue-600">
+            <Link to="/shin-lifeplan-app/dashboard" className="text-2xl font-bold text-blue-600">
               LifePlan
             </Link>
           </div>
@@ -90,7 +90,7 @@ const Header = () => {
                     <div className="px-4 py-2 text-sm text-gray-500">ライフプランがありません</div>
                   )}
                   <Link
-                    to="/create"
+                    to="/shin-lifeplan-app/create"
                     className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 border-t border-gray-200"
                     onClick={() => setShowPlanDropdown(false)}
                   >
@@ -119,7 +119,7 @@ const Header = () => {
           {/* 設定ボタン */}
           <div className="flex items-center ml-4">
             <Link
-              to="/settings"
+              to="/shin-lifeplan-app/settings"
               className={`p-2 rounded-full transition-colors ${
                 isActive('/settings')
                   ? 'bg-blue-600 text-white'

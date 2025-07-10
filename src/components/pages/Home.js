@@ -8,7 +8,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate('/create');
+    navigate('/shin-lifeplan-app/create');
   };
 
   const handleImport = () => {
@@ -22,7 +22,7 @@ const Home = () => {
           await importData(file);
           alert('データをインポートしました');
           // インポート成功後、ダッシュボードに遷移
-          navigate('/dashboard');
+          navigate('/shin-lifeplan-app/dashboard');
         } catch (error) {
           console.error('インポートエラー:', error);
           alert('インポートに失敗しました。正しいJSONファイルを選択してください。');

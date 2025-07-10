@@ -14,12 +14,12 @@ const NotFound = () => {
           </p>
         </div>
         <div className="space-y-4">
-          <Link to="/">
+          <Link to="/shin-lifeplan-app/">
             <Button size="lg" className="w-full">
               ホームに戻る
             </Button>
           </Link>
-          <Link to="/dashboard">
+          <Link to="/shin-lifeplan-app/dashboard">
             <Button variant="outline" size="lg" className="w-full">
               ダッシュボードに移動
             </Button>

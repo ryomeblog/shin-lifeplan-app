@@ -149,7 +149,7 @@ const LifePlanCreate = ({ initialData = null }) => {
   // 過去データを使用する
   const handleUsePastData = () => {
     setDataConfirmModal({ isOpen: false, existingPlans: [] });
-    navigate('/dashboard');
+    navigate('/shin-lifeplan-app/dashboard');
   };
 
   // 過去データを使用しない（新規作成を続行）
@@ -422,7 +422,7 @@ const LifePlanCreate = ({ initialData = null }) => {
         setActiveLifePlanId(lifePlanData.id);
 
         console.log('ライフプランデータを保存:', lifePlanData);
-        navigate('/dashboard');
+        navigate('/shin-lifeplan-app/dashboard');
       } else {
         throw new Error('Failed to save life plan');
       }
@@ -435,7 +435,7 @@ const LifePlanCreate = ({ initialData = null }) => {
   // キャンセル処理
   const handleCancel = () => {
     if (window.confirm('作成をキャンセルしますか？')) {
-      navigate('/');
+      navigate('/shin-lifeplan-app/');
     }
   };
 

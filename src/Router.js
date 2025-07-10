@@ -28,15 +28,15 @@ const LayoutWrapper = () => {
 // ルーター設定
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: '/shin-lifeplan-app/',
     element: <Home />,
   },
   {
-    path: '/create',
+    path: '/shin-lifeplan-app/create',
     element: <LifePlanCreate />,
   },
   {
-    path: '/',
+    path: '/shin-lifeplan-app/',
     element: <LayoutWrapper />,
     children: [
       {

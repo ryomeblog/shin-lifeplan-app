@@ -270,12 +270,12 @@ const Assets = () => {
 
   // 保有資産詳細画面へ遷移
   const handleHoldingAssetDetail = (holdingId) => {
-    navigate(`/holding-assets/${holdingId}`);
+    navigate(`/shin-lifeplan-app/holding-assets/${holdingId}`);
   };
 
   // 資産詳細画面へ遷移
   const handleAssetDetail = (assetId) => {
-    navigate(`/assets/${assetId}`);
+    navigate(`/shin-lifeplan-app/assets/${assetId}`);
   };
 
   const formatCurrency = (amount) => {

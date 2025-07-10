@@ -135,7 +135,7 @@ const AssetDetail = () => {
 
         if (success) {
           alert('資産を削除しました');
-          navigate('/assets');
+          navigate('/shin-lifeplan-app/assets');
         } else {
           alert('資産の削除に失敗しました');
         }
@@ -176,7 +176,7 @@ const AssetDetail = () => {
         <Card>
           <div className="text-center py-8">
             <p className="text-red-600 mb-4">{error || '資産が見つかりません'}</p>
-            <Button onClick={() => navigate('/assets')}>資産一覧に戻る</Button>
+            <Button onClick={() => navigate('/shin-lifeplan-app/assets')}>資産一覧に戻る</Button>
           </div>
         </Card>
       </div>
@@ -189,7 +189,11 @@ const AssetDetail = () => {
       <Card>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" onClick={() => navigate('/assets')}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/shin-lifeplan-app/assets')}
+            >
               <HiArrowLeft className="h-4 w-4 mr-2" />
               戻る
             </Button>

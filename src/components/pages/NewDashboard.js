@@ -275,7 +275,10 @@ const NewDashboard = () => {
           <Card
             title={
               <div className="flex items-center justify-between">
-                <Link to="/categories" className="text-blue-600 hover:text-blue-800">
+                <Link
+                  to="/shin-lifeplan-app/categories"
+                  className="text-blue-600 hover:text-blue-800"
+                >
                   カテゴリ一覧
                 </Link>
                 <div className="flex rounded-lg bg-gray-100 p-1">
@@ -327,7 +330,7 @@ const NewDashboard = () => {
           {/* 口座一覧 */}
           <Card
             title={
-              <Link to="/accounts" className="text-blue-600 hover:text-blue-800">
+              <Link to="/shin-lifeplan-app/accounts" className="text-blue-600 hover:text-blue-800">
                 口座一覧
               </Link>
             }
@@ -357,7 +360,7 @@ const NewDashboard = () => {
           {/* 保有資産 */}
           <Card
             title={
-              <Link to="/assets" className="text-blue-600 hover:text-blue-800">
+              <Link to="/shin-lifeplan-app/assets" className="text-blue-600 hover:text-blue-800">
                 保有資産
               </Link>
             }
@@ -385,7 +388,10 @@ const NewDashboard = () => {
           <Card
             title={
               <div className="flex items-center justify-between">
-                <Link to="/templates" className="text-blue-600 hover:text-blue-800">
+                <Link
+                  to="/shin-lifeplan-app/templates"
+                  className="text-blue-600 hover:text-blue-800"
+                >
                   テンプレート一覧
                 </Link>
                 <div className="flex rounded-lg bg-gray-100 p-1">
@@ -446,7 +452,7 @@ const NewDashboard = () => {
           {/* イベント一覧 */}
           <Card
             title={
-              <Link to="/events" className="text-blue-600 hover:text-blue-800">
+              <Link to="/shin-lifeplan-app/events" className="text-blue-600 hover:text-blue-800">
                 イベント一覧
               </Link>
             }
@@ -473,7 +479,7 @@ const NewDashboard = () => {
           {/* 家族管理 */}
           <Card
             title={
-              <Link to="/family" className="text-blue-600 hover:text-blue-800">
+              <Link to="/shin-lifeplan-app/family" className="text-blue-600 hover:text-blue-800">
                 家族管理
               </Link>
             }
