@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/shin-lifeplan-app/static/css/main.8873df19.css",
+    "main.js": "/shin-lifeplan-app/static/js/main.0dcc4f5e.js",
+    "index.html": "/shin-lifeplan-app/index.html",
+    "main.8873df19.css.map": "/shin-lifeplan-app/static/css/main.8873df19.css.map",
+    "main.0dcc4f5e.js.map": "/shin-lifeplan-app/static/js/main.0dcc4f5e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8873df19.css",
+    "static/js/main.0dcc4f5e.js"
+  ]
+}
