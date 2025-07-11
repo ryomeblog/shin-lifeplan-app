@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Card from '../ui/Card';
 import Select from '../ui/Select';
 import Modal from '../ui/Modal';
 import TransactionSummary from '../layout/TransactionSummary';
 import TransactionList from '../layout/TransactionList';
 import TransactionForm from '../forms/TransactionForm';
-import { getLifePlanSettings, getTransactions } from '../../utils/storage';
+import { getLifePlanSettings, getTransactions, saveLifePlanSettings } from '../../utils/storage';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
 
 const Transactions = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -14,6 +15,32 @@ const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+
+  // チュートリアル用
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [settings, setSettings] = useState(getLifePlanSettings());
+  const yearSelectRef = useRef(null);
+  const tabRef = useRef(null);
+  const summaryRef = useRef(null);
+  const listRef = useRef(null);
+  const addBtnRef = useRef(null);
+
+  // チュートリアル終了処理
+  const handleTutorialClose = () => {
+    if (settings) {
+      const newSettings = {
+        ...settings,
+        tutorialStatus: {
+          ...settings.tutorialStatus,
+          transactions: true,
+        },
+      };
+      saveLifePlanSettings(newSettings);
+      setSettings(newSettings);
+    }
+    setShowTutorial(false);
+  };
 
   // ライフプラン範囲に基づいた年選択肢を生成
   const generateYearOptions = () => {
@@ -123,106 +150,182 @@ const Transactions = () => {
     setSelectedYear(parseInt(e.target.value));
   };
 
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'year',
+      label: '年選択',
+      desc: 'ここで表示する年を切り替えられます。',
+      targetRef: yearSelectRef,
+      panelWidth: 320,
+      panelHeight: 180,
+    },
+    {
+      key: 'tab',
+      label: '取引種別タブ',
+      desc: '支出・収入・振替・投資の種別で取引を切り替えられます。',
+      targetRef: tabRef,
+      panelSide: 'bottom',
+      panelWidth: 320,
+      panelHeight: 180,
+    },
+    {
+      key: 'summary',
+      label: '年間サマリー',
+      desc: 'この年・種別の取引サマリーが表示されます。',
+      targetRef: summaryRef,
+      panelSide: 'right',
+      panelWidth: 320,
+      panelHeight: 180,
+    },
+    {
+      key: 'list',
+      label: '取引リスト',
+      desc: 'この年・種別の取引一覧です。編集や削除も可能です。',
+      targetRef: listRef,
+      panelSide: 'right',
+      panelWidth: 320,
+      panelHeight: 180,
+    },
+    {
+      key: 'add',
+      label: '新規追加ボタン',
+      desc: 'ここから新しい取引を追加できます。',
+      targetRef: addBtnRef,
+      panelSide: 'left',
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: { top: window.innerHeight - 220, left: window.innerWidth - 420 },
+    },
+  ];
+
+  // チュートリアル表示制御（例: 初回のみ表示など）
+  useEffect(() => {
+    // settings.tutorialStatus.transactions が false の場合のみ表示
+    if (settings && settings.tutorialStatus && settings.tutorialStatus.transactions !== true) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
+  }, [settings]);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
-        {/* ヘッダーセクション */}
-        <Card className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">取引管理</h1>
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={() => {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          setTutorialStep((prev) => prev + 1);
+        } else {
+          handleTutorialClose();
+        }
+      }}
+      onClose={handleTutorialClose}
+      visible={showTutorial}
+    >
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto p-6">
+          {/* ヘッダーセクション */}
+          <Card className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">取引管理</h1>
 
-            {/* 年選択 */}
-            <div className="w-32">
-              <Select
-                value={selectedYear}
-                onChange={handleYearChange}
-                options={generateYearOptions()}
-              />
+              {/* 年選択 */}
+              <div className="w-32" ref={yearSelectRef}>
+                <Select
+                  value={selectedYear}
+                  onChange={handleYearChange}
+                  options={generateYearOptions()}
+                />
+              </div>
             </div>
+
+            {/* タブ切り替え */}
+            <div className="flex bg-gray-100 rounded-full p-1" ref={tabRef}>
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-blue-500 text-white'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </Card>
+
+          {/* 年間サマリー */}
+          <div ref={summaryRef}>
+            <TransactionSummary
+              transactions={filteredTransactions}
+              year={selectedYear}
+              type={activeTab}
+            />
           </div>
 
-          {/* タブ切り替え */}
-          <div className="flex bg-gray-100 rounded-full p-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex-1 py-2 px-4 text-sm font-medium rounded-full transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-blue-500 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* 取引リスト */}
+          <div ref={listRef}>
+            <TransactionList
+              transactions={filteredTransactions}
+              type={activeTab}
+              onTransactionUpdate={handleTransactionUpdate}
+              onTransactionEdit={handleEditTransaction}
+            />
           </div>
-        </Card>
 
-        {/* 年間サマリー */}
-        <TransactionSummary
-          transactions={filteredTransactions}
-          year={selectedYear}
-          type={activeTab}
-        />
-
-        {/* 取引リスト */}
-        <TransactionList
-          transactions={filteredTransactions}
-          type={activeTab}
-          onTransactionUpdate={handleTransactionUpdate}
-          onTransactionEdit={handleEditTransaction}
-        />
-
-        {/* 新規追加ボタン（完全に丸いボタン） */}
-        <div className="fixed bottom-6 right-6">
-          <button
-            onClick={handleAddTransaction}
-            className="w-16 h-16 rounded-full bg-blue-500 hover:bg-blue-600 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
-          >
-            <svg
-              className="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* 新規追加ボタン（完全に丸いボタン） */}
+          <div className="fixed bottom-6 right-6" ref={addBtnRef}>
+            <button
+              onClick={handleAddTransaction}
+              className="w-16 h-16 rounded-full bg-blue-500 hover:bg-blue-600 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* 新規取引フォームモーダル */}
+          <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="新規取引" size="large">
+            <TransactionForm
+              initialType={activeTab}
+              selectedYear={selectedYear}
+              onSave={handleTransactionSaved}
+              onCancel={handleCloseModal}
+            />
+          </Modal>
+
+          {/* 取引編集フォームモーダル */}
+          <Modal
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            title="取引編集"
+            size="large"
+          >
+            <TransactionForm
+              transaction={editingTransaction}
+              isEditing={true}
+              selectedYear={selectedYear}
+              onSave={handleTransactionEditSaved}
+              onCancel={handleCloseEditModal}
+            />
+          </Modal>
         </div>
-
-        {/* 新規取引フォームモーダル */}
-        <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="新規取引" size="large">
-          <TransactionForm
-            initialType={activeTab}
-            selectedYear={selectedYear}
-            onSave={handleTransactionSaved}
-            onCancel={handleCloseModal}
-          />
-        </Modal>
-
-        {/* 取引編集フォームモーダル */}
-        <Modal
-          isOpen={isEditModalOpen}
-          onClose={handleCloseEditModal}
-          title="取引編集"
-          size="large"
-        >
-          <TransactionForm
-            transaction={editingTransaction}
-            isEditing={true}
-            selectedYear={selectedYear}
-            onSave={handleTransactionEditSaved}
-            onCancel={handleCloseEditModal}
-          />
-        </Modal>
       </div>
-    </div>
+    </TutorialSpotlight>
   );
 };
 
