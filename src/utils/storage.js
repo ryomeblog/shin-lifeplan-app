@@ -80,6 +80,33 @@ export const saveLifePlan = (lifePlanData) => {
       existingPlans = [];
     }
 
+    // チュートリアル進捗の初期値
+    const defaultTutorialStatus = {
+      dashboard: false,
+      transactions: false,
+      events: false,
+      reports: false,
+      accounts: false,
+      assets: false,
+      templates: false,
+      categories: false,
+    };
+
+    // settings.tutorialStatusがなければ追加・既存なら維持
+    if (!lifePlanData.settings) {
+      lifePlanData.settings = {};
+    }
+    if (!lifePlanData.settings.tutorialStatus) {
+      lifePlanData.settings.tutorialStatus = { ...defaultTutorialStatus };
+    } else {
+      // 既存のtutorialStatusに新しいキーがあれば追加
+      for (const key of Object.keys(defaultTutorialStatus)) {
+        if (!(key in lifePlanData.settings.tutorialStatus)) {
+          lifePlanData.settings.tutorialStatus[key] = false;
+        }
+      }
+    }
+
     const existingIndex = existingPlans.findIndex((p) => p.id === lifePlanData.id);
 
     if (existingIndex >= 0) {

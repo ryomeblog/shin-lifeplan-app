@@ -402,6 +402,17 @@ const LifePlanCreate = ({ initialData = null }) => {
           dateFormat: 'YYYY-MM-DD',
           numberFormat: 'comma',
         },
+        // チュートリアル進捗の初期値を追加
+        tutorialStatus: {
+          dashboard: false,
+          transactions: false,
+          events: false,
+          reports: false,
+          accounts: false,
+          assets: false,
+          templates: false,
+          categories: false,
+        },
       },
       familyMembers: familyMembers,
       accounts: initialData?.accounts || [],
