@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../ui/Card';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
 import {
   getActiveLifePlan,
   getCategories,
@@ -10,6 +11,7 @@ import {
   getTransactions,
   getEvents,
   getLifePlanSettings,
+  saveLifePlanSettings,
 } from '../../utils/storage';
 
 const NewDashboard = () => {
@@ -23,8 +25,105 @@ const NewDashboard = () => {
     events: [],
     familyMembers: [],
   });
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [settings, setSettings] = useState(null);
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  // 各ハイライト要素のref
+  const categoryRef = useRef(null);
+  const accountRef = useRef(null);
+  const assetRef = useRef(null);
+  const templateRef = useRef(null);
+  const eventRef = useRef(null);
+  const familyRef = useRef(null);
+
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'category',
+      label: 'カテゴリ一覧',
+      desc: 'ここでは支出・収入カテゴリのトップ3が確認できます。クリックで詳細画面に移動します。',
+      targetRef: categoryRef,
+      panelHeight: 200,
+      panelWidth: 320,
+      panelInitialPos: {
+        top: 100,
+        left: 550,
+      },
+    },
+    {
+      key: 'account',
+      label: '口座一覧',
+      desc: 'ここでは口座の残高ランキングが表示されます。クリックで口座管理画面に移動します。',
+      targetRef: accountRef,
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: {
+        top: 100,
+        left: 210,
+      },
+    },
+    {
+      key: 'asset',
+      label: '保有資産',
+      desc: 'ここでは保有資産の実現損益トップ3が表示されます。クリックで資産詳細へ。',
+      targetRef: assetRef,
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: {
+        top: 350,
+        left: 550,
+      },
+    },
+    {
+      key: 'template',
+      label: 'テンプレート一覧',
+      desc: '定期的な取引テンプレートのトップ3が表示されます。クリックでテンプレート管理画面へ。',
+      targetRef: templateRef,
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: {
+        top: 350,
+        left: 210,
+      },
+    },
+    {
+      key: 'event',
+      label: 'イベント一覧',
+      desc: 'イベントごとの費用ランキングが表示されます。クリックでイベント管理画面へ。',
+      targetRef: eventRef,
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: {
+        top: 500,
+        left: 550,
+      },
+    },
+    {
+      key: 'family',
+      label: '家族管理',
+      desc: '家族メンバーの情報が確認できます。クリックで家族管理画面へ。',
+      targetRef: familyRef,
+      panelWidth: 320,
+      panelHeight: 180,
+      panelInitialPos: {
+        top: 500,
+        left: 210,
+      },
+    },
+  ];
 
   useEffect(() => {
+    const settingsData = getLifePlanSettings();
+    setSettings(settingsData);
+    if (
+      settingsData &&
+      settingsData.tutorialStatus &&
+      settingsData.tutorialStatus.dashboard === false
+    ) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
     loadDashboardData();
   }, []);
 
@@ -279,246 +378,329 @@ const NewDashboard = () => {
     return member.lifeExpectancy || (member.gender === 'female' ? 87 : 81);
   };
 
+  // チュートリアル進行
+  const handleTutorialNext = () => {
+    if (tutorialStep < tutorialSteps.length - 1) {
+      setTutorialStep((prev) => prev + 1);
+    } else {
+      handleTutorialComplete();
+    }
+  };
+
+  // チュートリアル完了処理
+  const handleTutorialComplete = () => {
+    if (!settings) return;
+    const newSettings = {
+      ...settings,
+      tutorialStatus: {
+        ...settings.tutorialStatus,
+        dashboard: true,
+      },
+    };
+    saveLifePlanSettings(newSettings);
+    setSettings(newSettings);
+    setShowTutorial(false);
+  };
+  // ハイライト判定
+  const isHighlight = (key) => showTutorial && tutorialSteps[tutorialStep].key === key;
+
+  // バッジUI
+  function TutorialBadge({ step, active }) {
+    return (
+      <span
+        className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+          active ? 'bg-blue-600 text-white shadow-lg animate-bounce' : 'bg-gray-300 text-gray-700'
+        }`}
+        style={{ verticalAlign: 'middle' }}
+      >
+        {`STEP ${step + 1}`}
+      </span>
+    );
+  }
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* カテゴリ一覧と口座一覧 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* カテゴリ一覧 */}
-          <Card
-            title={
-              <div className="flex items-center justify-between">
-                <Link
-                  to="/shin-lifeplan-app/categories"
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  カテゴリ一覧
-                </Link>
-                <div className="flex rounded-lg bg-gray-100 p-1">
-                  <button
-                    onClick={() => setCategoryTab('expenses')}
-                    className={`px-4 py-1 rounded-md text-sm font-medium transition-colors ${
-                      categoryTab === 'expenses'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    支出
-                  </button>
-                  <button
-                    onClick={() => setCategoryTab('income')}
-                    className={`px-4 py-1 rounded-md text-sm font-medium transition-colors ${
-                      categoryTab === 'income'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    収入
-                  </button>
-                </div>
-              </div>
-            }
-          >
-            <div className="space-y-2">
-              {getCurrentCategories().length > 0 ? (
-                getCurrentCategories().map((category, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{category.name}</span>
-                    <span
-                      className={`font-semibold ${category.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={handleTutorialNext}
+      onClose={handleTutorialComplete}
+      visible={showTutorial}
+    >
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto p-6 space-y-6">
+          {/* カテゴリ一覧と口座一覧 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* カテゴリ一覧 */}
+            <Card
+              title={
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Link
+                      to="/shin-lifeplan-app/categories"
+                      className="text-blue-600 hover:text-blue-800"
                     >
-                      {formatCurrency(category.amount)}
-                    </span>
+                      カテゴリ一覧
+                    </Link>
+                    {isHighlight('category') && <TutorialBadge step={tutorialStep} active />}
                   </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
-
-          {/* 口座一覧 */}
-          <Card
-            title={
-              <Link to="/shin-lifeplan-app/accounts" className="text-blue-600 hover:text-blue-800">
-                口座一覧
-              </Link>
-            }
-          >
-            <div className="space-y-2">
-              {dashboardData.accounts && dashboardData.accounts.length > 0 ? (
-                dashboardData.accounts.map((account, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{account.name}</span>
-                    <span className="font-semibold text-gray-900">
-                      {formatCurrency(account.amount)}
-                    </span>
+                  <div className="flex rounded-lg bg-gray-100 p-1">
+                    <button
+                      onClick={() => setCategoryTab('expenses')}
+                      className={`px-4 py-1 rounded-md text-sm font-medium transition-colors ${
+                        categoryTab === 'expenses'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      支出
+                    </button>
+                    <button
+                      onClick={() => setCategoryTab('income')}
+                      className={`px-4 py-1 rounded-md text-sm font-medium transition-colors ${
+                        categoryTab === 'income'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      収入
+                    </button>
                   </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* 保有資産とテンプレート一覧 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 保有資産 */}
-          <Card
-            title={
-              <Link to="/shin-lifeplan-app/assets" className="text-blue-600 hover:text-blue-800">
-                保有資産
-              </Link>
-            }
-          >
-            <div className="space-y-2">
-              {dashboardData.assets && dashboardData.assets.length > 0 ? (
-                dashboardData.assets.map((asset, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{asset.name}</span>
-                    <span className="font-semibold text-green-600">
-                      {formatCurrency(asset.amount)}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
-
-          {/* テンプレート一覧 */}
-          <Card
-            title={
-              <div className="flex items-center justify-between">
-                <Link
-                  to="/shin-lifeplan-app/templates"
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  テンプレート一覧
-                </Link>
-                <div className="flex rounded-lg bg-gray-100 p-1">
-                  <button
-                    onClick={() => setTemplateTab('expenses')}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      templateTab === 'expenses'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    支出
-                  </button>
-                  <button
-                    onClick={() => setTemplateTab('income')}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      templateTab === 'income'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    収入
-                  </button>
-                  <button
-                    onClick={() => setTemplateTab('investment')}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      templateTab === 'investment'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    投資
-                  </button>
                 </div>
-              </div>
-            }
-          >
-            <div className="space-y-2">
-              {getCurrentTemplates().length > 0 ? (
-                getCurrentTemplates().map((template, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{template.name}</span>
-                    <span className="font-semibold text-blue-600">テンプレート</span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* イベント一覧と家族管理 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* イベント一覧 */}
-          <Card
-            title={
-              <Link to="/shin-lifeplan-app/events" className="text-blue-600 hover:text-blue-800">
-                イベント一覧
-              </Link>
-            }
-          >
-            <div className="space-y-2">
-              {dashboardData.events && dashboardData.events.length > 0 ? (
-                dashboardData.events.map((event, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <span className="text-gray-900">{event.name}</span>
-                    <span className="font-semibold text-red-600">
-                      {formatCurrency(event.amount)}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
-
-          {/* 家族管理 */}
-          <Card
-            title={
-              <Link to="/shin-lifeplan-app/family" className="text-blue-600 hover:text-blue-800">
-                家族管理
-              </Link>
-            }
-          >
-            <div className="space-y-2">
-              {dashboardData.familyMembers && dashboardData.familyMembers.length > 0 ? (
-                dashboardData.familyMembers.map((member, index) => {
-                  const lifeExpectancy = calculateLifeExpectancy(member);
-                  return (
+              }
+              className={isHighlight('category') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {getCurrentCategories().length > 0 ? (
+                  getCurrentCategories().map((category, index) => (
                     <div
                       key={index}
                       className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                     >
-                      <span className="text-gray-900">{member.name}</span>
-                      <span className="text-sm text-gray-600">寿命 {lifeExpectancy}歳</span>
+                      <span className="text-gray-900">{category.name}</span>
+                      <span
+                        className={`font-semibold ${category.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
+                      >
+                        {formatCurrency(category.amount)}
+                      </span>
                     </div>
-                  );
-                })
-              ) : (
-                <div className="text-center text-gray-500 py-4">データがありません</div>
-              )}
-            </div>
-          </Card>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+
+            {/* 口座一覧 */}
+            <Card
+              title={
+                <div className="flex items-center">
+                  <Link
+                    to="/shin-lifeplan-app/accounts"
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    口座一覧
+                  </Link>
+                  {isHighlight('account') && <TutorialBadge step={tutorialStep} active />}
+                </div>
+              }
+              className={isHighlight('account') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {dashboardData.accounts && dashboardData.accounts.length > 0 ? (
+                  dashboardData.accounts.map((account, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-gray-900">{account.name}</span>
+                      <span className="font-semibold text-gray-900">
+                        {formatCurrency(account.amount)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* 保有資産とテンプレート一覧 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 保有資産 */}
+            <Card
+              title={
+                <div className="flex items-center">
+                  <Link
+                    to="/shin-lifeplan-app/assets"
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    保有資産
+                  </Link>
+                  {isHighlight('asset') && <TutorialBadge step={tutorialStep} active />}
+                </div>
+              }
+              className={isHighlight('asset') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {dashboardData.assets && dashboardData.assets.length > 0 ? (
+                  dashboardData.assets.map((asset, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-gray-900">{asset.name}</span>
+                      <span className="font-semibold text-green-600">
+                        {formatCurrency(asset.amount)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+
+            {/* テンプレート一覧 */}
+            <Card
+              title={
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Link
+                      to="/shin-lifeplan-app/templates"
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      テンプレート一覧
+                    </Link>
+                    {isHighlight('template') && <TutorialBadge step={tutorialStep} active />}
+                  </div>
+                  <div className="flex rounded-lg bg-gray-100 p-1">
+                    <button
+                      onClick={() => setTemplateTab('expenses')}
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                        templateTab === 'expenses'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      支出
+                    </button>
+                    <button
+                      onClick={() => setTemplateTab('income')}
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                        templateTab === 'income'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      収入
+                    </button>
+                    <button
+                      onClick={() => setTemplateTab('investment')}
+                      className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                        templateTab === 'investment'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      投資
+                    </button>
+                  </div>
+                </div>
+              }
+              className={isHighlight('template') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {getCurrentTemplates().length > 0 ? (
+                  getCurrentTemplates().map((template, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-gray-900">{template.name}</span>
+                      <span className="font-semibold text-blue-600">テンプレート</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* イベント一覧と家族管理 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* イベント一覧 */}
+            <Card
+              title={
+                <div className="flex items-center">
+                  <Link
+                    to="/shin-lifeplan-app/events"
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    イベント一覧
+                  </Link>
+                  {isHighlight('event') && <TutorialBadge step={tutorialStep} active />}
+                </div>
+              }
+              className={isHighlight('event') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {dashboardData.events && dashboardData.events.length > 0 ? (
+                  dashboardData.events.map((event, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <span className="text-gray-900">{event.name}</span>
+                      <span className="font-semibold text-red-600">
+                        {formatCurrency(event.amount)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+
+            {/* 家族管理 */}
+            <Card
+              title={
+                <div className="flex items-center">
+                  <Link
+                    to="/shin-lifeplan-app/family"
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    家族管理
+                  </Link>
+                  {isHighlight('family') && <TutorialBadge step={tutorialStep} active />}
+                </div>
+              }
+              className={isHighlight('family') ? 'ring-4 ring-blue-400 ring-opacity-60' : ''}
+            >
+              <div className="space-y-2">
+                {dashboardData.familyMembers && dashboardData.familyMembers.length > 0 ? (
+                  dashboardData.familyMembers.map((member, index) => {
+                    const lifeExpectancy = calculateLifeExpectancy(member);
+                    return (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      >
+                        <span className="text-gray-900">{member.name}</span>
+                        <span className="text-sm text-gray-600">寿命 {lifeExpectancy}歳</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center text-gray-500 py-4">データがありません</div>
+                )}
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </TutorialSpotlight>
   );
 };
 

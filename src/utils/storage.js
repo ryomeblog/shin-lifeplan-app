@@ -192,6 +192,24 @@ export const getLifePlanSettings = () => {
     };
   }
 };
+// ライフプラン設定を保存
+export const saveLifePlanSettings = (settings) => {
+  try {
+    const activeLifePlan = getActiveLifePlan();
+    if (!activeLifePlan) {
+      throw new Error('No active life plan found');
+    }
+    const updatedPlan = {
+      ...activeLifePlan,
+      settings: settings,
+      updatedAt: new Date().toISOString(),
+    };
+    return saveLifePlan(updatedPlan);
+  } catch (error) {
+    console.error('Failed to save life plan settings:', error);
+    return false;
+  }
+};
 
 // カテゴリ一覧を取得
 export const getCategories = () => {
