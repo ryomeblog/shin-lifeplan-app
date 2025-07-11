@@ -285,8 +285,6 @@ import { API_ENDPOINTS } from '../../constants';
   - https://tailwindcss.com/plus/ui-blocks/preview
 - react-icons
   - https://react-icons.github.io/react-icons/
-- driver.js（チュートリアル）
-  - https://driverjs.com/docs/installation
 - Zustand
   - https://zustand.docs.pmnd.rs/getting-started/introduction
 - react-router-dom
