@@ -32,14 +32,14 @@ const Header = () => {
   }, []);
 
   const menuItems = [
-    { path: '/dashboard', label: 'ダッシュボード' },
-    { path: '/transactions', label: '取引' },
-    { path: '/events', label: 'イベント' },
-    { path: '/reports', label: 'レポート' },
-    { path: '/accounts', label: '口座' },
-    { path: '/assets', label: '資産' },
-    { path: '/templates', label: 'テンプレート' },
-    { path: '/categories', label: 'カテゴリ' },
+    { path: '/shin-lifeplan-app/dashboard', label: 'ダッシュボード' },
+    { path: '/shin-lifeplan-app/transactions', label: '取引' },
+    { path: '/shin-lifeplan-app/events', label: 'イベント' },
+    { path: '/shin-lifeplan-app/reports', label: 'レポート' },
+    { path: '/shin-lifeplan-app/accounts', label: '口座' },
+    { path: '/shin-lifeplan-app/assets', label: '資産' },
+    { path: '/shin-lifeplan-app/templates', label: 'テンプレート' },
+    { path: '/shin-lifeplan-app/categories', label: 'カテゴリ' },
   ];
 
   const isActive = (path) => location.pathname === path;
