@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/shin-lifeplan-app/static/css/main.8873df19.css",
-    "main.js": "/shin-lifeplan-app/static/js/main.effad3e8.js",
+    "main.css": "/shin-lifeplan-app/static/css/main.c8df51cb.css",
+    "main.js": "/shin-lifeplan-app/static/js/main.4c2fea89.js",
     "index.html": "/shin-lifeplan-app/index.html",
-    "main.8873df19.css.map": "/shin-lifeplan-app/static/css/main.8873df19.css.map",
-    "main.effad3e8.js.map": "/shin-lifeplan-app/static/js/main.effad3e8.js.map"
+    "main.c8df51cb.css.map": "/shin-lifeplan-app/static/css/main.c8df51cb.css.map",
+    "main.4c2fea89.js.map": "/shin-lifeplan-app/static/js/main.4c2fea89.js.map"
   },
   "entrypoints": [
-    "static/css/main.8873df19.css",
-    "static/js/main.effad3e8.js"
+    "static/css/main.c8df51cb.css",
+    "static/js/main.4c2fea89.js"
   ]
 }
