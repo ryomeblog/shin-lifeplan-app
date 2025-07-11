@@ -106,18 +106,31 @@ const NewDashboard = () => {
       });
     }
 
-    // タイプ別にソートしてトップ3を取得
-    const expenseCategories = Array.from(categoryTotals.values())
-      .filter((cat) => cat.type === 'expense')
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 3)
-      .map((cat) => ({ name: cat.name, amount: -cat.total }));
+    // 支出カテゴリ
+    let allExpenseCategories = categories.filter((cat) => cat.type === 'expense');
+    let expenseCategories = allExpenseCategories.map((cat) => {
+      const totalObj = categoryTotals.get(cat.id);
+      return {
+        name: cat.name,
+        amount: totalObj ? -totalObj.total : 0,
+      };
+    });
+    expenseCategories = expenseCategories
+      .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
+      .slice(0, 3);
 
-    const incomeCategories = Array.from(categoryTotals.values())
-      .filter((cat) => cat.type === 'income')
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 3)
-      .map((cat) => ({ name: cat.name, amount: cat.total }));
+    // 収入カテゴリ
+    let allIncomeCategories = categories.filter((cat) => cat.type === 'income');
+    let incomeCategories = allIncomeCategories.map((cat) => {
+      const totalObj = categoryTotals.get(cat.id);
+      return {
+        name: cat.name,
+        amount: totalObj ? totalObj.total : 0,
+      };
+    });
+    incomeCategories = incomeCategories
+      .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
+      .slice(0, 3);
 
     return { expenses: expenseCategories, income: incomeCategories };
   };
