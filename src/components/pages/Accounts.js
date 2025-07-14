@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AccountsList from '../layout/AccountsList';
 import AccountDetail from '../layout/AccountDetail';
 import TransferForm from '../layout/TransferForm';
 import AccountModal from '../forms/AccountModal';
-import { getActiveLifePlan, getAccounts, saveAccount, deleteAccount } from '../../utils/storage';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
+import {
+  getActiveLifePlan,
+  getAccounts,
+  saveAccount,
+  deleteAccount,
+  getLifePlanSettings,
+  saveLifePlanSettings,
+} from '../../utils/storage';
 
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
@@ -14,6 +22,69 @@ const Accounts = () => {
     planStartYear: 2020,
     planEndYear: 2050,
   });
+
+  // チュートリアル用
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [settings, setSettings] = useState(getLifePlanSettings());
+  const accountsListRef = useRef(null);
+  const addBtnRef = useRef(null);
+  const transferFormRef = useRef(null);
+
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'list',
+      label: '口座一覧',
+      desc: 'ここに登録した口座が一覧表示されます。クリックで詳細を確認できます。',
+      targetRef: accountsListRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+    {
+      key: 'add',
+      label: '口座追加ボタン',
+      desc: 'ここから新しい口座を追加できます。',
+      targetRef: addBtnRef,
+      panelSide: 'bottom',
+      panelWidth: 320,
+      panelHeight: 120,
+    },
+    {
+      key: 'transfer',
+      label: '振替フォーム',
+      desc: '口座間の資金移動（振替）をここで登録できます。',
+      targetRef: transferFormRef,
+      panelSide: 'left',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+  ];
+
+  // チュートリアル終了処理
+  const handleTutorialClose = () => {
+    if (settings) {
+      const newSettings = {
+        ...settings,
+        tutorialStatus: {
+          ...settings.tutorialStatus,
+          accounts: true,
+        },
+      };
+      saveLifePlanSettings(newSettings);
+      setSettings(newSettings);
+    }
+    setShowTutorial(false);
+  };
+
+  // チュートリアル表示制御
+  useEffect(() => {
+    if (settings && settings.tutorialStatus && settings.tutorialStatus.accounts !== true) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
+  }, [settings]);
 
   // ライフプラン設定を読み込み
   useEffect(() => {
@@ -116,40 +187,61 @@ const Accounts = () => {
   };
 
   return (
-    <div>
-      {selectedAccount ? (
-        <AccountDetail
-          account={selectedAccount}
-          onBack={() => setSelectedAccount(null)}
-          onEdit={handleEditAccount}
-          onDelete={handleDeleteAccount}
-          planSettings={planSettings}
-          formatCurrency={formatCurrency}
-        />
-      ) : (
-        <div className="max-w-7xl mx-auto p-4 lg:p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <AccountsList
-              accounts={accounts}
-              onAccountClick={handleAccountClick}
-              onAddAccount={handleAddAccount}
-              formatCurrency={formatCurrency}
-            />
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={() => {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          setTutorialStep((prev) => prev + 1);
+        } else {
+          handleTutorialClose();
+        }
+      }}
+      onClose={handleTutorialClose}
+      visible={showTutorial}
+    >
+      <div>
+        {selectedAccount ? (
+          <AccountDetail
+            account={selectedAccount}
+            onBack={() => setSelectedAccount(null)}
+            onEdit={handleEditAccount}
+            onDelete={handleDeleteAccount}
+            planSettings={planSettings}
+            formatCurrency={formatCurrency}
+          />
+        ) : (
+          <div className="max-w-7xl mx-auto p-4 lg:p-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* 口座一覧: PCは2/3幅, モバイルは全幅 */}
+              <div ref={accountsListRef} className="w-full lg:w-2/3">
+                <AccountsList
+                  accounts={accounts}
+                  onAccountClick={handleAccountClick}
+                  onAddAccount={handleAddAccount}
+                  formatCurrency={formatCurrency}
+                  addBtnRef={addBtnRef}
+                />
+              </div>
 
-            <TransferForm accounts={accounts} />
+              {/* 振替フォーム: PCは1/3幅, モバイルは全幅下部 */}
+              <div ref={transferFormRef} className="w-full lg:w-1/3">
+                <TransferForm accounts={accounts} />
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* モーダルを常にレンダリング */}
-      <AccountModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveAccount}
-        account={editingAccount}
-        isEditing={!!editingAccount}
-      />
-    </div>
+        {/* モーダルを常にレンダリング */}
+        <AccountModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleSaveAccount}
+          account={editingAccount}
+          isEditing={!!editingAccount}
+        />
+      </div>
+    </TutorialSpotlight>
   );
 };
 

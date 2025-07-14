@@ -1,14 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HoldingAssetsList from '../layout/HoldingAssetsList';
 import AssetSearchList from '../layout/AssetSearchList';
 import AssetModal from '../forms/AssetModal';
 import Modal from '../ui/Modal';
 import TransactionForm from '../forms/TransactionForm';
-import { getAssetInfo, getLifePlanSettings, saveAsset, getTransactions } from '../../utils/storage';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
+import {
+  getAssetInfo,
+  getLifePlanSettings,
+  saveAsset,
+  getTransactions,
+  saveLifePlanSettings,
+} from '../../utils/storage';
 
 const Assets = () => {
   const navigate = useNavigate();
+
+  // チュートリアル用
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [settings, setSettings] = useState(getLifePlanSettings());
+  const holdingListRef = useRef(null);
+  const holdingAddBtnRef = useRef(null);
+  const assetSearchRef = useRef(null);
+  const assetAddBtnRef = useRef(null);
 
   // ローカルストレージからデータを読み込み
   const [planSettings, setPlanSettings] = useState({
@@ -286,53 +302,137 @@ const Assets = () => {
     }).format(amount);
   };
 
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'holding-list',
+      label: '保有資産一覧',
+      desc: 'ここに現在保有している資産が一覧表示されます。クリックで詳細を確認できます。',
+      targetRef: holdingListRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+    {
+      key: 'holding-add',
+      label: '保有資産追加ボタン',
+      desc: 'ここから新しい保有資産を追加できます。',
+      targetRef: holdingAddBtnRef,
+      panelSide: 'bottom',
+      panelWidth: 320,
+      panelHeight: 120,
+    },
+    {
+      key: 'asset-search',
+      label: '資産検索・追加',
+      desc: 'ここで資産を検索したり、新規資産を追加できます。',
+      targetRef: assetSearchRef,
+      panelSide: 'left',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+    {
+      key: 'asset-add',
+      label: '資産追加ボタン',
+      desc: 'ここから新しい資産を追加できます。',
+      targetRef: assetAddBtnRef,
+      panelSide: 'bottom',
+      panelWidth: 320,
+      panelHeight: 120,
+    },
+  ];
+
+  // チュートリアル終了処理
+  const handleTutorialClose = () => {
+    if (settings) {
+      const newSettings = {
+        ...settings,
+        tutorialStatus: {
+          ...settings.tutorialStatus,
+          assets: true,
+        },
+      };
+      saveLifePlanSettings(newSettings);
+      setSettings(newSettings);
+    }
+    setShowTutorial(false);
+  };
+
+  // チュートリアル表示制御
+  useEffect(() => {
+    if (settings && settings.tutorialStatus && settings.tutorialStatus.assets !== true) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
+  }, [settings]);
+
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* 保有資産セクション */}
-      <HoldingAssetsList
-        holdingAssets={holdingAssetsWithDetails}
-        totalAssetValue={totalAssetValue}
-        onHoldingAssetClick={handleHoldingAssetDetail}
-        onAddHoldingAsset={handleAddHoldingAsset}
-        formatCurrency={formatCurrency}
-      />
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={() => {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          setTutorialStep((prev) => prev + 1);
+        } else {
+          handleTutorialClose();
+        }
+      }}
+      onClose={handleTutorialClose}
+      visible={showTutorial}
+    >
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* 保有資産セクション */}
+        <div ref={holdingListRef}>
+          <HoldingAssetsList
+            holdingAssets={holdingAssetsWithDetails}
+            totalAssetValue={totalAssetValue}
+            onHoldingAssetClick={handleHoldingAssetDetail}
+            onAddHoldingAsset={handleAddHoldingAsset}
+            formatCurrency={formatCurrency}
+            addBtnRef={holdingAddBtnRef}
+          />
+        </div>
 
-      {/* 資産検索セクション */}
-      <AssetSearchList
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filteredAssets={filteredAssets}
-        onAssetClick={handleAssetDetail}
-        onAddAsset={() => handleOpenAssetForm()}
-        calculateAverageReturn={calculateAverageReturn}
-        calculateAverageDividend={calculateAverageDividend}
-        calculateAveragePrice={calculateAveragePrice}
-      />
+        {/* 資産検索セクション */}
+        <div ref={assetSearchRef}>
+          <AssetSearchList
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            filteredAssets={filteredAssets}
+            onAssetClick={handleAssetDetail}
+            onAddAsset={() => handleOpenAssetForm()}
+            calculateAverageReturn={calculateAverageReturn}
+            calculateAverageDividend={calculateAverageDividend}
+            calculateAveragePrice={calculateAveragePrice}
+            addBtnRef={assetAddBtnRef}
+          />
+        </div>
 
-      {/* 資産フォームモーダル */}
-      <AssetModal
-        isOpen={isAssetFormOpen}
-        onClose={() => setIsAssetFormOpen(false)}
-        onSave={handleSaveAsset}
-        editingAsset={editingAsset}
-        planSettings={planSettings}
-      />
-
-      {/* 保有資産追加モーダル（投資フォーム） */}
-      <Modal
-        isOpen={isAddHoldingModalOpen}
-        onClose={handleCloseAddHoldingModal}
-        title="保有資産を追加"
-        size="large"
-      >
-        <TransactionForm
-          initialType="investment"
-          selectedYear={new Date().getFullYear()}
-          onSave={handleInvestmentTransactionSaved}
-          onCancel={handleCloseAddHoldingModal}
+        {/* 資産フォームモーダル */}
+        <AssetModal
+          isOpen={isAssetFormOpen}
+          onClose={() => setIsAssetFormOpen(false)}
+          onSave={handleSaveAsset}
+          editingAsset={editingAsset}
+          planSettings={planSettings}
         />
-      </Modal>
-    </div>
+
+        {/* 保有資産追加モーダル（投資フォーム） */}
+        <Modal
+          isOpen={isAddHoldingModalOpen}
+          onClose={handleCloseAddHoldingModal}
+          title="保有資産を追加"
+          size="large"
+        >
+          <TransactionForm
+            initialType="investment"
+            selectedYear={new Date().getFullYear()}
+            onSave={handleInvestmentTransactionSaved}
+            onCancel={handleCloseAddHoldingModal}
+          />
+        </Modal>
+      </div>
+    </TutorialSpotlight>
   );
 };
 

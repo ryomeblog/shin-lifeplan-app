@@ -4,7 +4,7 @@ import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { getTransactions, getLifePlanSettings } from '../../utils/storage';
 
-const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }) => {
+const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency, addBtnRef }) => {
   // 各口座の残高を計算（全年の取引を含む）
   const getAccountBalance = (account) => {
     try {
@@ -143,13 +143,15 @@ const AccountsList = ({ accounts, onAccountClick, onAddAccount, formatCurrency }
           </Card>
         )}
 
-        <Button
-          onClick={onAddAccount}
-          className="w-full flex items-center justify-center space-x-2 py-4"
-        >
-          <HiPlus className="h-5 w-5" />
-          <span>口座を追加</span>
-        </Button>
+        <div ref={addBtnRef}>
+          <Button
+            onClick={onAddAccount}
+            className="w-full flex items-center justify-center space-x-2 py-4"
+          >
+            <HiPlus className="h-5 w-5" />
+            <span>口座を追加</span>
+          </Button>
+        </div>
       </div>
     </div>
   );

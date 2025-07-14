@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   PieChart,
   Pie,
@@ -15,12 +15,131 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Card from '../ui/Card';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
 import {
   getLifePlanSettings,
   getCategories,
   getTransactions,
   getAssetInfo,
+  saveLifePlanSettings,
 } from '../../utils/storage';
+
+// ダミーグラフコンポーネント
+const COLORS = [
+  '#0088FE',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  '#8884D8',
+  '#82CA9D',
+  '#FFC658',
+  '#FF7C7C',
+  '#8DD1E1',
+  '#D084D0',
+];
+const DUMMY_EXPENSE_DATA = [
+  { name: '食費', value: 300000 },
+  { name: '住居', value: 200000 },
+  { name: '交通', value: 100000 },
+];
+const DUMMY_INCOME_DATA = [
+  { name: '給与', value: 500000 },
+  { name: '副業', value: 100000 },
+];
+const DUMMY_YEARLY_DATA = [
+  { year: 2020, income: 500000, expense: 300000 },
+  { year: 2021, income: 520000, expense: 310000 },
+  { year: 2022, income: 540000, expense: 320000 },
+];
+const DUMMY_ASSET_DATA = [
+  { year: 2020, totalAssetValue: 1000000, dividendAmount: 20000 },
+  { year: 2021, totalAssetValue: 1200000, dividendAmount: 25000 },
+  { year: 2022, totalAssetValue: 1400000, dividendAmount: 30000 },
+];
+
+const DummyExpensePie = () => (
+  <div className="h-48 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={DUMMY_EXPENSE_DATA}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={60}
+          label={({ name, percent }) =>
+            percent < 5 ? '' : `${name} ${(percent * 100).toFixed(1)}%`
+          }
+        >
+          {DUMMY_EXPENSE_DATA.map((entry, index) => (
+            <Cell key={`expense-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+);
+
+const DummyIncomePie = () => (
+  <div className="h-48 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={DUMMY_INCOME_DATA}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={60}
+          label={({ name, percent }) =>
+            percent < 5 ? '' : `${name} ${(percent * 100).toFixed(1)}%`
+          }
+        >
+          {DUMMY_INCOME_DATA.map((entry, index) => (
+            <Cell key={`income-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+);
+
+const DummyYearlyLine = () => (
+  <div className="h-48 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={DUMMY_YEARLY_DATA}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="year" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="income" stroke="#28a745" name="収入" strokeWidth={2} />
+        <Line type="monotone" dataKey="expense" stroke="#dc3545" name="支出" strokeWidth={2} />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+);
+
+const DummyAssetBar = () => (
+  <div className="h-56 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={DUMMY_ASSET_DATA}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="year" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="totalAssetValue" fill="#007bff" name="資産総額" opacity={0.8} />
+        <Bar dataKey="dividendAmount" fill="#ffc107" name="配当金" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+);
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState(0); // インデックスベースに変更
@@ -28,6 +147,116 @@ const Reports = () => {
   const [incomeData, setIncomeData] = useState([]);
   const [yearlyIncomeExpenseData, setYearlyIncomeExpenseData] = useState([]);
   const [assetProgressData, setAssetProgressData] = useState([]);
+
+  // チュートリアル用
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [settings, setSettings] = useState(getLifePlanSettings());
+  const tabHeaderRef = useRef(null);
+  const expensePieRef = useRef(null);
+  const incomePieRef = useRef(null);
+  const yearlyLineRef = useRef(null);
+  const assetBarRef = useRef(null);
+
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'tab-accounts',
+      label: '口座タブ',
+      desc: '「口座」タブを選択すると、収支やカテゴリごとの割合などを確認できます。',
+      targetRef: tabHeaderRef,
+      panelSide: 'bottom',
+      panelWidth: 340,
+      panelHeight: 140,
+      tabIndex: 0,
+    },
+    {
+      key: 'expense-pie',
+      label: '支出カテゴリ割合グラフ',
+      desc: 'ここでは支出カテゴリごとの割合を円グラフで確認できます。',
+      targetRef: expensePieRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 360,
+      tabIndex: 0,
+      dummyGraphComponent: DummyExpensePie,
+    },
+    {
+      key: 'income-pie',
+      label: '収入カテゴリ割合グラフ',
+      desc: 'ここでは収入カテゴリごとの割合を円グラフで確認できます。',
+      targetRef: incomePieRef,
+      panelSide: 'left',
+      panelWidth: 340,
+      panelHeight: 360,
+      tabIndex: 0,
+      dummyGraphComponent: DummyIncomePie,
+    },
+    {
+      key: 'yearly-line',
+      label: '年間収支推移グラフ',
+      desc: 'ここでは年間ごとの収入・支出の推移を折れ線グラフで確認できます。',
+      targetRef: yearlyLineRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 360,
+      tabIndex: 0,
+      dummyGraphComponent: DummyYearlyLine,
+    },
+    {
+      key: 'tab-assets',
+      label: '資産タブ',
+      desc: '「資産」タブを選択すると、資産推移や配当金などを確認できます。',
+      targetRef: tabHeaderRef,
+      panelSide: 'bottom',
+      panelWidth: 340,
+      panelHeight: 160,
+      tabIndex: 1,
+    },
+    {
+      key: 'asset-bar',
+      label: '資産推移グラフ',
+      desc: 'ここでは資産総額や配当金の推移を棒グラフで確認できます。',
+      targetRef: assetBarRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 400,
+      tabIndex: 1,
+      dummyGraphComponent: DummyAssetBar,
+    },
+  ];
+
+  // チュートリアル進行時にタブを自動切り替え
+  useEffect(() => {
+    if (showTutorial && tutorialSteps[tutorialStep]?.tabIndex !== undefined) {
+      setActiveTab(tutorialSteps[tutorialStep].tabIndex);
+    }
+    // eslint-disable-next-line
+  }, [tutorialStep, showTutorial]);
+
+  // チュートリアル終了処理
+  const handleTutorialClose = () => {
+    if (settings) {
+      const newSettings = {
+        ...settings,
+        tutorialStatus: {
+          ...settings.tutorialStatus,
+          reports: true,
+        },
+      };
+      saveLifePlanSettings(newSettings);
+      setSettings(newSettings);
+    }
+    setShowTutorial(false);
+  };
+
+  // チュートリアル表示制御
+  useEffect(() => {
+    if (settings && settings.tutorialStatus && settings.tutorialStatus.reports !== true) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
+  }, [settings]);
 
   useEffect(() => {
     loadData();
@@ -211,20 +440,6 @@ const Reports = () => {
     setAssetProgressData(yearlyAssetData);
   };
 
-  // 色の配列
-  const COLORS = [
-    '#0088FE',
-    '#00C49F',
-    '#FFBB28',
-    '#FF8042',
-    '#8884D8',
-    '#82CA9D',
-    '#FFC658',
-    '#FF7C7C',
-    '#8DD1E1',
-    '#D084D0',
-  ];
-
   // 金額フォーマット
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
@@ -273,102 +488,113 @@ const Reports = () => {
       {/* 支出・収入円グラフ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 支出カテゴリ割合 */}
-        <Card title="支出カテゴリ割合">
-          {expenseData.length > 0 ? (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenseData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={renderPieLabel}
-                  >
-                    {expenseData.map((entry, index) => (
-                      <Cell key={`expense-cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              <p>支出データがありません</p>
-            </div>
-          )}
-        </Card>
+        <div ref={expensePieRef}>
+          <Card title="支出カテゴリ割合">
+            {expenseData.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={expenseData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label={renderPieLabel}
+                    >
+                      {expenseData.map((entry, index) => (
+                        <Cell key={`expense-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>支出データがありません</p>
+              </div>
+            )}
+          </Card>
+        </div>
 
         {/* 収入カテゴリ割合 */}
-        <Card title="収入カテゴリ割合">
-          {incomeData.length > 0 ? (
+        <div ref={incomePieRef}>
+          <Card title="収入カテゴリ割合">
+            {incomeData.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={incomeData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label={renderPieLabel}
+                    >
+                      {incomeData.map((entry, index) => (
+                        <Cell key={`income-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>収入データがありません</p>
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {/* 年間収支推移 */}
+      <div
+        ref={yearlyLineRef}
+        className="w-full h-auto"
+        key={`yearly-line-${tutorialStep}-${activeTab}`}
+        data-spotlight-no-clone
+      >
+        <Card title="年間収支推移">
+          {yearlyIncomeExpenseData.length > 0 ? (
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={incomeData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={renderPieLabel}
-                  >
-                    {incomeData.map((entry, index) => (
-                      <Cell key={`income-cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(value)} />
+                <LineChart data={yearlyIncomeExpenseData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={formatYAxis} />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                </PieChart>
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#28a745"
+                    name="収入"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="expense"
+                    stroke="#dc3545"
+                    name="支出"
+                    strokeWidth={2}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <p>収入データがありません</p>
+              <p>収支データがありません</p>
             </div>
           )}
         </Card>
       </div>
-
-      {/* 年間収支推移 */}
-      <Card title="年間収支推移">
-        {yearlyIncomeExpenseData.length > 0 ? (
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={yearlyIncomeExpenseData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" />
-                <YAxis tickFormatter={formatYAxis} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#28a745"
-                  name="収入"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#dc3545"
-                  name="支出"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <p>収支データがありません</p>
-          </div>
-        )}
-      </Card>
     </div>
   );
 
@@ -376,27 +602,34 @@ const Reports = () => {
   const AssetsTabContent = () => (
     <div className="space-y-6">
       {/* 資産推移 */}
-      <Card title="資産推移">
-        {assetProgressData.length > 0 ? (
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={assetProgressData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" />
-                <YAxis tickFormatter={formatYAxis} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="totalAssetValue" fill="#007bff" name="資産総額" opacity={0.8} />
-                <Bar dataKey="dividendAmount" fill="#ffc107" name="配当金" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <p>資産データがありません</p>
-          </div>
-        )}
-      </Card>
+      <div
+        ref={assetBarRef}
+        className="w-full h-auto"
+        key={`asset-bar-${tutorialStep}-${activeTab}`}
+        data-spotlight-no-clone
+      >
+        <Card title="資産推移">
+          {assetProgressData.length > 0 ? (
+            <div className="h-96">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={assetProgressData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis tickFormatter={formatYAxis} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Bar dataKey="totalAssetValue" fill="#007bff" name="資産総額" opacity={0.8} />
+                  <Bar dataKey="dividendAmount" fill="#ffc107" name="配当金" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>資産データがありません</p>
+            </div>
+          )}
+        </Card>
+      </div>
     </div>
   );
 
@@ -413,32 +646,46 @@ const Reports = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">レポート・分析</h1>
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={() => {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          setTutorialStep((prev) => prev + 1);
+        } else {
+          handleTutorialClose();
+        }
+      }}
+      onClose={handleTutorialClose}
+      visible={showTutorial}
+    >
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-gray-900">レポート・分析</h1>
 
-      {/* タブ切り替えとコンテンツ表示 */}
-      <div className="space-y-6">
-        {/* タブヘッダー */}
-        <div className="flex border-b border-gray-200">
-          {tabs.map((tab, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveTab(index)}
-              className={`px-4 py-2 font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 border-b-2 -mb-px ${
-                activeTab === index
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* タブ切り替えとコンテンツ表示 */}
+        <div className="space-y-6">
+          {/* タブヘッダー */}
+          <div className="flex border-b border-gray-200" ref={tabHeaderRef}>
+            {tabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                className={`px-4 py-2 font-medium cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 border-b-2 -mb-px ${
+                  activeTab === index
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* タブコンテンツ */}
+          <div className="mt-4">{tabs[activeTab]?.content}</div>
         </div>
-
-        {/* タブコンテンツ */}
-        <div className="mt-4">{tabs[activeTab]?.content}</div>
       </div>
-    </div>
+    </TutorialSpotlight>
   );
 };
 

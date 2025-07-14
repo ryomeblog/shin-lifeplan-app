@@ -13,6 +13,7 @@ const AssetSearchList = ({
   calculateAverageReturn,
   calculateAverageDividend,
   calculateAveragePrice,
+  addBtnRef,
 }) => {
   const inputRef = useRef(null);
 
@@ -36,10 +37,12 @@ const AssetSearchList = ({
     <Card
       title="資産検索"
       actions={
-        <Button onClick={onAddAsset} size="sm" className="flex items-center space-x-1">
-          <HiPlus className="h-4 w-4" />
-          <span>新規資産追加</span>
-        </Button>
+        <div ref={addBtnRef}>
+          <Button onClick={onAddAsset} size="sm" className="flex items-center space-x-1">
+            <HiPlus className="h-4 w-4" />
+            <span>新規資産追加</span>
+          </Button>
+        </div>
       }
     >
       <div className="space-y-4">

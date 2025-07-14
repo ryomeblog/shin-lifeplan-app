@@ -1,12 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { HiPlus, HiPencilSquare, HiTrash } from 'react-icons/hi2';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
-import { getCategories, saveCategories } from '../../utils/storage';
+import {
+  getCategories,
+  saveCategories,
+  getLifePlanSettings,
+  saveLifePlanSettings,
+} from '../../utils/storage';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
 
 const Categories = () => {
+  // チュートリアル用
+  const [tutorialVisible, setTutorialVisible] = useState(() => {
+    try {
+      const settings = getLifePlanSettings();
+      return !settings?.tutorialStatus?.categories;
+    } catch {
+      return false;
+    }
+  });
+  const [tutorialStep, setTutorialStep] = useState(0);
+
+  // チュートリアルターゲットref
+  const addExpenseRef = useRef(null);
+  const expenseListRef = useRef(null);
+  const editDeleteRef = useRef(null);
+
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'categories-add',
+      label: 'カテゴリを追加',
+      desc: '「追加」ボタンから新しいカテゴリを作成できます。支出・収入ごとに追加可能です。',
+      targetRef: addExpenseRef,
+      panelSide: 'bottom',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+    {
+      key: 'categories-overview',
+      label: 'カテゴリ画面の使い方',
+      desc: 'ここでは取引で使うカテゴリ（支出・収入）を自由に追加・編集できます。',
+      targetRef: expenseListRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+    {
+      key: 'categories-edit',
+      label: 'カテゴリ編集・削除',
+      desc: 'カテゴリの「編集」「削除」ボタンから変更や削除ができます。',
+      targetRef: editDeleteRef,
+      panelSide: 'bottom',
+      panelWidth: 340,
+      panelHeight: 160,
+    },
+  ];
+
+  // チュートリアル進行
+  const handleTutorialNext = () => {
+    if (tutorialStep < tutorialSteps.length - 1) {
+      setTutorialStep((s) => s + 1);
+    } else {
+      // 完了時にsettings更新
+      try {
+        const settings = getLifePlanSettings();
+        saveLifePlanSettings({
+          ...settings,
+          tutorialStatus: { ...(settings?.tutorialStatus || {}), categories: true },
+        });
+      } catch (e) {
+        // エラー時は何もしない（チュートリアル強制非表示）
+      }
+      setTutorialVisible(false);
+    }
+  };
+  const handleTutorialClose = () => setTutorialVisible(false);
   // データ設計に合わせて単一のcategories配列で管理
   const [categories, setCategories] = useState([
     // 支出カテゴリ（デフォルト）
@@ -297,191 +369,223 @@ const Categories = () => {
     setEditingCategory(null);
   };
 
-  const CategoryItem = ({ category, onEdit, onDelete }) => (
-    <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
-      <div className="flex items-center space-x-3">
-        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: category.color }}></div>
-        <span className="text-gray-900 font-medium">{category.name}</span>
+  // forwardRefで編集・削除ボタンのdivにrefを渡す
+  const CategoryItem = React.forwardRef(function CategoryItem({ category, onEdit, onDelete }, ref) {
+    return (
+      <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+        <div className="flex items-center space-x-3">
+          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: category.color }}></div>
+          <span className="text-gray-900 font-medium">{category.name}</span>
+        </div>
+        <div className="flex space-x-2" ref={ref}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onEdit(category)}
+            className="flex items-center space-x-1"
+          >
+            <HiPencilSquare className="h-4 w-4" />
+            <span>編集</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onDelete(category.id)}
+            className="flex items-center space-x-1 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+          >
+            <HiTrash className="h-4 w-4" />
+            <span>削除</span>
+          </Button>
+        </div>
       </div>
-      <div className="flex space-x-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onEdit(category)}
-          className="flex items-center space-x-1"
-        >
-          <HiPencilSquare className="h-4 w-4" />
-          <span>編集</span>
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onDelete(category.id)}
-          className="flex items-center space-x-1 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
-        >
-          <HiTrash className="h-4 w-4" />
-          <span>削除</span>
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  });
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">カテゴリ一覧</h1>
-        <p className="text-gray-600 mt-2">取引で使用するカテゴリを管理できます</p>
-      </div>
-
-      <div className="space-y-8">
-        {/* 支出カテゴリ */}
-        <Card
-          title="支出カテゴリ"
-          actions={
-            <Button
-              onClick={() => handleAddCategory('expense')}
-              size="sm"
-              className="flex items-center space-x-1"
-            >
-              <HiPlus className="h-4 w-4" />
-              <span>追加</span>
-            </Button>
-          }
-        >
-          <div className="space-y-3">
-            {expenseCategories.length > 0 ? (
-              expenseCategories.map((category) => (
-                <CategoryItem
-                  key={category.id}
-                  category={category}
-                  onEdit={handleEditCategory}
-                  onDelete={handleDeleteCategory}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>支出カテゴリがありません</p>
-                <p className="text-sm mt-2">「追加」ボタンで新しいカテゴリを作成できます</p>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* 収入カテゴリ */}
-        <Card
-          title="収入カテゴリ"
-          actions={
-            <Button
-              onClick={() => handleAddCategory('income')}
-              size="sm"
-              className="flex items-center space-x-1"
-            >
-              <HiPlus className="h-4 w-4" />
-              <span>追加</span>
-            </Button>
-          }
-        >
-          <div className="space-y-3">
-            {incomeCategories.length > 0 ? (
-              incomeCategories.map((category) => (
-                <CategoryItem
-                  key={category.id}
-                  category={category}
-                  onEdit={handleEditCategory}
-                  onDelete={handleDeleteCategory}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>収入カテゴリがありません</p>
-                <p className="text-sm mt-2">「追加」ボタンで新しいカテゴリを作成できます</p>
-              </div>
-            )}
-          </div>
-        </Card>
-      </div>
-
-      {/* カテゴリ編集モーダル */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="カテゴリ登録">
-        <div className="space-y-6">
-          {/* カテゴリ種類選択 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ種類</label>
-            <div className="flex rounded-lg bg-gray-100 p-1">
-              <button
-                onClick={() => setFormData((prev) => ({ ...prev, type: 'expense' }))}
-                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  formData.type === 'expense'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                支出
-              </button>
-              <button
-                onClick={() => setFormData((prev) => ({ ...prev, type: 'income' }))}
-                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  formData.type === 'income'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                収入
-              </button>
-            </div>
-          </div>
-
-          {/* カテゴリ名 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ名</label>
-            <Input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-              placeholder={`カテゴリ名を入力${formData.type === 'income' ? '（例：給与収入、副業収入）' : ''}`}
-            />
-          </div>
-
-          {/* 色選択 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリの色</label>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg">
-                <div
-                  className="w-6 h-6 rounded-full"
-                  style={{ backgroundColor: formData.color }}
-                ></div>
-                <span className="text-gray-700">選択中の色</span>
-              </div>
-              <div className="grid grid-cols-5 gap-2">
-                {predefinedColors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setFormData((prev) => ({ ...prev, color }))}
-                    className={`w-10 h-10 rounded-lg border-2 transition-all ${
-                      formData.color === color
-                        ? 'border-gray-400 scale-110'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ボタン */}
-          <div className="flex space-x-3 pt-4">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)} className="flex-1">
-              キャンセル
-            </Button>
-            <Button onClick={handleSaveCategory} className="flex-1">
-              保存
-            </Button>
-          </div>
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={handleTutorialNext}
+      onClose={handleTutorialClose}
+      visible={tutorialVisible}
+    >
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">カテゴリ一覧</h1>
+          <p className="text-gray-600 mt-2">取引で使用するカテゴリを管理できます</p>
         </div>
-      </Modal>
-    </div>
+
+        <div className="space-y-8">
+          {/* 支出カテゴリ */}
+          <Card
+            title="支出カテゴリ"
+            actions={
+              <div
+                ref={addExpenseRef}
+                style={
+                  tutorialVisible && tutorialStep === 0
+                    ? { zIndex: 10001, position: 'relative', display: 'inline-block' }
+                    : { display: 'inline-block' }
+                }
+              >
+                <Button
+                  onClick={() => handleAddCategory('expense')}
+                  size="sm"
+                  variant="primary"
+                  className="flex items-center space-x-1"
+                >
+                  <HiPlus className="h-4 w-4" />
+                  <span>追加</span>
+                </Button>
+              </div>
+            }
+          >
+            <div className="space-y-3" ref={expenseListRef}>
+              {expenseCategories.length > 0 ? (
+                expenseCategories.map((category, idx) => (
+                  <div
+                    key={category.id}
+                    ref={
+                      tutorialVisible && tutorialStep === 2 && idx === 0 ? editDeleteRef : undefined
+                    }
+                    style={
+                      tutorialVisible && tutorialStep === 2 && idx === 0
+                        ? { zIndex: 10001, position: 'relative' }
+                        : undefined
+                    }
+                  >
+                    <CategoryItem
+                      category={category}
+                      onEdit={handleEditCategory}
+                      onDelete={handleDeleteCategory}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>支出カテゴリがありません</p>
+                  <p className="text-sm mt-2">「追加」ボタンで新しいカテゴリを作成できます</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* 収入カテゴリ */}
+          <Card
+            title="収入カテゴリ"
+            actions={
+              <Button
+                onClick={() => handleAddCategory('income')}
+                size="sm"
+                className="flex items-center space-x-1"
+              >
+                <HiPlus className="h-4 w-4" />
+                <span>追加</span>
+              </Button>
+            }
+          >
+            <div className="space-y-3">
+              {incomeCategories.length > 0 ? (
+                incomeCategories.map((category) => (
+                  <CategoryItem
+                    key={category.id}
+                    category={category}
+                    onEdit={handleEditCategory}
+                    onDelete={handleDeleteCategory}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>収入カテゴリがありません</p>
+                  <p className="text-sm mt-2">「追加」ボタンで新しいカテゴリを作成できます</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* カテゴリ編集モーダル */}
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="カテゴリ登録">
+          <div className="space-y-6">
+            {/* カテゴリ種類選択 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ種類</label>
+              <div className="flex rounded-lg bg-gray-100 p-1">
+                <button
+                  onClick={() => setFormData((prev) => ({ ...prev, type: 'expense' }))}
+                  className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    formData.type === 'expense'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  支出
+                </button>
+                <button
+                  onClick={() => setFormData((prev) => ({ ...prev, type: 'income' }))}
+                  className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    formData.type === 'income'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  収入
+                </button>
+              </div>
+            </div>
+
+            {/* カテゴリ名 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリ名</label>
+              <Input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder={`カテゴリ名を入力${formData.type === 'income' ? '（例：給与収入、副業収入）' : ''}`}
+              />
+            </div>
+
+            {/* 色選択 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">カテゴリの色</label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg">
+                  <div
+                    className="w-6 h-6 rounded-full"
+                    style={{ backgroundColor: formData.color }}
+                  ></div>
+                  <span className="text-gray-700">選択中の色</span>
+                </div>
+                <div className="grid grid-cols-5 gap-2">
+                  {predefinedColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setFormData((prev) => ({ ...prev, color }))}
+                      className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                        formData.color === color
+                          ? 'border-gray-400 scale-110'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ボタン */}
+            <div className="flex space-x-3 pt-4">
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} className="flex-1">
+                キャンセル
+              </Button>
+              <Button onClick={handleSaveCategory} className="flex-1">
+                保存
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </TutorialSpotlight>
   );
 };
 

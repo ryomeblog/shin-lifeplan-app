@@ -44,8 +44,8 @@ const NewDashboard = () => {
       label: 'カテゴリ一覧',
       desc: 'ここでは支出・収入カテゴリのトップ3が確認できます。クリックで詳細画面に移動します。',
       targetRef: categoryRef,
-      panelHeight: 200,
       panelWidth: 320,
+      panelHeight: 180,
     },
     {
       key: 'account',

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FiPlus, FiEdit, FiTrash2 } from 'react-icons/fi';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import Select from '../ui/Select';
 import Modal from '../ui/Modal';
 import EventModal from '../forms/EventModal';
+import TutorialSpotlight from '../layout/TutorialSpotlight';
 import {
   getEvents,
   saveEvent,
@@ -13,6 +14,7 @@ import {
   getTransactions,
   getCategories,
   getLifePlanSettings,
+  saveLifePlanSettings,
 } from '../../utils/storage';
 
 const Events = () => {
@@ -24,6 +26,14 @@ const Events = () => {
   const [editingEvent, setEditingEvent] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingEvent, setDeletingEvent] = useState(null);
+
+  // チュートリアル用
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [settings, setSettings] = useState(getLifePlanSettings());
+  const yearSelectRef = useRef(null);
+  const addBtnRef = useRef(null);
+  const eventListRef = useRef(null);
 
   // 年選択肢を生成
   const generateYearOptions = () => {
@@ -176,199 +186,270 @@ const Events = () => {
     return { income, expense, balance, transactions: eventTransactions };
   };
 
+  // チュートリアルステップ定義
+  const tutorialSteps = [
+    {
+      key: 'year',
+      label: '年選択',
+      desc: 'ここで表示する年を切り替えられます。',
+      targetRef: yearSelectRef,
+      panelSide: 'right',
+      panelWidth: 320,
+      panelHeight: 140,
+    },
+    {
+      key: 'add',
+      label: '新規イベント追加',
+      desc: 'ここから新しいイベントを追加できます。',
+      targetRef: addBtnRef,
+      panelSide: 'left',
+      panelWidth: 320,
+      panelHeight: 140,
+    },
+    {
+      key: 'list',
+      label: 'イベントリスト',
+      desc: 'ここに登録したイベントが一覧表示されます。',
+      targetRef: eventListRef,
+      panelSide: 'right',
+      panelWidth: 340,
+      panelHeight: 180,
+    },
+  ];
+
+  // チュートリアル終了処理
+  const handleTutorialClose = () => {
+    if (settings) {
+      const newSettings = {
+        ...settings,
+        tutorialStatus: {
+          ...settings.tutorialStatus,
+          events: true,
+        },
+      };
+      saveLifePlanSettings(newSettings);
+      setSettings(newSettings);
+    }
+    setShowTutorial(false);
+  };
+
+  // チュートリアル表示制御
+  useEffect(() => {
+    if (settings && settings.tutorialStatus && settings.tutorialStatus.events !== true) {
+      setShowTutorial(true);
+      setTutorialStep(0);
+    }
+  }, [settings]);
+
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* ヘッダー */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">イベント一覧</h1>
-        <Button onClick={handleCreateEvent} className="flex items-center space-x-2">
-          <FiPlus className="w-4 h-4" />
-          <span>新規イベント</span>
-        </Button>
-      </div>
-
-      {/* 年選択 */}
-      <div className="mb-6">
-        <Select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-          options={yearOptions}
-          className="w-48"
-        />
-      </div>
-
-      {/* イベントリスト */}
-      <div className="space-y-6">
-        {events.length > 0 ? (
-          events.map((event) => {
-            const summary = calculateEventSummary(event);
-
-            return (
-              <Card key={event.id} className="overflow-hidden">
-                <div className="p-6">
-                  {/* イベントヘッダー */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">{event.title}</h3>
-                      {event.description && <p className="text-gray-600">{event.description}</p>}
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditEvent(event)}
-                        className="flex items-center space-x-1"
-                      >
-                        <FiEdit className="w-4 h-4" />
-                        <span>編集</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleConfirmDelete(event)}
-                        className="flex items-center space-x-1 text-red-600 border-red-300 hover:bg-red-50"
-                      >
-                        <FiTrash2 className="w-4 h-4" />
-                        <span>削除</span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* 収支サマリー */}
-                  {summary.transactions.length > 0 && (
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600">収入合計</span>
-                          <div className="text-lg font-bold text-green-600">
-                            ¥{formatAmount(summary.income)}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">支出合計</span>
-                          <div className="text-lg font-bold text-red-600">
-                            -¥{formatAmount(summary.expense)}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-gray-600">収支</span>
-                          <div
-                            className={`text-lg font-bold ${summary.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                          >
-                            {summary.balance >= 0 ? '+' : '-'}¥
-                            {formatAmount(Math.abs(summary.balance))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 関連取引リスト */}
-                  {summary.transactions.length > 0 ? (
-                    <div className="border rounded-lg overflow-hidden">
-                      {/* ヘッダー */}
-                      <div className="bg-gray-50 px-4 py-3 border-b">
-                        <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-700">
-                          <div>取引内容</div>
-                          <div>カテゴリ</div>
-                          <div>金額</div>
-                        </div>
-                      </div>
-
-                      {/* 取引リスト */}
-                      <div className="divide-y">
-                        {summary.transactions.map((transaction) => (
-                          <div key={transaction.id} className="px-4 py-3">
-                            <div className="grid grid-cols-3 gap-4 items-center">
-                              <div className="text-sm text-gray-900">{transaction.title}</div>
-                              <div className="text-sm text-gray-600">
-                                {getCategoryName(transaction.categoryId)}
-                              </div>
-                              <div
-                                className={`text-sm font-medium ${getAmountStyle(transaction.type)}`}
-                              >
-                                {getAmountPrefix(transaction.type)}¥
-                                {formatAmount(transaction.amount * (transaction.frequency || 1))}
-                                {transaction.frequency > 1 && (
-                                  <span className="text-xs text-gray-500 ml-1">
-                                    (年{transaction.frequency}回)
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500 border rounded-lg bg-gray-50">
-                      <p>関連する取引がありません</p>
-                      <p className="text-sm mt-1">編集から取引を関連付けることができます</p>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            );
-          })
-        ) : (
-          <Card>
-            <div className="text-center py-12 text-gray-500">
-              <h3 className="text-lg font-medium mb-2">イベントがありません</h3>
-              <p className="text-sm mb-4">{selectedYear}年のライフイベントがありません</p>
-              <Button onClick={handleCreateEvent} className="flex items-center space-x-2 mx-auto">
-                <FiPlus className="w-4 h-4" />
-                <span>新規イベントを作成</span>
-              </Button>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      {/* イベントモーダル */}
-      <EventModal
-        isOpen={isEventModalOpen}
-        onClose={() => {
-          setIsEventModalOpen(false);
-          setEditingEvent(null);
-        }}
-        onSave={handleSaveEvent}
-        event={editingEvent}
-        isEditing={!!editingEvent}
-        selectedYear={selectedYear}
-      />
-
-      {/* 削除確認モーダル */}
-      <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setDeletingEvent(null);
-        }}
-        title="イベント削除"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-700">「{deletingEvent?.title}」を削除しますか？</p>
-          <p className="text-sm text-gray-500">
-            この操作は取り消すことができません。関連する取引は削除されませんが、イベントとの関連付けは解除されます。
-          </p>
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsDeleteModalOpen(false);
-                setDeletingEvent(null);
-              }}
-            >
-              キャンセル
-            </Button>
-            <Button variant="danger" onClick={handleDeleteEvent}>
-              削除
+    <TutorialSpotlight
+      steps={tutorialSteps}
+      step={tutorialStep}
+      onNext={() => {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          setTutorialStep((prev) => prev + 1);
+        } else {
+          handleTutorialClose();
+        }
+      }}
+      onClose={handleTutorialClose}
+      visible={showTutorial}
+    >
+      <div className="max-w-6xl mx-auto p-6">
+        {/* ヘッダー */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">イベント一覧</h1>
+          <div ref={addBtnRef}>
+            <Button onClick={handleCreateEvent} className="flex items-center space-x-2">
+              <FiPlus className="w-4 h-4" />
+              <span>新規イベント</span>
             </Button>
           </div>
         </div>
-      </Modal>
-    </div>
+
+        {/* 年選択 */}
+        <div className="mb-6" ref={yearSelectRef}>
+          <Select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            options={yearOptions}
+            className="w-48"
+          />
+        </div>
+
+        {/* イベントリスト */}
+        <div className="space-y-6" ref={eventListRef}>
+          {events.length > 0 ? (
+            events.map((event) => {
+              const summary = calculateEventSummary(event);
+
+              return (
+                <Card key={event.id} className="overflow-hidden">
+                  <div className="p-6">
+                    {/* イベントヘッダー */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{event.title}</h3>
+                        {event.description && <p className="text-gray-600">{event.description}</p>}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditEvent(event)}
+                          className="flex items-center space-x-1"
+                        >
+                          <FiEdit className="w-4 h-4" />
+                          <span>編集</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleConfirmDelete(event)}
+                          className="flex items-center space-x-1 text-red-600 border-red-300 hover:bg-red-50"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                          <span>削除</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* 収支サマリー */}
+                    {summary.transactions.length > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div className="grid grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-600">収入合計</span>
+                            <div className="text-lg font-bold text-green-600">
+                              ¥{formatAmount(summary.income)}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">支出合計</span>
+                            <div className="text-lg font-bold text-red-600">
+                              -¥{formatAmount(summary.expense)}
+                            </div>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">収支</span>
+                            <div
+                              className={`text-lg font-bold ${summary.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                            >
+                              {summary.balance >= 0 ? '+' : '-'}¥
+                              {formatAmount(Math.abs(summary.balance))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 関連取引リスト */}
+                    {summary.transactions.length > 0 ? (
+                      <div className="border rounded-lg overflow-hidden">
+                        {/* ヘッダー */}
+                        <div className="bg-gray-50 px-4 py-3 border-b">
+                          <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-700">
+                            <div>取引内容</div>
+                            <div>カテゴリ</div>
+                            <div>金額</div>
+                          </div>
+                        </div>
+
+                        {/* 取引リスト */}
+                        <div className="divide-y">
+                          {summary.transactions.map((transaction) => (
+                            <div key={transaction.id} className="px-4 py-3">
+                              <div className="grid grid-cols-3 gap-4 items-center">
+                                <div className="text-sm text-gray-900">{transaction.title}</div>
+                                <div className="text-sm text-gray-600">
+                                  {getCategoryName(transaction.categoryId)}
+                                </div>
+                                <div
+                                  className={`text-sm font-medium ${getAmountStyle(transaction.type)}`}
+                                >
+                                  {getAmountPrefix(transaction.type)}¥
+                                  {formatAmount(transaction.amount * (transaction.frequency || 1))}
+                                  {transaction.frequency > 1 && (
+                                    <span className="text-xs text-gray-500 ml-1">
+                                      (年{transaction.frequency}回)
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500 border rounded-lg bg-gray-50">
+                        <p>関連する取引がありません</p>
+                        <p className="text-sm mt-1">編集から取引を関連付けることができます</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })
+          ) : (
+            <Card>
+              <div className="text-center py-12 text-gray-500">
+                <h3 className="text-lg font-medium mb-2">イベントがありません</h3>
+                <p className="text-sm mb-4">{selectedYear}年のライフイベントがありません</p>
+                <Button onClick={handleCreateEvent} className="flex items-center space-x-2 mx-auto">
+                  <FiPlus className="w-4 h-4" />
+                  <span>新規イベントを作成</span>
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        {/* イベントモーダル */}
+        <EventModal
+          isOpen={isEventModalOpen}
+          onClose={() => {
+            setIsEventModalOpen(false);
+            setEditingEvent(null);
+          }}
+          onSave={handleSaveEvent}
+          event={editingEvent}
+          isEditing={!!editingEvent}
+          selectedYear={selectedYear}
+        />
+
+        {/* 削除確認モーダル */}
+        <Modal
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setDeletingEvent(null);
+          }}
+          title="イベント削除"
+          size="sm"
+        >
+          <div className="space-y-4">
+            <p className="text-gray-700">「{deletingEvent?.title}」を削除しますか？</p>
+            <p className="text-sm text-gray-500">
+              この操作は取り消すことができません。関連する取引は削除されませんが、イベントとの関連付けは解除されます。
+            </p>
+            <div className="flex justify-end space-x-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setDeletingEvent(null);
+                }}
+              >
+                キャンセル
+              </Button>
+              <Button variant="danger" onClick={handleDeleteEvent}>
+                削除
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </TutorialSpotlight>
   );
 };
 

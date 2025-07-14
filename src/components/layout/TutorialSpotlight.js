@@ -17,30 +17,56 @@ const TutorialSpotlight = ({ steps, step, onNext, onClose, children, visible }) 
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
 
+  // ステップ切り替え時に該当要素までスクロール
+  useEffect(() => {
+    if (!visible) return;
+    const target = steps[step]?.targetRef?.current;
+    if (target) {
+      // スクロール位置調整
+      const rect = target.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+      // 画面中央に来るように
+      const targetTop = rect.top + scrollY - window.innerHeight / 2 + rect.height / 2;
+      const targetLeft = rect.left + scrollX - window.innerWidth / 2 + rect.width / 2;
+      window.scrollTo({
+        top: Math.max(targetTop, 0),
+        left: Math.max(targetLeft, 0),
+        behavior: 'smooth',
+      });
+    }
+  }, [step, steps, visible]);
+
   // 各ステップのtargetRefを取得し、クローン作成
   useEffect(() => {
     if (!visible) return;
     const target = steps[step]?.targetRef?.current;
     if (target) {
-      const rect = target.getBoundingClientRect();
-      setTargetRect(rect);
+      if (target.hasAttribute('data-spotlight-no-clone')) {
+        setTargetRect(target.getBoundingClientRect());
+        setCloneNode(null);
+      } else {
+        const rect = target.getBoundingClientRect();
+        setTargetRect(rect);
 
-      // クローン作成
-      const clone = target.cloneNode(true);
-      clone.style.position = 'fixed';
-      clone.style.top = `${rect.top}px`;
-      clone.style.left = `${rect.left}px`;
-      clone.style.width = `${rect.width}px`;
-      clone.style.height = `${rect.height}px`;
-      clone.style.zIndex = 10001; // 背景(10000)より上
-      clone.style.pointerEvents = 'none';
-      clone.style.boxShadow = '0 0 0 4px #2563eb80, 0 8px 32px #0002';
-      clone.style.background = '#fff';
-      clone.style.borderRadius = '12px';
-      setCloneNode(clone);
+        // クローン作成
+        const clone = target.cloneNode(true);
+        clone.style.position = 'fixed';
+        clone.style.top = `${rect.top}px`;
+        clone.style.left = `${rect.left}px`;
+        clone.style.width = `${rect.width}px`;
+        clone.style.height = `${rect.height}px`;
+        clone.style.zIndex = 10001; // 背景(10000)より上
+        clone.style.pointerEvents = 'none';
+        clone.style.boxShadow = '0 0 0 4px #2563eb80, 0 8px 32px #0002';
+        clone.style.background = '#fff';
+        clone.style.boxShadow = '0 0 0 4px #2563eb80, 0 8px 32px #0002';
+        clone.style.borderRadius = '12px';
+        setCloneNode(clone);
 
-      // 元要素をクリック不可
-      target.style.pointerEvents = 'none';
+        // 元要素をクリック不可
+        target.style.pointerEvents = 'none';
+      }
     } else {
       setTargetRect(null);
     }
@@ -169,6 +195,9 @@ const TutorialSpotlight = ({ steps, step, onNext, onClose, children, visible }) 
 
   if (!visible) return children;
 
+  // チュートリアル用ダミーグラフ
+  const DummyGraph = steps[step]?.dummyGraphComponent;
+
   return (
     <>
       {/* 暗い背景 */}
@@ -206,6 +235,12 @@ const TutorialSpotlight = ({ steps, step, onNext, onClose, children, visible }) 
             {steps[step].label}
           </div>
           <div className="text-gray-700 text-sm mb-3">{steps[step].desc}</div>
+          {/* チュートリアル用ダミーグラフを表示 */}
+          {DummyGraph && (
+            <div className="mb-2">
+              <DummyGraph />
+            </div>
+          )}
           <div className="flex justify-between">
             <Button onClick={onNext} className="w-full">
               {step === steps.length - 1 ? '完了' : '次へ'}

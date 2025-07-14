@@ -9,6 +9,7 @@ const HoldingAssetsList = ({
   onHoldingAssetClick,
   onAddHoldingAsset,
   formatCurrency,
+  addBtnRef,
 }) => {
   return (
     <Card title="保有資産" subtitle={`総資産: ${formatCurrency(totalAssetValue)}`}>
@@ -25,7 +26,6 @@ const HoldingAssetsList = ({
 
         {/* 保有資産リスト */}
         {holdingAssets.map((holding) => {
-          console.log('holding', holding);
           if (!holding.details) return null;
 
           return (
@@ -70,13 +70,15 @@ const HoldingAssetsList = ({
         )}
 
         {/* 保有資産追加ボタン */}
-        <Button
-          onClick={onAddHoldingAsset}
-          className="w-full flex items-center justify-center space-x-2 py-4"
-        >
-          <HiPlus className="h-5 w-5" />
-          <span>保有資産を追加</span>
-        </Button>
+        <div ref={addBtnRef}>
+          <Button
+            onClick={onAddHoldingAsset}
+            className="w-full flex items-center justify-center space-x-2 py-4"
+          >
+            <HiPlus className="h-5 w-5" />
+            <span>保有資産を追加</span>
+          </Button>
+        </div>
       </div>
     </Card>
   );

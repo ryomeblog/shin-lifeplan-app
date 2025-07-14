@@ -17,6 +17,7 @@ import {
   exportData,
   importData,
 } from '../../utils/storage';
+import TutorialManager from '../layout/TutorialManager';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('basic');
@@ -192,6 +193,9 @@ const Settings = () => {
         onEdit={handleEditFamilyMember}
         onDelete={handleDeleteFamilyMember}
       />
+
+      {/* チュートリアル管理 */}
+      <TutorialManager />
 
       <DataManagement onExport={handleExportData} onImport={handleImportData} />
     </div>
