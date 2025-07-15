@@ -39,7 +39,7 @@ const Templates = () => {
       targetRef: tabHeaderRef,
       panelSide: 'bottom',
       panelWidth: 340,
-      panelHeight: 140,
+      panelHeight: 160,
       tabId: 'expense',
     },
     {
@@ -49,7 +49,7 @@ const Templates = () => {
       targetRef: tabHeaderRef,
       panelSide: 'bottom',
       panelWidth: 340,
-      panelHeight: 140,
+      panelHeight: 160,
       tabId: 'income',
     },
     {
@@ -59,7 +59,7 @@ const Templates = () => {
       targetRef: tabHeaderRef,
       panelSide: 'bottom',
       panelWidth: 340,
-      panelHeight: 140,
+      panelHeight: 160,
       tabId: 'investment',
     },
     {
@@ -68,8 +68,8 @@ const Templates = () => {
       desc: 'ここから新しいテンプレートを作成できます。',
       targetRef: addBtnRef,
       panelSide: 'left',
-      panelWidth: 320,
-      panelHeight: 120,
+      panelWidth: 340,
+      panelHeight: 160,
     },
   ];
 

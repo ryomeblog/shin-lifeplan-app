@@ -167,7 +167,7 @@ const Reports = () => {
       targetRef: tabHeaderRef,
       panelSide: 'bottom',
       panelWidth: 340,
-      panelHeight: 140,
+      panelHeight: 160,
       tabIndex: 0,
     },
     {

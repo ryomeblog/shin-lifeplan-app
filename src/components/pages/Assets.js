@@ -319,8 +319,8 @@ const Assets = () => {
       desc: 'ここから新しい保有資産を追加できます。',
       targetRef: holdingAddBtnRef,
       panelSide: 'bottom',
-      panelWidth: 320,
-      panelHeight: 120,
+      panelWidth: 340,
+      panelHeight: 160,
     },
     {
       key: 'asset-search',
@@ -337,8 +337,8 @@ const Assets = () => {
       desc: 'ここから新しい資産を追加できます。',
       targetRef: assetAddBtnRef,
       panelSide: 'bottom',
-      panelWidth: 320,
-      panelHeight: 120,
+      panelWidth: 340,
+      panelHeight: 160,
     },
   ];
 
