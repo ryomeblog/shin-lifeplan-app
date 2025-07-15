@@ -156,7 +156,7 @@ const Settings = () => {
         try {
           await importData(file);
           alert('データをインポートしました');
-          window.location.reload();
+          window.location.href = '/shin-lifeplan-app/';
         } catch (error) {
           console.error('インポートエラー:', error);
           alert('インポートに失敗しました');
