@@ -159,6 +159,23 @@ const FireSettingsForm = ({ onSave }) => {
           }
         });
 
+        // 収入・支出取引も資産額に反映
+        if (yearDataIndex >= 0 && Array.isArray(transactions)) {
+          // 支出（expense）は減算、収入（income）は加算
+          const expenseSum = transactions
+            .filter((t) => t.type === 'expense')
+            .reduce((sum, t) => sum + (t.amount || 0), 0);
+          const incomeSum = transactions
+            .filter((t) => t.type === 'income')
+            .reduce((sum, t) => sum + (t.amount || 0), 0);
+          totalValue += incomeSum - expenseSum;
+        }
+
+        // 前年の資産額を引き継ぐ（累積計算）
+        if (yearDataIndex > 0) {
+          totalValue += yearlyAssetData[yearDataIndex - 1].totalAssetValue;
+        }
+
         if (yearDataIndex >= 0) {
           yearlyAssetData[yearDataIndex].totalAssetValue = totalValue;
         }
