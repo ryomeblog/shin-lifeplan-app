@@ -48,8 +48,8 @@ const Accounts = () => {
       desc: 'ここから新しい口座を追加できます。',
       targetRef: addBtnRef,
       panelSide: 'bottom',
-      panelWidth: 320,
-      panelHeight: 120,
+      panelWidth: 340,
+      panelHeight: 160,
     },
     {
       key: 'transfer',
