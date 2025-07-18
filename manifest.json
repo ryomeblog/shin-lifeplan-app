@@ -19,7 +19,8 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/",
+  "start_url": "/shin-lifeplan-app/",
+  "scope": "/shin-lifeplan-app/",
   "display": "standalone",
   "theme_color": "#2563eb",
   "background_color": "#f9fafb",
