@@ -124,8 +124,7 @@ const TransactionSummary = ({ transactions, year, type }) => {
         percentage:
           totalAmount > 0 ? ((category.amount / Math.abs(totalAmount)) * 100).toFixed(1) : 0,
       }))
-      .sort((a, b) => b.amount - a.amount)
-      .slice(0, 5); // 上位5カテゴリ
+      .sort((a, b) => b.amount - a.amount); // カテゴリ数分表示
   }, [transactions, totalAmount, config.showChart, categories]);
 
   // 金額をフォーマット
