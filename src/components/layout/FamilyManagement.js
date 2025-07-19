@@ -9,7 +9,7 @@ const FamilyManagement = ({ familyMembers, onAdd, onEdit, onDelete }) => {
     const today = new Date();
     const age = today.getFullYear() - birth.getFullYear();
 
-    // 今年、まだ誕生日が来ていない場合、年齢を減らす
+    // 今年、まだ誕生日が来ていない場合、年齢を減らす。
     if (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate())) return age;
   };
 
