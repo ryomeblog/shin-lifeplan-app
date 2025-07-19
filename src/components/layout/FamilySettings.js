@@ -5,13 +5,19 @@ import Table from '../ui/Table';
 import Card from '../ui/Card';
 
 const FamilySettings = ({ familyMembers, onAddMember, onEditMember, onDeleteMember, errors }) => {
-  const currentYear = new Date().getFullYear();
+  const currentDate = new Date();
 
   // 年齢計算関数
-  const calculateAge = (birthDate, referenceYear = currentYear) => {
-    const birth = new Date(birthDate);
-    const reference = new Date(referenceYear, 0, 1);
-    return reference.getFullYear() - birth.getFullYear();
+  const calculateAge = (birthDate, today = currentDate) => {
+    // !!-CAUTION-!! type of birthDate is string.
+    birthDate = new Date(birthDate);
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    // 今年、まだ誕生日が来ていない場合、年齢を減らす
+    if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
+
+    return age;
   };
 
   // テーブルの列定義
